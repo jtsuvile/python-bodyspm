@@ -1,0 +1,15 @@
+Functions:
+
+prep:
+read_in_data ## sub by sub?
+combine_subwise_data 
+
+analyses:
+glm
+ttest
+compare_groups(master matrix, group definitions) ## pixel-wise test of proportions
+
+visualise:
+plot_response(raw matrix, oneside/twoside) ## single sub
+plot_analysis_results
+
