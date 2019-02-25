@@ -1,7 +1,7 @@
 Functions:
 
 prep:
-read_in_data ## sub by sub?
+read_in_data ## input: subname or sublist, onesided/twosided (one or vector)
 combine_subwise_data 
 
 analyses:
@@ -12,4 +12,3 @@ compare_groups(master matrix, group definitions) ## pixel-wise test of proportio
 visualise:
 plot_response(raw matrix, oneside/twoside) ## single sub
 plot_analysis_results
-
