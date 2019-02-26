@@ -4,31 +4,40 @@ from cv2 import GaussianBlur
 import simplejson as json
 import matplotlib.pyplot as plt
 
-class Stimulus:
-
-    def __init__(self, name, onesided, show_name=''):
-        self.name = name
-        self.onesided = onesided
-        self.stimulus_name = show_name
-
 # class to keep the relevant information of each stimulus together
 class Stimuli:
 
-    def __init__(self, names, onesided, show_names=None):
+    def __init__(self, names=None, onesided=None, show_names=None, fileloc='', from_file=False):
         self.all = {}
-        if isinstance(onesided, bool):
-            print("just one value")
-            new_onesided = np.repeat(onesided, len(names))
-        elif len(onesided) == len(names):
-            new_onesided = onesided
+        if not from_file:
+            if not names:
+                print("Need stimulus names")
+                return
+            # if onesided is provided as just one value, make vector
+            if isinstance(onesided, bool):
+                new_onesided = np.repeat(onesided, len(names))
+            elif len(onesided) == len(names):
+                new_onesided = onesided
+            else:
+                print("need argument 'onesided' either as single boolean value "
+                      "or vector with same length as stimulus names")
+                return
+            for i, name in enumerate(names):
+                self.all[name] = {'onesided': new_onesided[i]}
+                if show_names and show_names[i]:
+                    self.all[name]['show_name'] = show_names[i]
+        # NB: surely there is a more elegant way to read stimuli from file?
         else:
-            print("need argument 'onesided' either as single boolean value "
-                  "or vector with same length as stimulus names")
-            return
-        for i, name in enumerate(names):
-            self.all[name] = {'onesided': new_onesided[i]}
-            if show_names and show_names[i]:
-                self.all[name]['show_name'] = show_names[i]
+            filename = fileloc + '/stimuli_info.json'
+            with open(filename) as f:
+                indata = json.load(f)
+            for key, value in indata.items():
+                self.all[key] = value
+
+    def write_stim_to_file(self, fileloc):
+        filename = fileloc + '/stimuli_info.json'
+        with open(filename, 'w') as json_file:
+            json.dump(self.all, json_file)
 
     def __str__(self):
         return "Stimulus set with "+ str(len(self.all)) + " stimuli defined: " + self.all.keys()
@@ -123,6 +132,8 @@ class Subject:
         self.data_from_file()
 
     def draw_sub_data(self, stim):
+        # NB: Add possibility to write fig to file instead of showing
+
         # make sure non coloured values are white in twosided datas
         twosided_cmap = plt.get_cmap('Greens')
         twosided_cmap.set_under('white', 1.0)
@@ -134,7 +145,7 @@ class Subject:
                 widths.append(1)
             else:
                 widths.append(2)
-        fig, axes = plt.subplots(figsize=(13, 3), ncols=len(self.data.keys()), gridspec_kw={'width_ratios': widths})
+        fig, axes = plt.subplots(figsize=(20, 3), ncols=len(self.data.keys()), gridspec_kw={'width_ratios': widths})
         for i, (key, value) in enumerate(self.data.items()):
             onesided = stim.all[key]['onesided']
             if onesided:
@@ -150,9 +161,6 @@ class Subject:
         fig.suptitle("subject : " + self.name)
         fig.tight_layout()
         plt.show()
-
-    # TODO : TO ADD
-    # make a small test subject data set for sharing
 
     def __str__(self):
         return "subject with id "+str(self.name)+', has '+str(len(self.data.keys()))+' colour maps'
