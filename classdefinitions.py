@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 # class to keep the relevant information of each stimulus together
 class Stimuli:
 
-    def __init__(self, names=None, onesided=None, show_names=None, fileloc='', from_file=False):
+    def __init__(self, names=None, onesided=True, show_names=None, fileloc='', from_file=False):
         self.all = {}
         if not from_file:
             if not names:
@@ -82,9 +82,9 @@ class Subject:
                 # NB: depending on the size & positioning of base image on your web interface,
                 # you might need to change the indices below to give the best possible fit
                 if stim.all[stimulus]['onesided']:
-                    raw_res = as_coloured[10:531, 33:203] - as_coloured[10:531, 698:868]  # this creates 522*171 array
+                    raw_res = as_coloured[9:531, 32:203] - as_coloured[9:531, 697:868]  # this creates 522*171 array
                 else:
-                    raw_res = np.hstack((as_coloured[10:531, 35:205], as_coloured[10:531, 700:870]))  # this creates 522*342 array
+                    raw_res = np.hstack((as_coloured[9:531, 34:205], as_coloured[9:531, 699:870]))  # this creates 522*342 array
                 self.add_data(stimulus, raw_res)
 
     def write_data(self, fileloc):
@@ -131,9 +131,7 @@ class Subject:
         # read in data from the locations specified in the json
         self.data_from_file()
 
-    def draw_sub_data(self, stim):
-        # NB: Add possibility to write fig to file instead of showing
-
+    def draw_sub_data(self, stim, fileloc=None):
         # make sure non coloured values are white in twosided datas
         twosided_cmap = plt.get_cmap('Greens')
         twosided_cmap.set_under('white', 1.0)
@@ -160,7 +158,14 @@ class Subject:
                 axes[i].set_title(key)
         fig.suptitle("subject : " + self.name)
         fig.tight_layout()
-        plt.show()
+        if fileloc:
+            fileloc_fig = fileloc + '/figures/'
+            if not os.path.exists(fileloc_fig):
+                os.makedirs(fileloc_fig)
+            filename = fileloc_fig+ '/sub_' + str(self.name) + '_data.png'
+            plt.savefig(filename, bbox_inches='tight')
+        else:
+            plt.show()
 
     def __str__(self):
         return "subject with id "+str(self.name)+', has '+str(len(self.data.keys()))+' colour maps'
