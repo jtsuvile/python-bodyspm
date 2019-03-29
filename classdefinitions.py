@@ -60,6 +60,9 @@ class Subject:
     def has_data(self):
         return self.data.keys()
 
+    def has_background(self):
+        return self.bginfo.keys()
+
     def read_data(self, dataloc, stim):
         for stimulus in stim.all.keys():
             data_in = dataloc + '/' + str(self.name) + '/' + stimulus + '.csv'
@@ -74,6 +77,8 @@ class Subject:
                 # transfer data from a list of indices to array
                 arr_color = np.zeros((600, 900))
                 (x, y) = [paint[:, 2], paint[:, 1]]
+                x[x >= 600] = 599
+                y[y >= 900] = 899
                 arr_color[x.astype(int), y.astype(int)] = arr_color[x.astype(int), y.astype(int)] + 1
                 # add blur to replicate the effect of spray can in the web interface
                 # NB: size of blur might need to be changed depending on your data collection settings
@@ -86,6 +91,20 @@ class Subject:
                 else:
                     raw_res = np.hstack((as_coloured[9:531, 34:205], as_coloured[9:531, 699:870]))  # this creates 522*342 array
                 self.add_data(stimulus, raw_res)
+
+    def read_bg(self, dataloc, bgfile, fieldnames):
+        # BN: code currently assumes that bgfile is a list and fieldnames is list of lists to accommodate situation
+        # where subject fills in a lot of background information. Maybe edit to accept both single value + list and
+        # current list + list of lists?
+        data_in = dataloc + '/' + str(self.name) + '/' + bgfile
+        if os.path.isfile(data_in):
+            with open(data_in) as d:
+                tempdata = d.readlines()
+            templist = tempdata[-1].strip().split(',')
+            for i in range(len(fieldnames)):
+                self.add_background(fieldnames[i],templist[i])
+        else:
+            print('cannot find file ', data_in)
 
     def write_data(self, fileloc):
         subdir = fileloc + '/'+str(self.name) +'/'
@@ -143,7 +162,7 @@ class Subject:
                 widths.append(1)
             else:
                 widths.append(2)
-        fig, axes = plt.subplots(figsize=(20, 3), ncols=len(self.data.keys()), gridspec_kw={'width_ratios': widths})
+        fig, axes = plt.subplots(figsize=(24, 3), ncols=len(self.data.keys()), gridspec_kw={'width_ratios': widths})
         for i, (key, value) in enumerate(self.data.items()):
             onesided = stim.all[key]['onesided']
             if onesided:

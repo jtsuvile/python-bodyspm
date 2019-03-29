@@ -10,7 +10,7 @@ There will also be an option to save the whole data set to a less sustainable da
 
 ### TODO:
 1. prep
-    * combine_subwise_data 
+    * edit read_bg to accept both list of filenames and single filename
 2. analyses:
     * glm
     * ttest
