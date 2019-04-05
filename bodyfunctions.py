@@ -86,12 +86,23 @@ def combine_data(dataloc, subnums, save=False):
         print("saved pickle to " +dataloc + "/full_dataset.pickle")
     return all_res
 
+def one_sample_t_test(data):
+    '''
+    one sample t-test to see if coloured data is significantly more than 0
+
+    :param data: a 3-D matrix of subject-wise colouring maps
+    :return: statistics: t statistic for each pixel
+    :return: p-value for each pixel (uncorrected)
+    '''
+    statistics, pval = stats.ttest_1samp(data, 0, nan_policy='omit', axis=0)
+    return statistics, pval
+
 
 def compare_groups(data, group1, group2, testtype='t'):
     '''
     Compares the maps of two groups of subjects pixel-wise
 
-    :param data: 3-D data matrix of the subject-wise colouring maps. Axis 0 represents subjects.
+    :param data: 3-D data matrix of subject-wise colouring maps. Axis 0 represents subjects.
     :param group1: indices of group1 members in the matrix
     :param group2: indices of group2 members in the matrix
     :param testtype: should the groups be compared using a two sample t-test (default) or z-test of proportions?

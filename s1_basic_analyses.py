@@ -1,5 +1,5 @@
 from classdefinitions import Subject, Stimuli
-from bodyfunctions import compare_groups, correlate_maps
+from bodyfunctions import compare_groups, correlate_maps, one_sample_t_test
 import pickle
 import numpy as np
 import matplotlib.pyplot as plt
@@ -16,7 +16,7 @@ all_data = pickle.load(open(datafile, "rb" ))
 alpha = 0.2 # for testing with the tiny data set, in real use you would set this to 0.05/0.01 or whatever alpha level you choose
 
 # one sample t-test
-statistics, pval = stats.ttest_1samp(all_data['emotions_1'], 0, nan_policy = 'omit', axis=0)
+statistics, pval = one_sample_t_test(all_data['sensitivity_0'])
 
 lim = max(np.nanmax(statistics), abs(np.nanmin(statistics)))
 
