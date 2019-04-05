@@ -3,6 +3,8 @@ from bodyfunctions import compare_groups, correlate_maps
 import pickle
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy import stats
+
 import pandas as pd
 from statsmodels.stats.proportion import proportions_ztest
 

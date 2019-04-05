@@ -87,12 +87,23 @@ def combine_data(dataloc, subnums, save=False):
 
 
 def compare_groups(data, group1, group2, testtype='t'):
+    '''
+    Compares the maps of two groups of subjects pixel-wise
+
+    :param data: 3-D data matrix of the subject-wise colouring maps. Axis 0 represents subjects.
+    :param group1: indices of group1 members in the matrix
+    :param group2: indices of group2 members in the matrix
+    :param testtype: should the groups be compared using a two sample t-test (default) or z-test of proportions?
+    :return: two matrices, with the test statistic and p-value for the comparison per each pixel
+    '''
     # copy the data for each group to avoid accidentally making edits to original data
     g0_data = np.copy(data[group1])
     g1_data = np.copy(data[group2])
     if testtype=='z':
         print('z test not yet implemented')
         # test of proportions
+
+        # NB: what to do if data ==0? will it add bias in some direction to tie it with positive or negative?
         g0_data[g0_data > 0] = 1
         g0_data[g0_data < 0] = -1
         g1_data[g1_data > 0] = 1
@@ -114,8 +125,17 @@ def compare_groups(data, group1, group2, testtype='t'):
 
 
 def correlate_maps(data, corr_with):
+    '''
+    Correlates a set of subject-wise colouring maps with a vector of values (e.g. a background factor)
 
+    :param data: 3-D data matrix of the subject-wise colouring maps. Axis 0 represents subjects.
+    :param corr_with: vector of values (1 per subject) to correlate with.
+    :return: map with correlation coefficient for each.
+    '''
     dims = data.shape
+    if dims[0] is not len(corr_with): # NB: change this to a proper error at some point
+        print('You need to provide exactly one value per subject for the analysis. Stopping execution.')
+        return np.nan
     # temporarily change data to 2-D to enable correlation analysis
     data_reshaped = np.reshape(data, (dims[0], -1))
     # run correlation on each pixel separately
