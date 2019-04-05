@@ -13,6 +13,5 @@ There will also be an option to save the whole data set to a less sustainable da
     * edit read_bg to accept both list of filenames and single filename
 2. analyses:
     * glm
-    * compare_groups(master matrix, group definitions) ## pixel-wise test of proportions
 3. visualise:
     * plot_analysis_results

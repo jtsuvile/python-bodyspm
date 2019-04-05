@@ -2,6 +2,7 @@
 import numpy as np
 import pandas as pd
 from scipy import stats
+from statsmodels.stats.proportion import proportions_ztest
 from classdefinitions import Subject, Stimuli
 import pickle
 
@@ -100,22 +101,20 @@ def compare_groups(data, group1, group2, testtype='t'):
     g0_data = np.copy(data[group1])
     g1_data = np.copy(data[group2])
     if testtype=='z':
-        print('z test not yet implemented')
         # test of proportions
-
-        # NB: what to do if data ==0? will it add bias in some direction to tie it with positive or negative?
+        if np.amin(g0_data) < 0 or np.amin(g1_data) < 0:
+            print('test of proportions is only defined for data with no negative values')
+            return
+        # binarize and count hits
         g0_data[g0_data > 0] = 1
-        g0_data[g0_data < 0] = -1
         g1_data[g1_data > 0] = 1
-        g1_data[g1_data < 0] = -1
-
         successes = [np.concatenate(np.sum(g0_data, axis=0)), np.concatenate(np.sum(g1_data, axis=0))]
         counts = [np.concatenate(np.nansum(~np.isnan(g0_data), axis=0)),
                   np.concatenate(np.nansum(~np.isnan(g1_data), axis=0))]
-        # not ready
-        # proportions_ztest(successes, counts)
-        statistics_twosamp = np.nan
-        pval_twosamp = np.nan
+        # run proportions test for each pixel based on number of observations(counts) and number of coloured pixels (successes)
+        map_out = list(map(lambda x, y: proportions_ztest(x,y), np.transpose(successes), np.transpose(counts))) # a little slow, is there a better iteration?
+        statistics_twosamp = np.transpose(map_out)[0]
+        pval_twosamp = np.transpose(map_out)[1]
     elif testtype=='t':
         # two sample t-test
         statistics_twosamp, pval_twosamp = stats.ttest_ind(g0_data, g1_data, axis=0, nan_policy='omit')

@@ -6,7 +6,6 @@ import matplotlib.pyplot as plt
 from scipy import stats
 
 import pandas as pd
-from statsmodels.stats.proportion import proportions_ztest
 
 # Read pickled dataset from file
 
@@ -36,25 +35,25 @@ plt.show()
 groups_to_compare = ['foo', 'bar']
 groupdefinitions = ['foo', 'foo', 'bar', 'bar']  # this will be later integrated to subject info & pickle
 
-g0_indices = [i for i, x in enumerate(groupdefinitions) if x == groups_to_compare[0]]
-g1_indices = [i for i, x in enumerate(groupdefinitions) if x == groups_to_compare[1]]
+group1 = [i for i, x in enumerate(groupdefinitions) if x == groups_to_compare[0]]
+group2 = [i for i, x in enumerate(groupdefinitions) if x == groups_to_compare[1]]
 which_stim = 'sensitivity_0'
 
-comparison_stats, comparison_p = compare_groups(all_data[which_stim], g0_indices, g1_indices)
+comparison_stats, comparison_p = compare_groups(all_data[which_stim], group1, group2, testtype='z')
 
 # average maps (as proportion)
 mapname = 'sensitivity_0'
-map = all_data[mapname]
+this_map = all_data[mapname]
 onesided = all_data['stimuli'].all[mapname]['onesided']
 
 if onesided:
     # one-sided
-    map[map<0] = -1
-    map[map>0] = 1
-    propdata = np.nansum(map, axis=0) /sum(~np.isnan(map))
+    this_map[this_map<0] = -1
+    this_map[this_map>0] = 1
+    propdata = np.nansum(this_map, axis=0) /sum(~np.isnan(this_map))
 else:
     # two-sided
-    propdata = np.nansum(np.ceil(abs(map)), axis = 0) /sum(~np.isnan(map))
+    propdata = np.nansum(np.ceil(abs(this_map)), axis = 0) /sum(~np.isnan(this_map))
 
 # correlations with X
 which_stim = 'sensitivity_0'
