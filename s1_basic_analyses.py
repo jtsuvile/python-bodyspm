@@ -1,7 +1,6 @@
 from classdefinitions import Subject, Stimuli
-from bodyfunctions import combine_data
+from bodyfunctions import compare_groups, correlate_maps
 import pickle
-from scipy import stats
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -32,33 +31,16 @@ plt.show()
 #
 # compare two groups
 #
-groups_to_compare = ('foo', 'bar')
+groups_to_compare = ['foo', 'bar']
 groupdefinitions = ['foo', 'foo', 'bar', 'bar']  # this will be later integrated to subject info & pickle
+
+g0_indices = [i for i, x in enumerate(groupdefinitions) if x == groups_to_compare[0]]
+g1_indices = [i for i, x in enumerate(groupdefinitions) if x == groups_to_compare[1]]
 which_stim = 'sensitivity_0'
 
-g0_indices = [i for i,x in enumerate(groupdefinitions) if x==groups_to_compare[0]]
-g1_indices = [i for i,x in enumerate(groupdefinitions) if x==groups_to_compare[1]]
-
-# copy the data for each group to avoid accidentally making edits to original data
-g0_data = np.copy(all_data[which_stim][g0_indices])
-g1_data = np.copy(all_data[which_stim][g1_indices])
-
-# test of proportions
-g0_data[g0_data>0] = 1
-g0_data[g0_data<0] = -1
-g1_data[g1_data>0] = 1
-g1_data[g1_data<0] = -1
-
-successes = [np.concatenate(np.sum(g0_data, axis=0)), np.concatenate(np.sum(g1_data, axis=0))]
-counts = [np.concatenate(np.nansum(~np.isnan(g0_data), axis=0)), np.concatenate(np.nansum(~np.isnan(g1_data), axis=0))]
-# not ready
-# proportions_ztest(successes, counts)
-
-# two sample t-test
-statistics_twosamp, pval_twosamp = stats.ttest_ind(g0_data, g1_data, axis=0, nan_policy='omit')
+comparison_stats, comparison_p = compare_groups(all_data[which_stim], g0_indices, g1_indices)
 
 # average maps (as proportion)
-
 mapname = 'sensitivity_0'
 map = all_data[mapname]
 onesided = all_data['stimuli'].all[mapname]['onesided']
@@ -72,29 +54,23 @@ else:
     # two-sided
     propdata = np.nansum(np.ceil(abs(map)), axis = 0) /sum(~np.isnan(map))
 
-
-# plot
-twosided_cmap = plt.get_cmap('Greens')
-twosided_cmap.set_under('white', 1.0)
-
-fig = plt.figure()
-if onesided:
-    img = plt.imshow(propdata, cmap='RdBu_r', vmin=-1, vmax=1)
-else:
-    img = plt.imshow(propdata, cmap=twosided_cmap, vmin=0, vmax=1)
-
-fig.colorbar(img)
-plt.show()
-
 # correlations with X
 which_stim = 'sensitivity_0'
 data = all_data[which_stim]
-dims = data.shape
-feature_to_corr_with = [1, 2, 3, 4]
+corr_with = all_data['bg']['sitting_work'].astype(float)
+corr_map = correlate_maps(data, corr_with)
 
+# test success with plotting
+twosided_cmap = plt.get_cmap('Greens')
+twosided_cmap.set_under('white', 1.0)
+onesided = True
+showdata = corr_map
 
-data_reshaped = np.reshape(data, (dims[0], -1))
+fig = plt.figure()
+if onesided:
+    img = plt.imshow(showdata, cmap='RdBu_r', vmin=-1, vmax=1)
+else:
+    img = plt.imshow(showdata, cmap=twosided_cmap, vmin=0, vmax=1)
 
-result = map(lambda x: np.correlate(x, feature_to_corr_with), data_reshaped)
-
-data_re_reshaped = np.reshape(data_reshaped, dims)
+fig.colorbar(img)
+plt.show()

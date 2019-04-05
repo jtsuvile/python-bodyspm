@@ -1,9 +1,9 @@
 # imports
 import numpy as np
 import pandas as pd
+from scipy import stats
 from classdefinitions import Subject, Stimuli
 import pickle
-
 
 def preprocess_subjects(subnums, indataloc, outdataloc, stimuli, bgfiles=None,fieldnames=None):
     '''Reads in data from web interface output and writes the subjects out to .csv files (colouring data) and
@@ -84,3 +84,42 @@ def combine_data(dataloc, subnums, save=False):
             pickle.dump(all_res, handle, protocol=pickle.HIGHEST_PROTOCOL)
         print("saved pickle to " +dataloc + "/full_dataset.pickle")
     return all_res
+
+
+def compare_groups(data, group1, group2, testtype='t'):
+    # copy the data for each group to avoid accidentally making edits to original data
+    g0_data = np.copy(data[group1])
+    g1_data = np.copy(data[group2])
+    if testtype=='z':
+        print('z test not yet implemented')
+        # test of proportions
+        g0_data[g0_data > 0] = 1
+        g0_data[g0_data < 0] = -1
+        g1_data[g1_data > 0] = 1
+        g1_data[g1_data < 0] = -1
+
+        successes = [np.concatenate(np.sum(g0_data, axis=0)), np.concatenate(np.sum(g1_data, axis=0))]
+        counts = [np.concatenate(np.nansum(~np.isnan(g0_data), axis=0)),
+                  np.concatenate(np.nansum(~np.isnan(g1_data), axis=0))]
+        # not ready
+        # proportions_ztest(successes, counts)
+        statistics_twosamp = np.nan
+        pval_twosamp = np.nan
+    elif testtype=='t':
+        # two sample t-test
+        statistics_twosamp, pval_twosamp = stats.ttest_ind(g0_data, g1_data, axis=0, nan_policy='omit')
+    else:
+        print("acceptable comparison types are 'z' and 't', not sure what you want")
+    return statistics_twosamp, pval_twosamp
+
+
+def correlate_maps(data, corr_with):
+
+    dims = data.shape
+    # temporarily change data to 2-D to enable correlation analysis
+    data_reshaped = np.reshape(data, (dims[0], -1))
+    # run correlation on each pixel separately
+    corr_res = np.apply_along_axis(np.correlate, 0, data_reshaped, corr_with)
+    # reshape result
+    corr_map = np.reshape(corr_res, (dims[1], dims[2]))
+    return corr_map
