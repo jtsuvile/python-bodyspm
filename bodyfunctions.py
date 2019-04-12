@@ -3,11 +3,12 @@ import numpy as np
 import pandas as pd
 from scipy import stats
 from statsmodels.stats.proportion import proportions_ztest
+from statsmodels.stats.multitest import multipletests
 from classdefinitions import Subject, Stimuli
 import pickle
 
 def preprocess_subjects(subnums, indataloc, outdataloc, stimuli, bgfiles=None,fieldnames=None):
-    '''Reads in data from web interface output and writes the subjects out to .csv files (colouring data) and
+    """Reads in data from web interface output and writes the subjects out to .csv files (colouring data) and
     .json (other sub data). Also draws single subject's data into file for quality control.
     :param subnums : list of subject numbers to process
     :param indataloc : where the data from the online interface has been saved
@@ -19,7 +20,8 @@ def preprocess_subjects(subnums, indataloc, outdataloc, stimuli, bgfiles=None,fi
     :param fieldnames: list of lists, optional. List for each background information file giving the names of the
     fields (used as keys in background info dictionary)
 
-    Does not return anything, data are stored as files to outdataloc'''
+    Does not return anything, data are stored as files to outdataloc
+    """
 
     for i, subnum in enumerate(subnums):
         print("preprocessing subject " +  str(subnum) + " which is " + str(i+1) + "/" + str(len(subnums)))
@@ -40,7 +42,7 @@ def preprocess_subjects(subnums, indataloc, outdataloc, stimuli, bgfiles=None,fi
     return
 
 def combine_data(dataloc, subnums, save=False):
-    '''
+    """
     Combines a data set from subjects who have been written to file.
 
     :param dataloc: where the subject data files have been saved. Assumes .json files for subjects and
@@ -52,9 +54,8 @@ def combine_data(dataloc, subnums, save=False):
     where N is length of subnums, and X and Y are the dimensions of the maps. The dictionary will have keys for
     each stimulus (with the value being 3-D Numpy array) and 'subids' (list of the subids in the same order as they appear
     in the data arrays).
-    '''
+    """
 
-    # NB: add sub bg info into all_data
     stim = Stimuli(fileloc=dataloc, from_file=True)
     size_onesided = (522, 171)
     size_twosided = (522, 342)
@@ -87,19 +88,19 @@ def combine_data(dataloc, subnums, save=False):
     return all_res
 
 def one_sample_t_test(data):
-    '''
+    """
     one sample t-test to see if coloured data is significantly more than 0
 
     :param data: a 3-D matrix of subject-wise colouring maps
     :return: statistics: t statistic for each pixel
     :return: p-value for each pixel (uncorrected)
-    '''
+    """
     statistics, pval = stats.ttest_1samp(data, 0, nan_policy='omit', axis=0)
     return statistics, pval
 
 
 def compare_groups(data, group1, group2, testtype='t'):
-    '''
+    """
     Compares the maps of two groups of subjects pixel-wise
 
     :param data: 3-D data matrix of subject-wise colouring maps. Axis 0 represents subjects.
@@ -107,7 +108,7 @@ def compare_groups(data, group1, group2, testtype='t'):
     :param group2: indices of group2 members in the matrix
     :param testtype: should the groups be compared using a two sample t-test (default) or z-test of proportions?
     :return: two matrices, with the test statistic and p-value for the comparison per each pixel
-    '''
+    """
     # copy the data for each group to avoid accidentally making edits to original data
     g0_data = np.copy(data[group1])
     g1_data = np.copy(data[group2])
@@ -135,13 +136,13 @@ def compare_groups(data, group1, group2, testtype='t'):
 
 
 def correlate_maps(data, corr_with):
-    '''
+    """
     Correlates a set of subject-wise colouring maps with a vector of values (e.g. a background factor)
 
     :param data: 3-D data matrix of the subject-wise colouring maps. Axis 0 represents subjects.
     :param corr_with: vector of values (1 per subject) to correlate with.
     :return: map with correlation coefficient for each.
-    '''
+    """
     dims = data.shape
     if dims[0] is not len(corr_with): # NB: change this to a proper error at some point
         print('You need to provide exactly one value per subject for the analysis. Stopping execution.')
@@ -153,3 +154,39 @@ def correlate_maps(data, corr_with):
     # reshape result
     corr_map = np.reshape(corr_res, (dims[1], dims[2]))
     return corr_map
+
+
+def p_adj_maps(pval_map, mask=None, alpha = 0.05, method='fdr_bh'):
+    """
+    An easier interface to correct p-values for multiple comparisons. By default, implements False Detection Rate
+    correction (Benjamini/Hochberg), but multiple other methods can be selected.
+
+    Implements
+    https://www.statsmodels.org/dev/generated/statsmodels.stats.multitest.multipletests.html
+
+    :param pval_map: a 2-D matrix of p-values
+    :param mask: optional. A boolean matrix with the areas inside the body outline set to 1/TRUE. If provided, will
+    reduce the number of comparisons to correct for, as only areas inside the body outline (i.e. areas of interest)
+    are considered.
+    :param alpha: selected alpha-level (default 0.05)
+    :param method:
+    :return: 2-D matrix of the same size as first parameter, with p-values corrected for multiple comparison
+    """
+    # TODO: test this with proper data
+    dims = pval_map.shape
+    if mask is not None:
+        data_reshaped = np.reshape(pval_map, (dims[0], -1))
+    else:
+        if dims!=mask.shape:
+            print('expected mask to be same shape as data, cannot continue')
+            return
+        else:
+            # if we have mask, we can just pick the relevant numbers
+            data_reshaped = pval_map[mask.astype(int)>0]
+    reject, pvals_corrected, alpacSidak, alhacBonferroni = multipletests(data_reshaped, alpha, method)
+    if mask==None:
+        pval_map_corrected = np.reshape(pvals_corrected, (dims[1],dims[2]))
+    else:
+        pval_map_corrected = np.ones(dims)
+        pval_map_corrected[mask.astype(int)>0] = pvals_corrected
+    return pval_map_corrected
