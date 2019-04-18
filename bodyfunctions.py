@@ -113,6 +113,7 @@ def compare_groups(data, group1, group2, testtype='t'):
     # copy the data for each group to avoid accidentally making edits to original data
     g0_data = np.copy(data[group1])
     g1_data = np.copy(data[group2])
+    dims = g0_data.shape
     if testtype=='z':
         # test of proportions
         if np.amin(g0_data) < 0 or np.amin(g1_data) < 0:
@@ -126,8 +127,8 @@ def compare_groups(data, group1, group2, testtype='t'):
                   np.concatenate(np.nansum(~np.isnan(g1_data), axis=0))]
         # run proportions test for each pixel based on number of observations(counts) and number of coloured pixels (successes)
         map_out = list(map(lambda x, y: proportions_ztest(x,y), np.transpose(successes), np.transpose(counts))) # a little slow, is there a better iteration?
-        statistics_twosamp = np.transpose(map_out)[0]
-        pval_twosamp = np.transpose(map_out)[1]
+        statistics_twosamp = np.reshape(np.transpose(map_out)[0], (dims[1],dims[2]))
+        pval_twosamp = np.reshape(np.transpose(map_out)[1], (dims[1],dims[2]))
     elif testtype=='t':
         # two sample t-test
         statistics_twosamp, pval_twosamp = stats.ttest_ind(g0_data, g1_data, axis=0, nan_policy='omit')
@@ -174,7 +175,7 @@ def p_adj_maps(pval_map, mask=None, alpha = 0.05, method='fdr_bh'):
     :return: 2-D matrix of the same size as first parameter, with p-values corrected for multiple comparison
     """
     dims = pval_map.shape
-    if mask is not None:
+    if mask is None:
         data_reshaped = np.reshape(pval_map, (dims[0], -1))
     else:
         if dims!=mask.shape:
@@ -182,9 +183,10 @@ def p_adj_maps(pval_map, mask=None, alpha = 0.05, method='fdr_bh'):
             return
         else:
             # if we have mask, we can just pick the relevant numbers
+            print('found mask of the right size')
             data_reshaped = pval_map[mask.astype(int)>0]
     reject, pvals_corrected, alpacSidak, alhacBonferroni = multipletests(data_reshaped, alpha, method)
-    if mask==None:
+    if mask is None:
         pval_map_corrected = np.reshape(pvals_corrected, (dims[1],dims[2]))
     else:
         pval_map_corrected = np.ones(dims)
