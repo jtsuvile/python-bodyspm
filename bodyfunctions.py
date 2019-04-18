@@ -2,6 +2,7 @@
 import numpy as np
 import pandas as pd
 from scipy import stats
+from skimage import io
 from statsmodels.stats.proportion import proportions_ztest
 from statsmodels.stats.multitest import multipletests
 from classdefinitions import Subject, Stimuli
@@ -172,7 +173,6 @@ def p_adj_maps(pval_map, mask=None, alpha = 0.05, method='fdr_bh'):
     :param method:
     :return: 2-D matrix of the same size as first parameter, with p-values corrected for multiple comparison
     """
-    # TODO: test this with proper data
     dims = pval_map.shape
     if mask is not None:
         data_reshaped = np.reshape(pval_map, (dims[0], -1))
@@ -190,3 +190,25 @@ def p_adj_maps(pval_map, mask=None, alpha = 0.05, method='fdr_bh'):
         pval_map_corrected = np.ones(dims)
         pval_map_corrected[mask.astype(int)>0] = pvals_corrected
     return pval_map_corrected
+
+
+def read_in_mask(file1, file2=None):
+    """
+    Easily read in a black and white mask image and change to binary numpy array to use in other functions.
+
+    :param file1: Black-and-white mask image, where black shows areas inside the mask (i.e. to be included) and white
+    shows areas outside of the mask (i.e. background)
+    :param file2: For two-sided data, mask to use for the right side
+    :return: numpy array of the mask with 1=include, 0=exclude
+    """
+    mask_array = io.imread(file1, as_gray=True)
+    mask_array[mask_array < 1] = 0
+    mask_array = mask_array * -1
+    mask_array = mask_array + 1
+    if file2 is not None:
+        mask_other_side = io.imread(file2, as_gray=True)
+        mask_other_side[mask_other_side < 1] = 0
+        mask_other_side = mask_other_side * -1
+        mask_other_side = mask_other_side + 1
+        mask_array = np.concatenate((mask_array, mask_other_side), axis=1)
+    return mask_array
