@@ -14,7 +14,7 @@ dataloc = '/Users/jtsuvile/Documents/projects/kipupotilaat/python_code_testing/'
 datafile = dataloc + 'full_dataset.pickle'
 all_data = pickle.load(open(datafile, "rb" ))
 
-mask_use = read_in_mask(dataloc + 'mask_back_new.png', dataloc + 'mask_front_new.png')
+mask_use = read_in_mask(dataloc + 'mask_front_new.png',dataloc + 'mask_back_new.png')
 
 # fig = plt.figure()
 # img = plt.imshow(mask_use)
@@ -34,6 +34,11 @@ stats_to_show[pval_adjusted>alpha] = 0
 
 fig = plt.figure()
 img = plt.imshow(stats_to_show, cmap='RdBu_r', vmin=-10, vmax=10)
+fig.colorbar(img)
+plt.show()
+
+fig = plt.figure()
+img = plt.imshow(mask_use)
 fig.colorbar(img)
 plt.show()
 
@@ -86,5 +91,27 @@ if onesided:
 else:
     img = plt.imshow(showdata, cmap=twosided_cmap, vmin=0, vmax=1)
 
+fig.colorbar(img)
+plt.show()
+
+##
+# counts
+##
+
+mapname = 'sensitivity_0'
+this_map = all_data[mapname]
+
+count_pixels(this_map)
+count_pixels(this_map, mask_use)
+
+## NB: maybe not indexing properly?
+mask_indices = np.nonzero(mask_use)
+inside_mask = this_map[:,mask_indices[0], mask_indices[1]]
+this_map_copy = np.copy(this_map)
+this_map_copy[:, mask_indices[0],mask_indices[1]] = inside_mask
+
+
+fig = plt.figure()
+img = plt.imshow(this_map_copy[3,:,:])
 fig.colorbar(img)
 plt.show()

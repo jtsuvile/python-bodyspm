@@ -8,6 +8,7 @@ from statsmodels.stats.multitest import multipletests
 from classdefinitions import Subject, Stimuli
 import pickle
 
+
 def preprocess_subjects(subnums, indataloc, outdataloc, stimuli, bgfiles=None,fieldnames=None):
     """Reads in data from web interface output and writes the subjects out to .csv files (colouring data) and
     .json (other sub data). Also draws single subject's data into file for quality control.
@@ -41,6 +42,25 @@ def preprocess_subjects(subnums, indataloc, outdataloc, stimuli, bgfiles=None,fi
     stimuli.write_stim_to_file(outdataloc)
     print('done with preprocessing the subjects')
     return
+
+
+def binarize(data):
+    """
+    Change data from colouring (with blur) to binary 1/0 format. This is used in several analyses where data have
+    to be in binary format, such as two sample z test
+
+    NB: 0.007 chosen as limit based on what limit replicates coloring best in Aalto system (March 2019).
+    The best value for this parameter will depend on brush & blur settings.
+    If changed, I highly recommend visual inspection of the result against known colouring
+
+    :param data: matrix with colouring data
+    :return: same matrix, with coloured areas changed to 1 and non-coloured changed to 0
+    """
+
+    data[data > 0.007] = 1
+    data[data <= 0.007] = 0
+    return data
+
 
 def combine_data(dataloc, subnums, save=False):
     """
@@ -88,6 +108,7 @@ def combine_data(dataloc, subnums, save=False):
         print("saved pickle to " +dataloc + "/full_dataset.pickle")
     return all_res
 
+
 def one_sample_t_test(data):
     """
     one sample t-test to see if coloured data is significantly more than 0
@@ -120,8 +141,8 @@ def compare_groups(data, group1, group2, testtype='t'):
             print('test of proportions is only defined for data with no negative values')
             return
         # binarize and count hits
-        g0_data[g0_data > 0] = 1
-        g1_data[g1_data > 0] = 1
+        g0_data = binarize(g0_data)
+        g1_data = binarize(g1_data)
         successes = [np.concatenate(np.sum(g0_data, axis=0)), np.concatenate(np.sum(g1_data, axis=0))]
         counts = [np.concatenate(np.nansum(~np.isnan(g0_data), axis=0)),
                   np.concatenate(np.nansum(~np.isnan(g1_data), axis=0))]
@@ -145,6 +166,8 @@ def correlate_maps(data, corr_with):
     :param corr_with: vector of values (1 per subject) to correlate with.
     :return: map with correlation coefficient for each.
     """
+    # TODO: move from np.correlate to something which allows spearman and pearson,
+    #  like pandas corr or scipy spearmanr and pearsonr? Also get p-values
     dims = data.shape
     if dims[0] is not len(corr_with): # NB: change this to a proper error at some point
         print('You need to provide exactly one value per subject for the analysis. Stopping execution.')
@@ -197,10 +220,12 @@ def p_adj_maps(pval_map, mask=None, alpha = 0.05, method='fdr_bh'):
 def read_in_mask(file1, file2=None):
     """
     Easily read in a black and white mask image and change to binary numpy array to use in other functions.
+    If the data need left and right mask separately, please providethe mask to use on the left-hand side as the
+    first argument.
 
     :param file1: Black-and-white mask image, where black shows areas inside the mask (i.e. to be included) and white
-    shows areas outside of the mask (i.e. background)
-    :param file2: For two-sided data, mask to use for the right side
+    shows areas outside of the mask (i.e. background).
+    :param file2: Mask to use for the right side, if any
     :return: numpy array of the mask with 1=include, 0=exclude
     """
     mask_array = io.imread(file1, as_gray=True)
@@ -214,3 +239,24 @@ def read_in_mask(file1, file2=None):
         mask_other_side = mask_other_side + 1
         mask_array = np.concatenate((mask_array, mask_other_side), axis=1)
     return mask_array
+
+
+def count_pixels(data, mask=None):
+    """
+    Count the number and proportion of coloured pixels per subject
+
+    :param data: the 3D-data frame where to count the
+    :param mask: optional. If provided, takes
+    :return: number of coloured pixels per subject
+    """
+    data = binarize(data)
+    # sum all cells for each subject
+    if mask is None:
+        counts_vector = np.sum(np.sum(data, axis=1), axis=1)
+        n_pixels = data.shape[1]*data.shape[2]
+    else:
+        inside_mask = data[:,mask==1]
+        n_pixels = np.sum(np.sum(mask))
+        counts_vector = np.sum(inside_mask, axis=1)
+    prop_vector = [x / n_pixels for x in counts_vector]
+    return counts_vector, prop_vector

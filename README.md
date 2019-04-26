@@ -11,6 +11,7 @@ There will also be an option to save the whole data set to a less sustainable da
 ### TODO:
 1. prep
     * edit read_bg to accept both list of filenames and single filename
+    * check blur size for our data
 2. analyses:
     * glm
 3. visualise:
