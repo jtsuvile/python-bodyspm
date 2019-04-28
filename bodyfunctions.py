@@ -62,13 +62,14 @@ def binarize(data):
     return data
 
 
-def combine_data(dataloc, subnums, save=False):
+def combine_data(dataloc, subnums, groups=None, save=False):
     """
     Combines a data set from subjects who have been written to file.
 
     :param dataloc: where the subject data files have been saved. Assumes .json files for subjects and
     stimuli are located in this folder
     :param subnums: which subjects to combine (list). Assumes one .json file per subject
+    :param groups: list of group definitions to be included, must be same length and in same order as subnums
     :param save: do you want the combined data set saved into file (pickled)? (Boolean)
     :return: combined data for the defined subjects.
     The data are stored in a dictionary, where each body map will be presented as N * X * Y numpy array,
@@ -83,6 +84,8 @@ def combine_data(dataloc, subnums, save=False):
     all_res = {}
     all_res['subids'] = subnums
     all_res['stimuli'] = stim
+    if groups is not None and np.shape(groups)==np.shape(subnums):
+        all_res['groups'] = groups
     all_res['bg'] = pd.DataFrame(index=subnums)
     # init empty arrays for data
     for key in stim.all.keys():

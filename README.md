@@ -16,3 +16,7 @@ There will also be an option to save the whole data set to a less sustainable da
     * glm
 3. visualise:
     * plot_analysis_results
+    
+## Comments
+Currently including group definitions currently at combine data phase, might make more sense to have that already 
+when reading in subject?
