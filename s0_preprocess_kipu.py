@@ -42,21 +42,6 @@ preprocess_subjects(subnums, dataloc, outdataloc, stim, bg_files, field_names)
 # Gather subjects into one dict
 
 full_dataset = combine_data(outdataloc, subnums, save=True)
-#
-# # test reading subject from file
-#
-# # stim2 = Stimuli(fileloc='/Users/jtsuvile/Documents/projects/kipupotilaat/python_code_testing/', from_file=True)
-# # sub2 = Subject('375451')
-# # sub2.read_sub_from_file('/Users/jtsuvile/Documents/projects/kipupotilaat/python_code_testing/')
-#
-#
-# ## code snippets for potential later use
-#
-# # np.sum(all_res['emotions_0'], axis=0).shape
-#
-# # NB [outdata[key]['name'] for key in outdata.keys()]
-#
-# #for key, value in sub.data.items():
-# #    print(value['rawdata'])
+
 end = time.time()
 print(end - start)
