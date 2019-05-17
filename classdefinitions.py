@@ -78,7 +78,9 @@ class Subject:
                 arr_color = np.zeros((600, 900))
                 (x, y) = [paint[:, 2], paint[:, 1]]
                 x[x >= 600] = 599
+                x[x < 0] = 0
                 y[y >= 900] = 899
+                y[y < 0] = 0
                 arr_color[x.astype(int), y.astype(int)] = arr_color[x.astype(int), y.astype(int)] + 1
                 # add blur to replicate the effect of spray can in the web interface
                 # NB: size of blur might need to be changed depending on your data collection settings

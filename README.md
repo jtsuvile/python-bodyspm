@@ -8,7 +8,7 @@ This package takes the data from the online data collection system, and converts
 Additional subject info and info about the stimuli is saved as JSONs. These file formats are highly suitable for long term data storage and cross-platform compatibility.
 There will also be an option to save the whole data set to a less sustainable data format for smooth analysis, as well as multiple basic data analysis options.
 
-### TODO:
+### TODO, general:
 1. prep
     * edit read_bg to accept both list of filenames and single filename
     * check blur size for our data
@@ -16,7 +16,12 @@ There will also be an option to save the whole data set to a less sustainable da
     * glm
 3. visualise:
     * plot_analysis_results
+
+### TODO, kipupotilaat:
+1. Figure out how to save all controls into pickle (too large)
+2. Find age and sex matched controls CRPS patients 
+3. Compare CRPS patients to other pain patients
+4. Controls: onko eroa täysin kivuttomilla ja akuuttia kipua kokevilla? Vastaako aiempia? (check with Lauri)
     
 ## Comments
-Currently including group definitions currently at combine data phase, might make more sense to have that already 
-when reading in subject?
+Currently including group definitions at combine data phase, might make more sense to have that already when reading in subject?
