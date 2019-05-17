@@ -6,10 +6,10 @@ from bodyfunctions import combine_data, preprocess_subjects
 import matplotlib.pyplot as plt
 import numpy as np
 import time
-import csv
-import codecs
+
 
 who = 'control'
+
 
 start = time.time()
 # set up stimuli description
@@ -53,6 +53,7 @@ with open(subfile) as f:
     subnums = f.readlines()
 
 subnums = [x.strip() for x in subnums]
+
 
 print("hiya")
 
