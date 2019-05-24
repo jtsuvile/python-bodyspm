@@ -84,7 +84,7 @@ for i in range(1,500):
 
 print(best_matches[best_matches.age_diff>age_diff_cutoff])
 #
-best_matches.to_csv('/m/nbe/scratch/socbrain/kipupotilaat/data/age_and_gender_matched_subs_pain_cutoff_1_helsinki.csv')
+best_matches.to_csv('/m/nbe/scratch/socbrain/kipupotilaat/data/age_and_gender_matched_subs_pain_helsinki.csv')
 problem_subs = best_matches.loc[best_matches.age_diff>age_diff_cutoff, 'subid']
 
 #last_resort_controls = controls_small.loc[(controls_small.sex == '0') & (controls_small.feels_pain < 4) &

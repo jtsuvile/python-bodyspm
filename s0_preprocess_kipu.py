@@ -8,8 +8,7 @@ import numpy as np
 import time
 
 
-who = 'control'
-
+who = 'helsinki'
 
 start = time.time()
 # set up stimuli description
@@ -19,21 +18,7 @@ onesided = [True, True, True, True, True, True, True, False, False, False, False
 # the other. Alternative (False) describes situation where both sides of colouring are retained, e.g. touch allowances
 # for front and back of body.
 data_names = ['emotions_0', 'emotions_1', 'emotions_2', 'emotions_3', 'emotions_4','emotions_5','emotions_6', 'sensitivity_0','sensitivity_1','sensitivity_2', 'pain_0', 'pain_1']
-stim_names = ['stim1','stim2','stim3','stim4','stim5', 'pain1', 'pain2'] # potentially add stimulus names for more intuitive data handling
 bg_files = ['data.txt','pain_info.txt','current_feelings.txt','BPI_1.txt','BPI_2.txt']
-field_names = [['sex', 'age', 'weight','height','handedness','education','work_physical','work_sitting','psychologist','psychiatrist', 'neurologist'],
-               ['pain_now','pain_last_day', 'pain_chronic','hist_migraine','hist_headache','hist_abdomen','hist_back_shoulder','hist_joint_limb','hist_menstrual','hist_crps','hist_fibro',
-                'painkillers_overcounter','painkillers_prescription', 'painkillers_othercns'],
-               ['feels_pain','feels_depression','feels_anxiety','feels_happy','feels_sad','feels_angry','feels_surprise','feels_disgust'],
-               ['bpi_worst', 'bpi_least', 'bpi_average', 'bpi_now', 'bpi_painkiller_relief'],
-               ['bpi_functioning', 'bpi_mood','bpi_walk','bpi_work', 'bpi_relationships','bpi_sleep','bpi_enjoyment']]
-field_names_control = [['sex', 'age', 'weight','height','handedness','education','work_physical','work_sitting','psychologist','psychiatrist', 'neurologist'],
-               ['pain_now','pain_last_day', 'pain_chronic','hist_migraine','hist_headache','hist_abdomen','hist_back_shoulder','hist_joint_limb','hist_menstrual',
-                'painkillers_overcounter','painkillers_prescription', 'painkillers_othercns'],
-               ['feels_pain','feels_depression','feels_anxiety','feels_happy','feels_sad','feels_angry','feels_surprise','feels_disgust'],
-               ['bpi_worst', 'bpi_least', 'bpi_average', 'bpi_now', 'bpi_painkiller_relief'],
-               ['bpi_functioning', 'bpi_mood','bpi_walk','bpi_work', 'bpi_relationships','bpi_sleep','bpi_enjoyment']]
-
 
 # define stimulus set
 stim = Stimuli(data_names, onesided=onesided)
@@ -43,10 +28,23 @@ if who == 'control':
     dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/subjects/'
     outdataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/processed/'
     subfile = '/m/nbe/scratch/socbrain/kipupotilaat/data/matched_controls_may_2019.txt'
+    field_names = [['sex', 'age', 'weight','height','handedness','education','work_physical','work_sitting','profession','psychologist','psychiatrist', 'neurologist'],
+               ['pain_now','pain_last_day', 'pain_chronic','hist_migraine','hist_headache','hist_abdomen','hist_back_shoulder','hist_joint_limb','hist_menstrual',
+                'painkillers_overcounter','painkillers_prescription', 'painkillers_othercns'],
+               ['feels_pain','feels_depression','feels_anxiety','feels_happy','feels_sad','feels_angry','feels_surprise','feels_disgust'],
+               ['bpi_worst', 'bpi_least', 'bpi_average', 'bpi_now', 'bpi_painkiller_relief'],
+               ['bpi_functioning', 'bpi_mood','bpi_walk','bpi_work', 'bpi_relationships','bpi_sleep','bpi_enjoyment']]
 elif who == 'helsinki':
     dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/helsinki/subjects/'
     outdataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/helsinki/processed/'
     subfile = '/m/nbe/scratch/socbrain/kipupotilaat/data/helsinki/kipu_subs.txt'
+    field_names = [['sex', 'age', 'weight','height','handedness','education','work_physical','work_sitting','profession','psychologist','psychiatrist','neurologist'],
+               ['pain_now','pain_last_day', 'pain_chronic','hist_migraine','hist_headache','hist_abdomen','hist_back_shoulder','hist_joint_limb','hist_menstrual',
+                'painkillers_overcounter','painkillers_prescription', 'painkillers_othercns','hist_crps','hist_fibro'],
+               ['feels_pain','feels_depression','feels_anxiety','feels_happy','feels_sad','feels_angry','feels_surprise','feels_disgust'],
+               ['bpi_worst', 'bpi_least', 'bpi_average', 'bpi_now', 'bpi_painkiller_relief'],
+               ['bpi_functioning', 'bpi_mood','bpi_walk','bpi_work', 'bpi_relationships','bpi_sleep','bpi_enjoyment']]
+
 
 subnums = []
 with open(subfile) as f:
@@ -59,7 +57,7 @@ print("hiya")
 
 #subnums_left = [3200, 6058, 6460]
 # # read subjects from web output and write out to a more sensible format
-#preprocess_subjects(subnums_left, dataloc, outdataloc, stim, bg_files, field_names_control)
+preprocess_subjects(subnums, dataloc, outdataloc, stim, bg_files, field_names)
 #
 # # Gather subjects into one dict
 #
@@ -71,6 +69,8 @@ full_dataset = combine_data(outdataloc, subnums, save=True)
 end = time.time()
 print(end - start)
 
+bg = full_dataset['bg']
+bg.to_csv('/m/nbe/scratch/socbrain/kipupotilaat/data/kipu_bg.csv')
 
 ## code for reading in grouping (e.g. pain type) from file
 # with open('/m/nbe/scratch/socbrain/kipupotilaat/data/helsinki/kipuklinikka_kiputyyppi.csv', mode='r', encoding="utf-8-sig") as csv_file:

@@ -58,7 +58,8 @@ def binarize(data):
     """
 
     data[data > 0.007] = 1
-    data[data <= 0.007] = 0
+    data[data < -0.007] = -1
+    data[(data <= 0.007) & (data >=-0.007)] = 0
     return data
 
 
@@ -252,7 +253,7 @@ def count_pixels(data, mask=None):
     :param mask: optional. If provided, takes
     :return: number of coloured pixels per subject
     """
-    data = binarize(data)
+    data = abs(binarize(data))
     # sum all cells for each subject
     if mask is None:
         counts_vector = np.sum(np.sum(data, axis=1), axis=1)
