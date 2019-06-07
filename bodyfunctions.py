@@ -62,7 +62,7 @@ def binarize(data):
     return data
 
 
-def combine_data(dataloc, subnums, groups=None, save=False):
+def combine_data(dataloc, subnums, groups=None, save=False, noImages = False):
     """
     Combines a data set from subjects who have been written to file.
 
@@ -71,6 +71,7 @@ def combine_data(dataloc, subnums, groups=None, save=False):
     :param subnums: which subjects to combine (list). Assumes one .json file per subject
     :param groups: list of group definitions to be included, must be same length and in same order as subnums
     :param save: do you want the combined data set saved into file (pickled)? (Boolean)
+    :param noImages: do you want to just combine background data? (useful for extremely large data sets)
     :return: combined data for the defined subjects.
     The data are stored in a dictionary, where each body map will be presented as N * X * Y numpy array,
     where N is length of subnums, and X and Y are the dimensions of the maps. The dictionary will have keys for
@@ -88,15 +89,16 @@ def combine_data(dataloc, subnums, groups=None, save=False):
         all_res['groups'] = groups
     all_res['bg'] = pd.DataFrame(index=subnums)
     # init empty arrays for data
-    for key in stim.all.keys():
-        if stim.all[key]['onesided']:
-            all_res[key] = np.zeros((len(subnums), size_onesided[0], size_onesided[1]))
-        else:
-            all_res[key] = np.zeros((len(subnums), size_twosided[0], size_twosided[1]))
+    if not noImages:
+        for key in stim.all.keys():
+            if stim.all[key]['onesided']:
+                all_res[key] = np.zeros((len(subnums), size_onesided[0], size_onesided[1]))
+            else:
+                all_res[key] = np.zeros((len(subnums), size_twosided[0], size_twosided[1]))
     # populate with data
     for j, subnum in enumerate(subnums):
         temp_sub = Subject(subnum)
-        temp_sub.read_sub_from_file(dataloc)
+        temp_sub.read_sub_from_file(dataloc, noImages)
         for key, value in temp_sub.data.items():
             all_res[key][j] = temp_sub.data[key]
         for bgkey, bgvalue in temp_sub.bginfo.items():

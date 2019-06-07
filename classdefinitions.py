@@ -137,7 +137,7 @@ class Subject:
                 data_key = filename.split('_as_matrix')[0]
                 self.data[data_key] = np.loadtxt(file, delimiter=',')
 
-    def read_sub_from_file(self, fileloc):
+    def read_sub_from_file(self, fileloc, noImages=False):
         # subject info from a json file
         filename = fileloc + '/sub_' + str(self.name) + '_info.json'
         with open(filename) as f:
@@ -148,7 +148,8 @@ class Subject:
             if key not in ('name','group','datafiles'):
                 self.bginfo[key] = value
         # read in data from the locations specified in the json
-        self.data_from_file()
+        if not noImages:
+            self.data_from_file()
 
     def draw_sub_data(self, stim, fileloc=None):
         # make sure non coloured values are white in twosided datas

@@ -36,7 +36,7 @@ subnums = ['test_sub_1', 'test_sub_2', 'test_sub_3','test_sub_4']
 outdataloc = '/Users/jtsuvile/Documents/projects/kipupotilaat/python_code_testing/'
 grouping = ['foo', 'bar', 'foo', 'bar']
 
-full_dataset = combine_data(outdataloc, subnums, groups = grouping, save=True)
+full_dataset = combine_data(outdataloc, subnums, groups = grouping, save=False, noImages=True)
 
 indices = lambda searchList, elem: [[i for i, x in enumerate(searchList) if x == e] for e in elem]
 indices(full_dataset['groups'], ['foo','bar'])
