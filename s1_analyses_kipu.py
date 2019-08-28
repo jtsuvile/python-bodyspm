@@ -1,9 +1,9 @@
 import matplotlib
-#matplotlib.use('Agg')
+# matplotlib.use('Agg')
 
 from classdefinitions import Subject, Stimuli
 from bodyfunctions import *
-import pickle
+import h5py
 import numpy as np
 import pandas as pd
 from scipy import stats
@@ -11,23 +11,23 @@ from scipy import stats
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-figloc = '/Users/jtsuvile/Documents/projects/kipupotilaat/data/figures/'
-maskloc = '/Volumes/SCRsocbrain/kipupotilaat/data/'
-datafile = '/Users/jtsuvile/Documents/projects/kipupotilaat/data/full_dataset.pickle'
+figloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/helsinki/figures/'
+maskloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/'
+dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/helsinki/processed/'
+datafile = get_latest_datafile(dataloc)
 datafile_controls = '/Users/jtsuvile/Documents/projects/kipupotilaat/data/matched_controls.pickle'
-print("loading data")
-kipu = pd.read_pickle(datafile)
-control = pd.read_pickle(datafile_controls)
-print("loaded data")
+# print("loading data")
+# kipu = pd.read_pickle(datafile)
+# control = pd.read_pickle(datafile_controls)
+# print("loaded data")
 mask_fb = read_in_mask(maskloc + 'mask_front_new.png', maskloc + 'mask_back_new.png')
 mask_one = read_in_mask(maskloc + 'mask_front_new.png')
 
-stim_names = {'emotions_0':'sadness', 'emotions_1':'happiness', 'emotions_2':'anger', 'emotions_3':'surprise',
-              'emotions_4': 'fear', 'emotions_5':'disgust', 'emotions_6':'neutral',
-              'pain_0':'acute pain', 'pain_1': 'chonic_pain', 'sensitivity_0':'tactile sensitivity',
-              'sensitivity_1':'nociceptive sensitivity', 'sensitivity_2':'hedonic sensitivity'}
-
-twosided = [0,0,0,0,0,0,0,1,1,1,1,1]
+stim_names = {'emotions_0': ['sadness', 0], 'emotions_1': ['happiness', 0], 'emotions_2': ['anger', 0],
+              'emotions_3': ['surprise', 0], 'emotions_4': ['fear', 0], 'emotions_5': ['disgust', 0],
+              'emotions_6': ['neutral', 0],
+              'pain_0': ['acute pain', 1], 'pain_1': ['chonic_pain', 1], 'sensitivity_0': ['tactile sensitivity', 1],
+              'sensitivity_1': ['nociceptive sensitivity', 1], 'sensitivity_2': ['hedonic sensitivity', 1]}
 
 #data_to_function = np.concatenate((kipu['emotions_1'], control['emotions_1']), axis=0)
 #g_kipu = np.arange(0, 102)

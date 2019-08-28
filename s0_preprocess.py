@@ -32,9 +32,11 @@ stim = Stimuli(data_names, onesided=onesided)
 preprocess_subjects(subnums, dataloc, outdataloc, stim, bg_files, fieldnames)
 
 # Gather subjects into one dict
-subnums = ['test_sub_1', 'test_sub_2', 'test_sub_3','test_sub_4']
-outdataloc = '/Users/jtsuvile/Documents/projects/kipupotilaat/python_code_testing/'
-grouping = ['foo', 'bar', 'foo', 'bar']
+# subnums = ['test_sub_1', 'test_sub_2', 'test_sub_3','test_sub_4']
+# outdataloc = '/Users/jtsuvile/Documents/projects/kipupotilaat/python_code_testing/'
+# grouping = ['foo', 'bar', 'foo', 'bar']
+
+
 
 full_dataset = combine_data(outdataloc, subnums, groups = grouping, save=True)
 
