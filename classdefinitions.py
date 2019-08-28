@@ -77,10 +77,10 @@ class Subject:
                 # transfer data from a list of indices to array
                 arr_color = np.zeros((600, 900))
                 (x, y) = [paint[:, 2], paint[:, 1]]
+                x[x <=0] = 0
                 x[x >= 600] = 599
-                x[x < 0] = 0
+                y[y <=0] = 0
                 y[y >= 900] = 899
-                y[y < 0] = 0
                 arr_color[x.astype(int), y.astype(int)] = arr_color[x.astype(int), y.astype(int)] + 1
                 # add blur to replicate the effect of spray can in the web interface
                 # NB: size of blur might need to be changed depending on your data collection settings
@@ -139,7 +139,7 @@ class Subject:
                 data_key = filename.split('_as_matrix')[0]
                 self.data[data_key] = np.loadtxt(file, delimiter=',')
 
-    def read_sub_from_file(self, fileloc):
+    def read_sub_from_file(self, fileloc, noImages=False):
         # subject info from a json file
         filename = fileloc + '/sub_' + str(self.name) + '_info.json'
         with open(filename) as f:
@@ -150,7 +150,8 @@ class Subject:
             if key not in ('name','group','datafiles'):
                 self.bginfo[key] = value
         # read in data from the locations specified in the json
-        self.data_from_file()
+        if not noImages:
+            self.data_from_file()
 
     def draw_sub_data(self, stim, fileloc=None):
         # make sure non coloured values are white in twosided datas

@@ -1,12 +1,15 @@
 # imports
 import numpy as np
 import pandas as pd
+import os
 from scipy import stats
 from skimage import io
 from statsmodels.stats.proportion import proportions_ztest
 from statsmodels.stats.multitest import multipletests
 from classdefinitions import Subject, Stimuli
+from datetime import datetime
 import pickle
+import h5py
 
 
 def preprocess_subjects(subnums, indataloc, outdataloc, stimuli, bgfiles=None,fieldnames=None):
@@ -58,12 +61,11 @@ def binarize(data):
     """
 
     data[data > 0.007] = 1
-    data[data < -0.007] = -1
-    data[(data <= 0.007) & (data >=-0.007)] = 0
+    data[data <= 0.007] = 0
     return data
 
 
-def combine_data(dataloc, subnums, groups=None, save=False):
+def combine_data(dataloc, subnums, groups=None, save=False, noImages = False):
     """
     Combines a data set from subjects who have been written to file.
 
@@ -72,6 +74,7 @@ def combine_data(dataloc, subnums, groups=None, save=False):
     :param subnums: which subjects to combine (list). Assumes one .json file per subject
     :param groups: list of group definitions to be included, must be same length and in same order as subnums
     :param save: do you want the combined data set saved into file (pickled)? (Boolean)
+    :param noImages: do you want to just combine background data? (useful for extremely large data sets)
     :return: combined data for the defined subjects.
     The data are stored in a dictionary, where each body map will be presented as N * X * Y numpy array,
     where N is length of subnums, and X and Y are the dimensions of the maps. The dictionary will have keys for
@@ -79,37 +82,55 @@ def combine_data(dataloc, subnums, groups=None, save=False):
     in the data arrays).
     """
 
+    filename = dataloc + '/dataset_' + datetime.now().strftime("%d%m%Y-%H%M") + '.h5'
     stim = Stimuli(fileloc=dataloc, from_file=True)
     size_onesided = (522, 171)
     size_twosided = (522, 342)
     all_res = {}
-    all_res['subids'] = subnums
+    all_res['bg'] = pd.DataFrame(index=subnums)
+    all_res['bg']['subid'] = np.nan
     all_res['stimuli'] = stim
     if groups is not None and np.shape(groups)==np.shape(subnums):
-        all_res['groups'] = groups
-    all_res['bg'] = pd.DataFrame(index=subnums)
-    # init empty arrays for data
+        print('added group definitions')
+        all_res['bg']['groups'] = groups
+
+    # first attempt with H5
+    have_written_bg = False
+
     for key in stim.all.keys():
+        print(key)
+        # TODO: need to re-enable noImages flag
         if stim.all[key]['onesided']:
-            all_res[key] = np.zeros((len(subnums), size_onesided[0], size_onesided[1]))
+            data_matrix = np.zeros((len(subnums), size_onesided[0], size_onesided[1]))
         else:
-            all_res[key] = np.zeros((len(subnums), size_twosided[0], size_twosided[1]))
-    # populate with data
-    for j, subnum in enumerate(subnums):
-        temp_sub = Subject(subnum)
-        temp_sub.read_sub_from_file(dataloc)
-        for key, value in temp_sub.data.items():
-            all_res[key][j] = temp_sub.data[key]
-        for bgkey, bgvalue in temp_sub.bginfo.items():
-            if not bgkey in all_res['bg'].columns:
-                all_res['bg'][bgkey] = np.nan
-            all_res['bg'].loc[subnum, bgkey] = bgvalue
+            data_matrix = np.zeros((len(subnums), size_twosided[0], size_twosided[1]))
+        for j, subnum in enumerate(subnums):
+            print(subnum)
+            temp_sub = Subject(subnum)
+            temp_sub.read_sub_from_file(dataloc, noImages)
+            data_matrix[j] = temp_sub.data[key]
+            if sum(all_res['bg']['subid'] == subnum) == 0:
+                all_res['bg'].loc[subnum, 'subid'] = int(subnum)
+                for bgkey, bgvalue in temp_sub.bginfo.items():
+                    if bgkey != 'profession':  # cannot be neatly converted to numeric, excluding for now
+                        if not bgkey in all_res['bg'].columns:
+                            all_res['bg'][bgkey] = np.nan
+                        all_res['bg'].loc[subnum, bgkey] = int(bgvalue)
+        if save:
+            with h5py.File(filename, 'a') as store:
+                print('writing out ', key)
+                store.create_dataset(key, data=data_matrix)
+                if not have_written_bg:
+                    print('writing out background data')
+                    for bgkey, bgvalue in all_res['bg'].items():
+                        if bgkey == 'groups':
+                            dt = h5py.special_dtype(vlen=str)
+                            store.create_dataset(bgkey, data=bgvalue.to_numpy(), dtype=dt)
+                            print('saved group definitions')
+                        else:
+                            store.create_dataset(bgkey, data=bgvalue.to_numpy(), dtype="int32")
+                have_written_bg = True
     print("combined all data successfully ")
-    if save:
-        filename = dataloc + '/full_dataset.pickle'
-        with open(filename, 'wb') as handle:
-            pickle.dump(all_res, handle, protocol=pickle.HIGHEST_PROTOCOL)
-        print("saved pickle to " +dataloc + "/full_dataset.pickle")
     return all_res
 
 
@@ -233,11 +254,17 @@ def read_in_mask(file1, file2=None):
     :return: numpy array of the mask with 1=include, 0=exclude
     """
     mask_array = io.imread(file1, as_gray=True)
+    dims = mask_array.shape
+    if len(dims) == 3:
+        mask_array = mask_array[:, :, 0]
     mask_array[mask_array < 1] = 0
     mask_array = mask_array * -1
     mask_array = mask_array + 1
     if file2 is not None:
         mask_other_side = io.imread(file2, as_gray=True)
+        dims = mask_other_side.shape
+        if len(dims) == 3:
+            mask_other_side = mask_other_side[:, :, 0]
         mask_other_side[mask_other_side < 1] = 0
         mask_other_side = mask_other_side * -1
         mask_other_side = mask_other_side + 1
@@ -253,7 +280,7 @@ def count_pixels(data, mask=None):
     :param mask: optional. If provided, takes
     :return: number of coloured pixels per subject
     """
-    data = abs(binarize(data))
+    data = binarize(data)
     # sum all cells for each subject
     if mask is None:
         counts_vector = np.sum(np.sum(data, axis=1), axis=1)
@@ -264,3 +291,17 @@ def count_pixels(data, mask=None):
         counts_vector = np.sum(inside_mask, axis=1)
     prop_vector = [x / n_pixels for x in counts_vector]
     return counts_vector, prop_vector
+
+
+def get_latest_datafile(datadir):
+    """
+    :param datadir: where to search for datasets
+    :return: full path to latest datafile named dataset_ in the given datadir
+    """
+    for file in os.listdir(datadir):
+        latestfile = ''
+        if file.startswith("dataset"):
+            if file > latestfile:
+                latestfile = file
+            dataloc = os.path.join(datadir, latestfile)
+    return dataloc

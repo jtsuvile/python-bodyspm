@@ -6,6 +6,7 @@ from bodyfunctions import combine_data, preprocess_subjects
 import matplotlib.pyplot as plt
 import numpy as np
 import time
+import csv
 
 
 who = 'helsinki'
@@ -27,7 +28,8 @@ stim = Stimuli(data_names, onesided=onesided)
 if who == 'control':
     dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/subjects/'
     outdataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/processed/'
-    subfile = '/m/nbe/scratch/socbrain/kipupotilaat/data/matched_controls_may_2019.txt'
+    subfile = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/subs.txt'
+    #subfile = '/m/nbe/scratch/socbrain/kipupotilaat/data/matched_controls_may_2019.txt'
     field_names = [['sex', 'age', 'weight','height','handedness','education','work_physical','work_sitting','profession','psychologist','psychiatrist', 'neurologist'],
                ['pain_now','pain_last_day', 'pain_chronic','hist_migraine','hist_headache','hist_abdomen','hist_back_shoulder','hist_joint_limb','hist_menstrual',
                 'painkillers_overcounter','painkillers_prescription', 'painkillers_othercns'],
@@ -38,6 +40,7 @@ elif who == 'helsinki':
     dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/helsinki/subjects/'
     outdataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/helsinki/processed/'
     subfile = '/m/nbe/scratch/socbrain/kipupotilaat/data/helsinki/kipu_subs.txt'
+    grouping_file = '/m/nbe/scratch/socbrain/kipupotilaat/data/helsinki/kipuklinikka_kiputyyppi.csv'
     field_names = [['sex', 'age', 'weight','height','handedness','education','work_physical','work_sitting','profession','psychologist','psychiatrist','neurologist'],
                ['pain_now','pain_last_day', 'pain_chronic','hist_migraine','hist_headache','hist_abdomen','hist_back_shoulder','hist_joint_limb','hist_menstrual',
                 'painkillers_overcounter','painkillers_prescription', 'painkillers_othercns','hist_crps','hist_fibro'],
@@ -46,31 +49,39 @@ elif who == 'helsinki':
                ['bpi_functioning', 'bpi_mood','bpi_walk','bpi_work', 'bpi_relationships','bpi_sleep','bpi_enjoyment']]
 
 
-subnums = []
+#subnums = ['7691', '7710', '7718', '7754', '7782']
+#group_df = pd.DataFrame(['foo', 'bar', 'bar', 'foo', 'foo'])
 with open(subfile) as f:
     subnums = f.readlines()
 
 subnums = [x.strip() for x in subnums]
 
-
 print("hiya")
 
-#subnums_left = [3200, 6058, 6460]
-# # read subjects from web output and write out to a more sensible format
-preprocess_subjects(subnums, dataloc, outdataloc, stim, bg_files, field_names)
-#
+# read subjects from web output and write out to a more sensible format
+#preprocess_subjects(subnums, dataloc, outdataloc, stim, bg_files, field_names)
+
 # # Gather subjects into one dict
 #
 # #grouping = [groupname] * len(subnums)
-
-
-full_dataset = combine_data(outdataloc, subnums, save=True)
+#
+if who == 'helsinki':
+    with open(grouping_file, newline='', encoding='utf-8-sig') as csvfile:
+        grouping_data = list(csv.reader(csvfile, delimiter=';'))
+    group_df = pd.DataFrame(grouping_data)
+    group_df.columns =['diagnosis_1', 'diagnosis_2', 'subid']
+    group_df['diagnosis_1'] = group_df['diagnosis_1'].str.upper()
+    full_dataset = combine_data(outdataloc, group_df['subid'].tolist(), groups=group_df['diagnosis_1'].tolist(),
+                                save=True) #, noImages=True
+    bg = full_dataset['bg']
+    bg.to_csv('/m/nbe/scratch/socbrain/kipupotilaat/data/all_pain_patients_12_08_2019.csv')
+elif who == 'control':
+    print("combining data from ", len(subnums), " subjects")
+    full_dataset = combine_data(outdataloc, subnums,
+                                save=True, noImages=False)
 
 end = time.time()
 print(end - start)
-
-bg = full_dataset['bg']
-bg.to_csv('/m/nbe/scratch/socbrain/kipupotilaat/data/kipu_bg.csv')
 
 ## code for reading in grouping (e.g. pain type) from file
 # with open('/m/nbe/scratch/socbrain/kipupotilaat/data/helsinki/kipuklinikka_kiputyyppi.csv', mode='r', encoding="utf-8-sig") as csv_file:
@@ -106,4 +117,3 @@ bg.to_csv('/m/nbe/scratch/socbrain/kipupotilaat/data/kipu_bg.csv')
 #         f.write("%s\n" % item)
 #
 
-# NB: 3669 not correct subject number
