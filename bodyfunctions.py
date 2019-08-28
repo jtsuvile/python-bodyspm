@@ -10,6 +10,7 @@ from classdefinitions import Subject, Stimuli
 from datetime import datetime
 import pickle
 import h5py
+from tqdm import tqdm
 
 
 def preprocess_subjects(subnums, indataloc, outdataloc, stimuli, bgfiles=None,fieldnames=None):
@@ -97,15 +98,15 @@ def combine_data(dataloc, subnums, groups=None, save=False, noImages = False):
     # first attempt with H5
     have_written_bg = False
 
-    for key in stim.all.keys():
-        print(key)
+    for key in tqdm(stim.all.keys(), desc="bodymap number"):
+        #print(key)
         # TODO: need to re-enable noImages flag
         if stim.all[key]['onesided']:
             data_matrix = np.zeros((len(subnums), size_onesided[0], size_onesided[1]))
         else:
             data_matrix = np.zeros((len(subnums), size_twosided[0], size_twosided[1]))
-        for j, subnum in enumerate(subnums):
-            print(subnum)
+        for j, subnum in tqdm(enumerate(subnums), desc="subjects"):
+            #print(subnum)
             temp_sub = Subject(subnum)
             temp_sub.read_sub_from_file(dataloc, noImages)
             data_matrix[j] = temp_sub.data[key]
@@ -118,7 +119,7 @@ def combine_data(dataloc, subnums, groups=None, save=False, noImages = False):
                         all_res['bg'].loc[subnum, bgkey] = int(bgvalue)
         if save:
             with h5py.File(filename, 'a') as store:
-                print('writing out ', key)
+                #print('writing out ', key)
                 store.create_dataset(key, data=data_matrix)
                 if not have_written_bg:
                     print('writing out background data')
@@ -126,11 +127,11 @@ def combine_data(dataloc, subnums, groups=None, save=False, noImages = False):
                         if bgkey == 'groups':
                             dt = h5py.special_dtype(vlen=str)
                             store.create_dataset(bgkey, data=bgvalue.to_numpy(), dtype=dt)
-                            print('saved group definitions')
+                            #print('saved group definitions')
                         else:
                             store.create_dataset(bgkey, data=bgvalue.to_numpy(), dtype="int32")
                 have_written_bg = True
-    print("combined all data successfully ")
+    #print("combined all data successfully ")
     return all_res
 
 

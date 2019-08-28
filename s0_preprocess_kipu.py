@@ -9,7 +9,7 @@ import time
 import csv
 
 
-who = 'helsinki'
+who = 'control'
 
 start = time.time()
 # set up stimuli description
@@ -18,8 +18,9 @@ onesided = [True, True, True, True, True, True, True, False, False, False, False
 # representing intensifying and one image representing lessening activation. In this case, one side is deducted from
 # the other. Alternative (False) describes situation where both sides of colouring are retained, e.g. touch allowances
 # for front and back of body.
-data_names = ['emotions_0', 'emotions_1', 'emotions_2', 'emotions_3', 'emotions_4','emotions_5','emotions_6', 'sensitivity_0','sensitivity_1','sensitivity_2', 'pain_0', 'pain_1']
-bg_files = ['data.txt','pain_info.txt','current_feelings.txt','BPI_1.txt','BPI_2.txt']
+data_names = ['emotions_0', 'emotions_1', 'emotions_2', 'emotions_3', 'emotions_4','emotions_5','emotions_6',
+              'sensitivity_0', 'sensitivity_1', 'sensitivity_2', 'pain_0', 'pain_1']
+bg_files = ['data.txt', 'pain_info.txt', 'current_feelings.txt', 'BPI_1.txt', 'BPI_2.txt']
 
 # define stimulus set
 stim = Stimuli(data_names, onesided=onesided)
@@ -78,7 +79,7 @@ if who == 'helsinki':
 elif who == 'control':
     print("combining data from ", len(subnums), " subjects")
     full_dataset = combine_data(outdataloc, subnums,
-                                save=True, noImages=False)
+                                save=True)
 
 end = time.time()
 print(end - start)
