@@ -8,7 +8,6 @@ from statsmodels.stats.proportion import proportions_ztest
 from statsmodels.stats.multitest import multipletests
 from classdefinitions import Subject, Stimuli
 from datetime import datetime
-import pickle
 import h5py
 from tqdm import tqdm
 
@@ -60,9 +59,14 @@ def binarize(data):
     :param data: matrix with colouring data
     :return: same matrix, with coloured areas changed to 1 and non-coloured changed to 0
     """
-
     data[data > 0.007] = 1
     data[data <= 0.007] = 0
+    return data
+
+def binarize_posneg(data):
+    data[data > 0.007] = 1
+    data[(data <= 0.007) & (data >= -0.007)] = 0
+    data[data < -0.007] = -1
     return data
 
 
@@ -147,19 +151,19 @@ def one_sample_t_test(data):
     return statistics, pval
 
 
-def compare_groups(data, group1, group2, testtype='t'):
+def compare_groups(group1, group2, testtype='t'):
     """
     Compares the maps of two groups of subjects pixel-wise
 
-    :param data: 3-D data matrix of subject-wise colouring maps. Axis 0 represents subjects.
-    :param group1: indices of group1 members in the matrix
-    :param group2: indices of group2 members in the matrix
+    :param data:
+    :param group1: Data for group 1. 3-D data matrix of subject-wise colouring maps. Axis 0 represents subjects.
+    :param group2: Data for group 2. 3-D data matrix of subject-wise colouring maps. Axis 0 represents subjects.
     :param testtype: should the groups be compared using a two sample t-test (default) or z-test of proportions?
     :return: two matrices, with the test statistic and p-value for the comparison per each pixel
     """
     # copy the data for each group to avoid accidentally making edits to original data
-    g0_data = np.copy(data[group1])
-    g1_data = np.copy(data[group2])
+    g0_data = np.copy(group1)
+    g1_data = np.copy(group2)
     dims = g0_data.shape
     if testtype=='z':
         # test of proportions
@@ -201,10 +205,10 @@ def correlate_maps(data, corr_with):
     # temporarily change data to 2-D to enable correlation analysis
     data_reshaped = np.reshape(data, (dims[0], -1))
     # run correlation on each pixel separately
-    corr_res = np.apply_along_axis(np.correlate, 0, data_reshaped, corr_with)
+    corr_res = np.apply_along_axis(np.corrcoef, 0, data_reshaped, corr_with)
     # reshape result
     corr_map = np.reshape(corr_res, (dims[1], dims[2]))
-    return corr_map
+    return corr_map, corr_res
 
 
 def p_adj_maps(pval_map, mask=None, alpha = 0.05, method='fdr_bh'):
@@ -225,22 +229,27 @@ def p_adj_maps(pval_map, mask=None, alpha = 0.05, method='fdr_bh'):
     """
     dims = pval_map.shape
     if mask is None:
-        data_reshaped = np.reshape(pval_map, (dims[0], -1))
+        data_reshaped = np.reshape(pval_map, (-1, 1))
+        #print(dims)
+        #print(data_reshaped.shape)
     else:
-        if dims!=mask.shape:
+        if dims != mask.shape:
             print('expected mask to be same shape as data, cannot continue')
             return
         else:
             # if we have mask, we can just pick the relevant numbers
-            print('found mask of the right size')
+            #print('found mask of the right size')
             data_reshaped = pval_map[mask.astype(int)>0]
     reject, pvals_corrected, alpacSidak, alhacBonferroni = multipletests(data_reshaped, alpha, method)
     if mask is None:
-        pval_map_corrected = np.reshape(pvals_corrected, (dims[1],dims[2]))
+        pval_map_corrected = np.reshape(pvals_corrected, (dims[0], -1))
+        reject_map = np.reshape(reject, (dims[0],-1))
     else:
         pval_map_corrected = np.ones(dims)
         pval_map_corrected[mask.astype(int)>0] = pvals_corrected
-    return pval_map_corrected
+        reject_map = np.ones(dims)
+        reject_map[mask.astype(int) > 0] = reject
+    return pval_map_corrected, reject_map
 
 
 def read_in_mask(file1, file2=None):
@@ -299,10 +308,11 @@ def get_latest_datafile(datadir):
     :param datadir: where to search for datasets
     :return: full path to latest datafile named dataset_ in the given datadir
     """
+    latestfile = ''
     for file in os.listdir(datadir):
-        latestfile = ''
         if file.startswith("dataset"):
             if file > latestfile:
                 latestfile = file
             dataloc = os.path.join(datadir, latestfile)
     return dataloc
+

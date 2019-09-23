@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 # class to keep the relevant information of each stimulus together
 class Stimuli:
 
+
     def __init__(self, names=None, onesided=True, show_names=None, fileloc='', from_file=False):
         self.all = {}
         if not from_file:
