@@ -9,7 +9,7 @@ import time
 import csv
 
 
-who = 'control'
+who = 'helsinki'
 
 start = time.time()
 # set up stimuli description
@@ -34,7 +34,7 @@ if who == 'control':
     field_names = [['sex', 'age', 'weight','height','handedness','education','work_physical','work_sitting','profession','psychologist','psychiatrist', 'neurologist'],
                ['pain_now','pain_last_day', 'pain_chronic','hist_migraine','hist_headache','hist_abdomen','hist_back_shoulder','hist_joint_limb','hist_menstrual',
                 'painkillers_overcounter','painkillers_prescription', 'painkillers_othercns'],
-               ['feels_pain','feels_depression','feels_anxiety','feels_happy','feels_sad','feels_angry','feels_surprise','feels_disgust'],
+               ['feels_pain','feels_depression','feels_anxiety','feels_happy','feels_sad','feels_angry','feels_fear','feels_surprise','feels_disgust'],
                ['bpi_worst', 'bpi_least', 'bpi_average', 'bpi_now', 'bpi_painkiller_relief'],
                ['bpi_functioning', 'bpi_mood','bpi_walk','bpi_work', 'bpi_relationships','bpi_sleep','bpi_enjoyment']]
 elif who == 'helsinki':
@@ -45,22 +45,34 @@ elif who == 'helsinki':
     field_names = [['sex', 'age', 'weight','height','handedness','education','work_physical','work_sitting','profession','psychologist','psychiatrist','neurologist'],
                ['pain_now','pain_last_day', 'pain_chronic','hist_migraine','hist_headache','hist_abdomen','hist_back_shoulder','hist_joint_limb','hist_menstrual',
                 'painkillers_overcounter','painkillers_prescription', 'painkillers_othercns','hist_crps','hist_fibro'],
-               ['feels_pain','feels_depression','feels_anxiety','feels_happy','feels_sad','feels_angry','feels_surprise','feels_disgust'],
+               ['feels_pain','feels_depression','feels_anxiety','feels_happy','feels_sad','feels_angry','feels_fear','feels_surprise','feels_disgust'],
                ['bpi_worst', 'bpi_least', 'bpi_average', 'bpi_now', 'bpi_painkiller_relief'],
                ['bpi_functioning', 'bpi_mood','bpi_walk','bpi_work', 'bpi_relationships','bpi_sleep','bpi_enjoyment']]
+elif who == 'matched_controls':
+    dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/subjects/'
+    outdataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/processed/'
+    subfile = '/m/nbe/scratch/socbrain/kipupotilaat/data/age_and_gender_matched_subs_pain_helsinki.csv'
+    field_names = [['sex', 'age', 'weight','height','handedness','education','work_physical','work_sitting','profession','psychologist','psychiatrist', 'neurologist'],
+               ['pain_now','pain_last_day', 'pain_chronic','hist_migraine','hist_headache','hist_abdomen','hist_back_shoulder','hist_joint_limb','hist_menstrual',
+                'painkillers_overcounter','painkillers_prescription', 'painkillers_othercns'],
+               ['feels_pain','feels_depression','feels_anxiety','feels_happy','feels_sad','feels_angry','feels_fear','feels_surprise','feels_disgust'],
+               ['bpi_worst', 'bpi_least', 'bpi_average', 'bpi_now', 'bpi_painkiller_relief'],
+               ['bpi_functioning', 'bpi_mood','bpi_walk','bpi_work', 'bpi_relationships','bpi_sleep','bpi_enjoyment']]
+    matchdata = pd.read_csv(subfile)
+    subnums = list(matchdata['control_id'])
 
 
-#subnums = ['7691', '7710', '7718', '7754', '7782']
-#group_df = pd.DataFrame(['foo', 'bar', 'bar', 'foo', 'foo'])
-with open(subfile) as f:
-    subnums = f.readlines()
 
-subnums = [x.strip() for x in subnums]
+# if who is not 'matched_controls':
+#     with open(subfile) as f:
+#         subnums = f.readlines()
+#     subnums = [x.strip() for x in subnums]
+#
+# print("hiya")
 
-print("hiya")
-
+# subnums = ['4308']
 # read subjects from web output and write out to a more sensible format
-#preprocess_subjects(subnums, dataloc, outdataloc, stim, bg_files, field_names)
+# preprocess_subjects(subnums, dataloc, outdataloc, stim, bg_files, field_names)
 
 # # Gather subjects into one dict
 #
@@ -73,13 +85,21 @@ if who == 'helsinki':
     group_df.columns =['diagnosis_1', 'diagnosis_2', 'subid']
     group_df['diagnosis_1'] = group_df['diagnosis_1'].str.upper()
     full_dataset = combine_data(outdataloc, group_df['subid'].tolist(), groups=group_df['diagnosis_1'].tolist(),
-                                save=True) #, noImages=True
+                                save=True, noImages=False) #, noImages=True
     bg = full_dataset['bg']
-    bg.to_csv('/m/nbe/scratch/socbrain/kipupotilaat/data/all_pain_patients_12_08_2019.csv')
+    bg.to_csv('/m/nbe/scratch/socbrain/kipupotilaat/data/all_pain_patients_21_10_2019.csv')
 elif who == 'control':
     print("combining data from ", len(subnums), " subjects")
     full_dataset = combine_data(outdataloc, subnums,
-                                save=True)
+                                save=False, noImages=True)
+    bg = full_dataset['bg']
+    bg.to_csv('/m/nbe/scratch/socbrain/kipupotilaat/data/bg_all_controls.csv')
+elif who == 'matched_controls':
+    print("combining data from ", len(subnums), " subjects")
+    full_dataset = combine_data(outdataloc, subnums,
+                                save=False, noImages=True)
+    bg = full_dataset['bg']
+    bg.to_csv('/m/nbe/scratch/socbrain/kipupotilaat/data/bg_matched_controls.csv')
 
 end = time.time()
 print(end - start)

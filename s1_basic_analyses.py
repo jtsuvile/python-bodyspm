@@ -9,7 +9,6 @@ from scipy import stats
 import pandas as pd
 
 
-
 # Read pickled dataset from file
 
 dataloc = '/Users/jtsuvile/Documents/projects/kipupotilaat/python_code_testing/'

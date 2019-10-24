@@ -63,6 +63,7 @@ def binarize(data):
     data[data <= 0.007] = 0
     return data
 
+
 def binarize_posneg(data):
     data[data > 0.007] = 1
     data[(data <= 0.007) & (data >= -0.007)] = 0
@@ -87,6 +88,8 @@ def combine_data(dataloc, subnums, groups=None, save=False, noImages = False):
     in the data arrays).
     """
 
+    # NB: currently noImages does not change behavior based on save false/true
+
     filename = dataloc + '/dataset_' + datetime.now().strftime("%d%m%Y-%H%M") + '.h5'
     stim = Stimuli(fileloc=dataloc, from_file=True)
     size_onesided = (522, 171)
@@ -98,22 +101,12 @@ def combine_data(dataloc, subnums, groups=None, save=False, noImages = False):
     if groups is not None and np.shape(groups)==np.shape(subnums):
         print('added group definitions')
         all_res['bg']['groups'] = groups
-
     # first attempt with H5
     have_written_bg = False
-
-    for key in tqdm(stim.all.keys(), desc="bodymap number"):
-        #print(key)
-        # TODO: need to re-enable noImages flag
-        if stim.all[key]['onesided']:
-            data_matrix = np.zeros((len(subnums), size_onesided[0], size_onesided[1]))
-        else:
-            data_matrix = np.zeros((len(subnums), size_twosided[0], size_twosided[1]))
+    if noImages:
         for j, subnum in tqdm(enumerate(subnums), desc="subjects"):
-            #print(subnum)
             temp_sub = Subject(subnum)
             temp_sub.read_sub_from_file(dataloc, noImages)
-            data_matrix[j] = temp_sub.data[key]
             if sum(all_res['bg']['subid'] == subnum) == 0:
                 all_res['bg'].loc[subnum, 'subid'] = int(subnum)
                 for bgkey, bgvalue in temp_sub.bginfo.items():
@@ -121,19 +114,38 @@ def combine_data(dataloc, subnums, groups=None, save=False, noImages = False):
                         if not bgkey in all_res['bg'].columns:
                             all_res['bg'][bgkey] = np.nan
                         all_res['bg'].loc[subnum, bgkey] = int(bgvalue)
-        if save:
-            with h5py.File(filename, 'a') as store:
-                #print('writing out ', key)
-                store.create_dataset(key, data=data_matrix)
-                if not have_written_bg:
-                    print('writing out background data')
-                    for bgkey, bgvalue in all_res['bg'].items():
-                        if bgkey == 'groups':
-                            dt = h5py.special_dtype(vlen=str)
-                            store.create_dataset(bgkey, data=bgvalue.to_numpy(), dtype=dt)
-                            #print('saved group definitions')
-                        else:
-                            store.create_dataset(bgkey, data=bgvalue.to_numpy(), dtype="int32")
+    else:
+        for key in tqdm(stim.all.keys(), desc="bodymap number"):
+            #print(key)
+            if stim.all[key]['onesided']:
+                data_matrix = np.zeros((len(subnums), size_onesided[0], size_onesided[1]))
+            else:
+                data_matrix = np.zeros((len(subnums), size_twosided[0], size_twosided[1]))
+            for j, subnum in tqdm(enumerate(subnums), desc="subjects"):
+                #print(subnum)
+                temp_sub = Subject(subnum)
+                temp_sub.read_sub_from_file(dataloc, noImages)
+                data_matrix[j] = temp_sub.data[key]
+                if sum(all_res['bg']['subid'] == subnum) == 0:
+                    all_res['bg'].loc[subnum, 'subid'] = int(subnum)
+                    for bgkey, bgvalue in temp_sub.bginfo.items():
+                        if bgkey != 'profession':  # cannot be neatly converted to numeric, excluding for now
+                            if not bgkey in all_res['bg'].columns:
+                                all_res['bg'][bgkey] = np.nan
+                            all_res['bg'].loc[subnum, bgkey] = int(bgvalue)
+            if save:
+                with h5py.File(filename, 'a') as store:
+                    #print('writing out ', key)
+                    store.create_dataset(key, data=data_matrix)
+                    if not have_written_bg:
+                        print('writing out background data')
+                        for bgkey, bgvalue in all_res['bg'].items():
+                            if bgkey == 'groups':
+                                dt = h5py.special_dtype(vlen=str)
+                                store.create_dataset(bgkey, data=bgvalue.to_numpy(), dtype=dt)
+                                #print('saved group definitions')
+                            else:
+                                store.create_dataset(bgkey, data=bgvalue.to_numpy(), dtype="int32")
                 have_written_bg = True
     #print("combined all data successfully ")
     return all_res
@@ -287,7 +299,7 @@ def count_pixels(data, mask=None):
     Count the number and proportion of coloured pixels per subject
 
     :param data: the 3D-data frame where to count the
-    :param mask: optional. If provided, takes
+    :param mask: optional. If provided, takes values inside mask into account in counting proportion colored
     :return: number of coloured pixels per subject
     """
     data = binarize(data)
@@ -302,6 +314,33 @@ def count_pixels(data, mask=None):
     prop_vector = [x / n_pixels for x in counts_vector]
     return counts_vector, prop_vector
 
+def count_pixels_posneg(data, mask=None):
+    """
+    Count the number and proportion of coloured pixels per subject
+
+    :param data: the 3D-data frame where to count the
+    :param mask: optional. If provided, takes values inside mask into account in counting proportion colored
+    :return: number of coloured pixels per subject
+    """
+    data = binarize_posneg(data)
+    data_neg = data.copy()
+    data_neg[data_neg > 0] = 0
+    data_neg = data_neg * -1
+    data_pos = data.copy()
+    data_pos[data_pos < 0] = 0
+    # sum all cells for each subject
+    if mask is None:
+        mask = np.ones((data.shape[1],data.shape[2]))
+    inside_mask_pos = data_pos[:, mask == 1]
+    pos_vector = np.sum(inside_mask_pos, axis=1)
+    inside_mask_neg = data_neg[:, mask == 1]
+    neg_vector = np.sum(inside_mask_neg, axis=1)
+    n_pixels = np.sum(np.sum(mask))
+    prop_pos = [x / n_pixels for x in pos_vector]
+    prop_neg = [x / n_pixels for x in neg_vector]
+
+    return pos_vector, prop_pos, neg_vector, prop_neg
+
 
 def get_latest_datafile(datadir):
     """
@@ -311,7 +350,7 @@ def get_latest_datafile(datadir):
     latestfile = ''
     for file in os.listdir(datadir):
         if file.startswith("dataset"):
-            if file > latestfile:
+            if latestfile == '' or os.path.getmtime(datadir +  '/' + file) > os.path.getmtime(datadir + '/' + latestfile):
                 latestfile = file
             dataloc = os.path.join(datadir, latestfile)
     return dataloc
