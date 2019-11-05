@@ -9,7 +9,7 @@ import time
 import csv
 
 
-who = 'helsinki'
+who = 'matched_controls_two_each'
 
 start = time.time()
 # set up stimuli description
@@ -60,8 +60,21 @@ elif who == 'matched_controls':
                ['bpi_functioning', 'bpi_mood','bpi_walk','bpi_work', 'bpi_relationships','bpi_sleep','bpi_enjoyment']]
     matchdata = pd.read_csv(subfile)
     subnums = list(matchdata['control_id'])
-
-
+elif who == 'matched_controls_two_each':
+    dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/subjects/'
+    outdataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/processed/'
+    subfile1 = '/m/nbe/scratch/socbrain/kipupotilaat/data/age_and_gender_matched_subs_pain_helsinki.csv'
+    subfile2 = '/m/nbe/scratch/socbrain/kipupotilaat/data/second_age_and_gender_matched_subs_pain_helsinki.csv'
+    field_names = [['sex', 'age', 'weight','height','handedness','education','work_physical','work_sitting','profession','psychologist','psychiatrist', 'neurologist'],
+               ['pain_now','pain_last_day', 'pain_chronic','hist_migraine','hist_headache','hist_abdomen','hist_back_shoulder','hist_joint_limb','hist_menstrual',
+                'painkillers_overcounter','painkillers_prescription', 'painkillers_othercns'],
+               ['feels_pain','feels_depression','feels_anxiety','feels_happy','feels_sad','feels_angry','feels_fear','feels_surprise','feels_disgust'],
+               ['bpi_worst', 'bpi_least', 'bpi_average', 'bpi_now', 'bpi_painkiller_relief'],
+               ['bpi_functioning', 'bpi_mood','bpi_walk','bpi_work', 'bpi_relationships','bpi_sleep','bpi_enjoyment']]
+    matchdata1 = pd.read_csv(subfile1)
+    matchdata2 = pd.read_csv(subfile2)
+    matchdata = pd.concat([matchdata1, matchdata2])
+    subnums = list(matchdata['control_id'])
 
 # if who is not 'matched_controls':
 #     with open(subfile) as f:
@@ -97,9 +110,15 @@ elif who == 'control':
 elif who == 'matched_controls':
     print("combining data from ", len(subnums), " subjects")
     full_dataset = combine_data(outdataloc, subnums,
-                                save=False, noImages=True)
+                                save=True, noImages=False)
     bg = full_dataset['bg']
-    bg.to_csv('/m/nbe/scratch/socbrain/kipupotilaat/data/bg_matched_controls.csv')
+    bg.to_csv('/m/nbe/scratch/socbrain/kipupotilaat/data/bg_matched_controls_30_10_2019.csv')
+elif who == 'matched_controls_two_each':
+    print("combining data from ", len(subnums), " subjects")
+    full_dataset = combine_data(outdataloc, subnums,
+                                save=True, noImages=False)
+    bg = full_dataset['bg']
+    bg.to_csv('/m/nbe/scratch/socbrain/kipupotilaat/data/bg_double_matched_controls_30_10_2019.csv')
 
 end = time.time()
 print(end - start)

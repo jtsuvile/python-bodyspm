@@ -16,12 +16,13 @@ datafile = get_latest_datafile(dataloc)
 mask_fb = read_in_mask(maskloc + 'mask_front_new.png', maskloc + 'mask_back_new.png')
 mask_one = read_in_mask(maskloc + 'mask_front_new.png')
 
+
 stim_names = {'emotions_0': ['sadness', 0], 'emotions_1': ['happiness', 0], 'emotions_2': ['anger', 0],
               'emotions_3': ['surprise', 0], 'emotions_4': ['fear', 0], 'emotions_5': ['disgust', 0],
-              'emotions_6': ['neutral', 0],
-              'pain_0': ['acute pain', 1], 'pain_1': ['chonic_pain', 1], 'sensitivity_0': ['tactile sensitivity', 1],
-              'sensitivity_1': ['nociceptive sensitivity', 1], 'sensitivity_2': ['hedonic sensitivity', 1]}
-
+              'emotions_6': ['neutral', 0]}# ,
+              # 'pain_0': ['acute pain', 1], 'pain_1': ['chonic_pain', 1], 'sensitivity_0': ['tactile sensitivity', 1],
+              # 'sensitivity_1': ['nociceptive sensitivity', 1], 'sensitivity_2': ['hedonic sensitivity', 1]}
+              #
 
 # Visualise group differences
 #
@@ -47,25 +48,23 @@ for i, cond in enumerate(stim_names.keys()):
         vmin = -1
         vmax = 1
         fig= plt.figure(figsize=(10,10))
+    print(np.max(pain))
+    print(np.max(crps))
 
-    # crps_t, crps_p = stats.ttest_1samp(crps, 0, nan_policy='omit', axis=0) #np.nanmean(binarize(crps), axis=0)
-    # crps_p_corrected, crps_reject = p_adj_maps(crps_p, mask, method='fdr_by')
-    # crps_p_corrected[np.isnan(crps_p_corrected)] = 1
-    # crps_t[crps_p_corrected>0.05] = 0
-    crps_t = np.nanmean(binarize_posneg(crps),axis=0)
+    if stim_names[cond][1] == 1: # do not binarize for t-test
+        crps_t = np.nanmean(binarize_posneg(crps.copy()),axis=0)
+        kipu_t = np.nanmean(binarize_posneg(pain.copy()), axis=0)
+    else: # binarize for t-test
+        crps_t = np.nanmean(binarize_posneg(crps),axis=0)
+        kipu_t = np.nanmean(binarize_posneg(pain), axis=0)
+
     masked_crps= np.ma.masked_where(mask != 1,crps_t)
-
-    # kipu_t, kipu_p = stats.ttest_1samp(pain, 0, nan_policy='omit', axis=0)#np.nanmean(binarize(pain), axis=0)
-    # kipu_p_corrected, kipu_reject = p_adj_maps(kipu_p, mask, method='fdr_by')
-    # kipu_p_corrected[np.isnan(kipu_p_corrected)] = 1
-    # kipu_t[kipu_p_corrected>0.05] = 0
-    kipu_t = np.nanmean(binarize_posneg(pain),axis=0)
     masked_kipu= np.ma.masked_where(mask != 1,kipu_t)
 
-    if (np.nanmin(crps_t)==0) & (np.nanmin(kipu_t)==0):
-        twosamp_t, twosamp_p = compare_groups(pain, crps, testtype='z')
-    else:
-        twosamp_t, twosamp_p = stats.ttest_ind(pain, crps, axis=0, nan_policy='omit')
+    # if (np.nanmin(crps_t)==0) & (np.nanmin(kipu_t)==0):
+    #     twosamp_t, twosamp_p = compare_groups(pain, crps, testtype='z')
+    # else:
+    twosamp_t, twosamp_p = stats.ttest_ind(pain, crps, axis=0, nan_policy='omit')
 
     twosamp_p_corrected, twosamp_reject = p_adj_maps(twosamp_p, mask=mask, method='fdr_by')
     twosamp_p_corrected[np.isnan(twosamp_p_corrected)] = 1
@@ -104,7 +103,7 @@ for i, cond in enumerate(stim_names.keys()):
     #
     fig.suptitle(stim_names[cond][0], size=20, va='top')
     #plt.show()
-    plt.savefig(figloc+cond+'_pain_crps_with_ttest_with_and_without_fdr.png')
+    plt.savefig(figloc+cond+'_pain_crps_ttest_with_and_without_fdr.png')
     plt.close()
 
 

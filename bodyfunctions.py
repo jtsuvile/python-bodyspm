@@ -200,16 +200,14 @@ def compare_groups(group1, group2, testtype='t'):
     return statistics_twosamp, pval_twosamp
 
 
-def correlate_maps(data, corr_with):
+def correlate_maps(data, corr_with, method):
     """
     Correlates a set of subject-wise colouring maps with a vector of values (e.g. a background factor)
 
     :param data: 3-D data matrix of the subject-wise colouring maps. Axis 0 represents subjects.
     :param corr_with: vector of values (1 per subject) to correlate with.
-    :return: map with correlation coefficient for each.
+    :return: map with correlation coefficient for each and map with p-values
     """
-    # TODO: move from np.correlate to something which allows spearman and pearson,
-    #  like pandas corr or scipy spearmanr and pearsonr? Also get p-values
     dims = data.shape
     if dims[0] is not len(corr_with): # NB: change this to a proper error at some point
         print('You need to provide exactly one value per subject for the analysis. Stopping execution.')
@@ -217,10 +215,14 @@ def correlate_maps(data, corr_with):
     # temporarily change data to 2-D to enable correlation analysis
     data_reshaped = np.reshape(data, (dims[0], -1))
     # run correlation on each pixel separately
-    corr_res = np.apply_along_axis(np.corrcoef, 0, data_reshaped, corr_with)
+    if method=='spearman':
+        corr_res, pvals = np.apply_along_axis(stats.spearmanr, data_reshaped, corr_with, axis=0)
+    if method=='pearson':
+        corr_res, pvals = np.apply_along_axis(stats.pearsonr,data_reshaped, corr_with, axis=0)
     # reshape result
     corr_map = np.reshape(corr_res, (dims[1], dims[2]))
-    return corr_map, corr_res
+    p_map = np.reshape(pvals, (dims[1], dims[2]))
+    return corr_map, p_map
 
 
 def p_adj_maps(pval_map, mask=None, alpha = 0.05, method='fdr_bh'):
