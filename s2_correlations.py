@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 from scipy import stats
 import pingouin as pg # TODO: add partial correlation with age
-
+from partcorr import partial_corr_vector
 import matplotlib.pyplot as plt
 import seaborn as sns
 from mpl_toolkits.axes_grid1 import make_axes_locatable
@@ -118,22 +118,23 @@ for j, cond in enumerate(stim_names.keys()):
         print('cond:', cond, 'which is number', j, 'partial correlation.')
         df = pd.DataFrame(data_reshaped, columns=range(0,data_reshaped.shape[1]))
         df = df.rename(columns=str)
-        df.insert(0,'age',control_for)
-        df.insert(0,'pain',corr_with)
         corr_res_spearman = np.zeros([1, data_reshaped.shape[1]])
         corr_p_spearman = np.ones([1, data_reshaped.shape[1]])
-        for pixel in range(0, data_reshaped.shape[1]):
-            try:
-                # faster with a lambda function and pandas apply?
-                stats_res = pg.partial_corr(data=df, x=str(pixel), y='pain', covar='age', method='spearman')
-                corr_val = stats_res.r[0]
-                p_val = stats_res['p-val'][0]
-            except:
-                corr_val = 0
-                p_val = 1
-            finally:
-                corr_res_spearman[0,pixel] = corr_val
-                corr_p_spearman[0,pixel] = p_val
+        stats_res = df.apply(lambda x: partial_corr_vector(data=df, x=x, y=corr_with, covar=control_for, method='spearman'), axis=0)
+        # for pixel in range(0, data_reshaped.shape[1]):
+        #     print(pixel)
+        #     try:
+        #         # faster with a lambda function and pandas apply?
+        #         #
+        #         stats_res = pg.partial_corr(data=df, x=str(pixel), y='pain', covar='age', method='spearman')
+        #         corr_val = stats_res.r[0]
+        #         p_val = stats_res['p-val'][0]
+        #     except:
+        #         corr_val = 0
+        #         p_val = 1
+        #     finally:
+        #         corr_res_spearman[0,pixel] = corr_val
+        #         corr_p_spearman[0,pixel] = p_val
     else:
         print('cond:', cond, 'which is number', j, 'using spearman.')
         corr_res_spearman, corr_p_spearman = np.apply_along_axis(stats.spearmanr, 0, data_reshaped, corr_with)

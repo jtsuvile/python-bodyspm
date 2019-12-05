@@ -1,0 +1,121 @@
+# import os
+# import pandas as pd
+# from bodyfunctions import *
+# import numpy as np
+# from classdefinitions import Subject, Stimuli
+# import h5py
+#
+# outdataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/helsinki/processed/'
+# datafile = get_latest_datafile(outdataloc)
+#
+# data = {}
+# with h5py.File(datafile, 'r') as h:
+#     data['acute'] = h.get('pain_0').value
+#     data['chronic'] = h.get('pain_1').value
+#     data['groups'] = list(h['groups'])
+#     data['subid'] = list(h['subid'])
+#     data['intensity'] = list(h['feels_pain'])
+#
+# for subject in range(len(data['subid'])):
+#     temp_acute = data['acute'][subject].copy
+#     temp_chronic = data['chronic'][subject]copy
+#     binarize()
+#
+# ###
+from classdefinitions import Subject, Stimuli
+from bodyfunctions import *
+import h5py
+import numpy as np
+from scipy import stats
+import matplotlib.pyplot as plt
+from matplotlib import cm
+from matplotlib.colors import ListedColormap, LinearSegmentedColormap
+
+
+figloc = '/Volumes/SCRsocbrain/kipupotilaat/figures/'
+maskloc = '/Volumes/SCRsocbrain/kipupotilaat/data/'
+dataloc = '/Volumes/SCRsocbrain/kipupotilaat/data/helsinki/processed/'
+datafile = get_latest_datafile(dataloc)
+mask_fb = read_in_mask(maskloc + 'mask_front_new.png', maskloc + 'mask_back_new.png')
+mask_one = read_in_mask(maskloc + 'mask_front_new.png')
+
+stim_names = {'emotions_0': ['sadness', 0], 'emotions_1': ['happiness', 0], 'emotions_2': ['anger', 0],
+              'emotions_3': ['surprise', 0], 'emotions_4': ['fear', 0], 'emotions_5': ['disgust', 0],
+              'emotions_6': ['neutral', 0],
+              'pain_0': ['acute pain', 1], 'pain_1': ['chonic_pain', 1], 'sensitivity_0': ['tactile sensitivity', 1],
+              'sensitivity_1': ['nociceptive sensitivity', 1], 'sensitivity_2': ['hedonic sensitivity', 1]}
+
+#kipu_diagnoses = pd.DataFrame(kipu['groups'], columns = ['diagnosis'], index = kipu['subids'])
+#crps = kipu_diagnoses['diagnosis'].str.match('CRPS')
+
+cmap = cm.get_cmap('hot',5)
+cmaplist = [cmap(i) for i in range(cmap.N)]
+cmaplist_2 = [(0.0, 0.0, 0.0416, 1.0), (0.0, 0.0, 0.6978963084702215, 1.0), (0.0, 0.3541670494785446, 1.0, 1.0), (0.015624015624015514, 1.0, 1.0, 1.0), (1.0, 1.0, 1.0, 1.0)]
+cmap2 = LinearSegmentedColormap.from_list(
+        'new_coolio', cmaplist_2, N=5)
+cond = 'emotions_0'
+with h5py.File(datafile, 'r') as h:
+    kipu = h[cond].value
+    kipu_diagnoses = list(h['groups'])
+
+crps_indices = np.asarray([x == 'CRPS' for x in kipu_diagnoses])
+pain = kipu[~crps_indices]
+crps = kipu[crps_indices]
+
+if stim_names[cond][1] == 1:
+    mask = mask_fb
+    cmap = 'hot'
+    vmin = 0
+    vmax = 10
+    fig = plt.figure(figsize=(25, 10))
+else:
+    mask = mask_one
+    cmap = 'seismic'
+    vmin = -10
+    vmax = 10
+    fig = plt.figure(figsize=(10, 10))
+
+crps_t, crps_p = stats.ttest_1samp(crps, 0, nan_policy='omit', axis=0)  # np.nanmean(binarize(crps), axis=0)
+crps_p_corrected = p_adj_maps(crps_p, mask)
+crps_p_corrected[np.isnan(crps_p_corrected)] = 1
+crps_t[crps_p_corrected > 0.05] = 0
+masked_crps = np.ma.masked_where(mask != 1, crps_t)
+
+kipu_t, kipu_p = stats.ttest_1samp(pain, 0, nan_policy='omit', axis=0)  # np.nanmean(binarize(pain), axis=0)
+kipu_p_corrected = p_adj_maps(kipu_p, mask)
+kipu_p_corrected[np.isnan(kipu_p_corrected)] = 1
+kipu_t[kipu_p_corrected > 0.05] = 0
+masked_kipu = np.ma.masked_where(mask != 1, kipu_t)
+
+# if (np.nanmin(crps_t)==0) & (np.nanmin(kipu_t)==0):
+#     twosamp_t, twosamp_p = compare_groups(pain, crps, testtype='t')
+# else:
+twosamp_t, twosamp_p = stats.ttest_ind(pain, crps, axis=0, nan_policy='omit')
+
+twosamp_p_corrected = p_adj_maps(twosamp_p, mask)
+twosamp_p_corrected[np.isnan(twosamp_p_corrected)] = 1
+twosamp_t[twosamp_p_corrected > 0.05] = 0
+masked_twosamp = np.ma.masked_where(mask != 1, twosamp_t)
+
+ax1 = plt.subplot(132)
+img1 = plt.imshow(masked_kipu, cmap=cmap, vmin=vmin, vmax=vmax)
+ax1.title.set_text('Misc pain patients')
+fig.colorbar(img1, fraction=0.046, pad=0.04)
+ax1.axis('off')
+
+ax2 = plt.subplot(131)
+img2 = plt.imshow(masked_crps, cmap=cmap, vmin=vmin, vmax=vmax)
+ax2.title.set_text('CRPS patients')
+fig.colorbar(img2, fraction=0.046, pad=0.04)
+ax2.axis('off')
+
+ax3 = plt.subplot(133)
+img3 = plt.imshow(masked_twosamp, cmap='bwr', vmin=-5, vmax=5)
+ax3.title.set_text('Difference')
+fig.colorbar(img3, fraction=0.046, pad=0.04)
+ax3.axis('off')
+#
+fig.suptitle(stim_names[cond], size=20, va='top')
+plt.show()
+#plt.savefig(figloc + cond + '_pain_crps_with_ttest.png')
+#plt.close()
