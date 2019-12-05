@@ -38,7 +38,7 @@ preprocess_subjects(subnums, dataloc, outdataloc, stim, bg_files, fieldnames)
 
 
 
-full_dataset = combine_data(outdataloc, subnums, groups = grouping, save=True)
+full_dataset = combine_data(outdataloc, subnums, groups = grouping, save=False, noImages=True)
 
 indices = lambda searchList, elem: [[i for i, x in enumerate(searchList) if x == e] for e in elem]
 indices(full_dataset['groups'], ['foo','bar'])
