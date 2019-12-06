@@ -10,17 +10,21 @@ import csv
 
 
 
-# bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/all_pain_patients_12_08_2019.csv'
+# bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/all_pain_patients_21_10_2019.csv'
 # dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/helsinki/processed/'
-# outfilename ='/m/nbe/scratch/socbrain/kipupotilaat/data/all_pain_patients_with_activations.csv'
+# outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/data/all_pain_patients_with_activations_10_2019.csv'
 
-# bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/bg_matched_controls.csv'
+# bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/bg_matched_controls_30_10_2019.csv'
 # dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/processed/matched_controls/'
-# outfilename ='/m/nbe/scratch/socbrain/kipupotilaat/data/matched_controls_with_activations.csv'
+# outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/data/matched_controls_with_activations_10_2019.csv'
 
-bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/bg_all_controls.csv'
-dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/processed/'
-outfilename ='/m/nbe/scratch/socbrain/kipupotilaat/data/all_healthy_with_activations.csv'
+bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/bg_double_matched_controls_30_10_2019.csv'
+dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/processed/double_matched_controls/'
+outfilename ='/m/nbe/scratch/socbrain/kipupotilaat/data/double_matched_controls_with_activations_10_2019.csv'
+
+# bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/bg_all_controls.csv'
+# dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/processed/'
+# outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/data/all_healthy_with_activations.csv'
 
 maskloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/'
 datafile = get_latest_datafile(dataloc)

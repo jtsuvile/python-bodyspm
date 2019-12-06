@@ -1,12 +1,15 @@
 # imports
 import numpy as np
 import pandas as pd
+import os
 from scipy import stats
 from skimage import io
 from statsmodels.stats.proportion import proportions_ztest
 from statsmodels.stats.multitest import multipletests
 from classdefinitions import Subject, Stimuli
-import pickle
+from datetime import datetime
+import h5py
+from tqdm import tqdm
 
 
 def preprocess_subjects(subnums, indataloc, outdataloc, stimuli, bgfiles=None,fieldnames=None):
@@ -56,9 +59,15 @@ def binarize(data):
     :param data: matrix with colouring data
     :return: same matrix, with coloured areas changed to 1 and non-coloured changed to 0
     """
-
     data[data > 0.007] = 1
     data[data <= 0.007] = 0
+    return data
+
+
+def binarize_posneg(data):
+    data[data > 0.007] = 1
+    data[(data <= 0.007) & (data >= -0.007)] = 0
+    data[data < -0.007] = -1
     return data
 
 
@@ -79,38 +88,66 @@ def combine_data(dataloc, subnums, groups=None, save=False, noImages = False):
     in the data arrays).
     """
 
+    # NB: currently noImages does not change behavior based on save false/true
+
+    filename = dataloc + '/dataset_' + datetime.now().strftime("%d%m%Y-%H%M") + '.h5'
     stim = Stimuli(fileloc=dataloc, from_file=True)
     size_onesided = (522, 171)
     size_twosided = (522, 342)
     all_res = {}
-    all_res['subids'] = subnums
+    all_res['bg'] = pd.DataFrame(index=subnums)
+    all_res['bg']['subid'] = np.nan
     all_res['stimuli'] = stim
     if groups is not None and np.shape(groups)==np.shape(subnums):
-        all_res['groups'] = groups
-    all_res['bg'] = pd.DataFrame(index=subnums)
-    # init empty arrays for data
-    if not noImages:
-        for key in stim.all.keys():
+        print('added group definitions')
+        all_res['bg']['groups'] = groups
+    # first attempt with H5
+    have_written_bg = False
+    if noImages:
+        for j, subnum in tqdm(enumerate(subnums), desc="subjects"):
+            temp_sub = Subject(subnum)
+            temp_sub.read_sub_from_file(dataloc, noImages)
+            if sum(all_res['bg']['subid'] == subnum) == 0:
+                all_res['bg'].loc[subnum, 'subid'] = int(subnum)
+                for bgkey, bgvalue in temp_sub.bginfo.items():
+                    if bgkey != 'profession':  # cannot be neatly converted to numeric, excluding for now
+                        if not bgkey in all_res['bg'].columns:
+                            all_res['bg'][bgkey] = np.nan
+                        all_res['bg'].loc[subnum, bgkey] = int(bgvalue)
+    else:
+        for key in tqdm(stim.all.keys(), desc="bodymap number"):
+            #print(key)
             if stim.all[key]['onesided']:
-                all_res[key] = np.zeros((len(subnums), size_onesided[0], size_onesided[1]))
+                data_matrix = np.zeros((len(subnums), size_onesided[0], size_onesided[1]))
             else:
-                all_res[key] = np.zeros((len(subnums), size_twosided[0], size_twosided[1]))
-    # populate with data
-    for j, subnum in enumerate(subnums):
-        temp_sub = Subject(subnum)
-        temp_sub.read_sub_from_file(dataloc, noImages)
-        for key, value in temp_sub.data.items():
-            all_res[key][j] = temp_sub.data[key]
-        for bgkey, bgvalue in temp_sub.bginfo.items():
-            if not bgkey in all_res['bg'].columns:
-                all_res['bg'][bgkey] = np.nan
-            all_res['bg'].loc[subnum, bgkey] = bgvalue
-    print("combined all data successfully ")
-    if save:
-        filename = dataloc + '/full_dataset.pickle'
-        with open(filename, 'wb') as handle:
-            pickle.dump(all_res, handle, protocol=pickle.HIGHEST_PROTOCOL)
-        print("saved pickle to " +dataloc + "/full_dataset.pickle")
+                data_matrix = np.zeros((len(subnums), size_twosided[0], size_twosided[1]))
+            for j, subnum in tqdm(enumerate(subnums), desc="subjects"):
+                #print(subnum)
+                temp_sub = Subject(subnum)
+                temp_sub.read_sub_from_file(dataloc, noImages)
+                data_matrix[j] = temp_sub.data[key]
+                if sum(all_res['bg']['subid'] == subnum) == 0:
+                    all_res['bg'].loc[subnum, 'subid'] = int(subnum)
+                    for bgkey, bgvalue in temp_sub.bginfo.items():
+                        if bgkey != 'profession':  # cannot be neatly converted to numeric, excluding for now
+                            if not bgkey in all_res['bg'].columns:
+                                all_res['bg'][bgkey] = np.nan
+                            all_res['bg'].loc[subnum, bgkey] = int(bgvalue)
+            if save:
+                with h5py.File(filename, 'a') as store:
+                    #print('writing out ', key)
+                    store.create_dataset(key, data=data_matrix)
+                    if not have_written_bg:
+                        print('writing out background data')
+                        for bgkey, bgvalue in all_res['bg'].items():
+                            if bgkey == 'groups':
+                                dt = h5py.special_dtype(vlen=str)
+                                store.create_dataset(bgkey, data=bgvalue.to_numpy(), dtype=dt)
+                                #print('saved group definitions')
+                            else:
+                                store.create_dataset(bgkey, data=bgvalue.to_numpy(), dtype="int32")
+                have_written_bg = True
+    #print("combined all data successfully ")
     return all_res
 
 
@@ -126,19 +163,19 @@ def one_sample_t_test(data):
     return statistics, pval
 
 
-def compare_groups(data, group1, group2, testtype='t'):
+def compare_groups(group1, group2, testtype='t'):
     """
     Compares the maps of two groups of subjects pixel-wise
 
-    :param data: 3-D data matrix of subject-wise colouring maps. Axis 0 represents subjects.
-    :param group1: indices of group1 members in the matrix
-    :param group2: indices of group2 members in the matrix
+    :param data:
+    :param group1: Data for group 1. 3-D data matrix of subject-wise colouring maps. Axis 0 represents subjects.
+    :param group2: Data for group 2. 3-D data matrix of subject-wise colouring maps. Axis 0 represents subjects.
     :param testtype: should the groups be compared using a two sample t-test (default) or z-test of proportions?
     :return: two matrices, with the test statistic and p-value for the comparison per each pixel
     """
     # copy the data for each group to avoid accidentally making edits to original data
-    g0_data = np.copy(data[group1])
-    g1_data = np.copy(data[group2])
+    g0_data = np.copy(group1)
+    g1_data = np.copy(group2)
     dims = g0_data.shape
     if testtype=='z':
         # test of proportions
@@ -163,16 +200,14 @@ def compare_groups(data, group1, group2, testtype='t'):
     return statistics_twosamp, pval_twosamp
 
 
-def correlate_maps(data, corr_with):
+def correlate_maps(data, corr_with, method):
     """
     Correlates a set of subject-wise colouring maps with a vector of values (e.g. a background factor)
 
     :param data: 3-D data matrix of the subject-wise colouring maps. Axis 0 represents subjects.
     :param corr_with: vector of values (1 per subject) to correlate with.
-    :return: map with correlation coefficient for each.
+    :return: map with correlation coefficient for each and map with p-values
     """
-    # TODO: move from np.correlate to something which allows spearman and pearson,
-    #  like pandas corr or scipy spearmanr and pearsonr? Also get p-values
     dims = data.shape
     if dims[0] is not len(corr_with): # NB: change this to a proper error at some point
         print('You need to provide exactly one value per subject for the analysis. Stopping execution.')
@@ -180,10 +215,14 @@ def correlate_maps(data, corr_with):
     # temporarily change data to 2-D to enable correlation analysis
     data_reshaped = np.reshape(data, (dims[0], -1))
     # run correlation on each pixel separately
-    corr_res = np.apply_along_axis(np.correlate, 0, data_reshaped, corr_with)
+    if method=='spearman':
+        corr_res, pvals = np.apply_along_axis(stats.spearmanr, data_reshaped, corr_with, axis=0)
+    if method=='pearson':
+        corr_res, pvals = np.apply_along_axis(stats.pearsonr,data_reshaped, corr_with, axis=0)
     # reshape result
     corr_map = np.reshape(corr_res, (dims[1], dims[2]))
-    return corr_map
+    p_map = np.reshape(pvals, (dims[1], dims[2]))
+    return corr_map, p_map
 
 
 def p_adj_maps(pval_map, mask=None, alpha = 0.05, method='fdr_bh'):
@@ -204,22 +243,27 @@ def p_adj_maps(pval_map, mask=None, alpha = 0.05, method='fdr_bh'):
     """
     dims = pval_map.shape
     if mask is None:
-        data_reshaped = np.reshape(pval_map, (dims[0], -1))
+        data_reshaped = np.reshape(pval_map, (-1, 1))
+        #print(dims)
+        #print(data_reshaped.shape)
     else:
-        if dims!=mask.shape:
+        if dims != mask.shape:
             print('expected mask to be same shape as data, cannot continue')
             return
         else:
             # if we have mask, we can just pick the relevant numbers
-            print('found mask of the right size')
+            #print('found mask of the right size')
             data_reshaped = pval_map[mask.astype(int)>0]
     reject, pvals_corrected, alpacSidak, alhacBonferroni = multipletests(data_reshaped, alpha, method)
     if mask is None:
-        pval_map_corrected = np.reshape(pvals_corrected, (dims[1],dims[2]))
+        pval_map_corrected = np.reshape(pvals_corrected, (dims[0], -1))
+        reject_map = np.reshape(reject, (dims[0],-1))
     else:
         pval_map_corrected = np.ones(dims)
         pval_map_corrected[mask.astype(int)>0] = pvals_corrected
-    return pval_map_corrected
+        reject_map = np.ones(dims)
+        reject_map[mask.astype(int) > 0] = reject
+    return pval_map_corrected, reject_map
 
 
 def read_in_mask(file1, file2=None):
@@ -234,11 +278,17 @@ def read_in_mask(file1, file2=None):
     :return: numpy array of the mask with 1=include, 0=exclude
     """
     mask_array = io.imread(file1, as_gray=True)
+    dims = mask_array.shape
+    if len(dims) == 3:
+        mask_array = mask_array[:, :, 0]
     mask_array[mask_array < 1] = 0
     mask_array = mask_array * -1
     mask_array = mask_array + 1
     if file2 is not None:
         mask_other_side = io.imread(file2, as_gray=True)
+        dims = mask_other_side.shape
+        if len(dims) == 3:
+            mask_other_side = mask_other_side[:, :, 0]
         mask_other_side[mask_other_side < 1] = 0
         mask_other_side = mask_other_side * -1
         mask_other_side = mask_other_side + 1
@@ -251,7 +301,7 @@ def count_pixels(data, mask=None):
     Count the number and proportion of coloured pixels per subject
 
     :param data: the 3D-data frame where to count the
-    :param mask: optional. If provided, takes
+    :param mask: optional. If provided, takes values inside mask into account in counting proportion colored
     :return: number of coloured pixels per subject
     """
     data = binarize(data)
@@ -265,3 +315,45 @@ def count_pixels(data, mask=None):
         counts_vector = np.sum(inside_mask, axis=1)
     prop_vector = [x / n_pixels for x in counts_vector]
     return counts_vector, prop_vector
+
+def count_pixels_posneg(data, mask=None):
+    """
+    Count the number and proportion of coloured pixels per subject
+
+    :param data: the 3D-data frame where to count the
+    :param mask: optional. If provided, takes values inside mask into account in counting proportion colored
+    :return: number of coloured pixels per subject
+    """
+    data = binarize_posneg(data)
+    data_neg = data.copy()
+    data_neg[data_neg > 0] = 0
+    data_neg = data_neg * -1
+    data_pos = data.copy()
+    data_pos[data_pos < 0] = 0
+    # sum all cells for each subject
+    if mask is None:
+        mask = np.ones((data.shape[1],data.shape[2]))
+    inside_mask_pos = data_pos[:, mask == 1]
+    pos_vector = np.sum(inside_mask_pos, axis=1)
+    inside_mask_neg = data_neg[:, mask == 1]
+    neg_vector = np.sum(inside_mask_neg, axis=1)
+    n_pixels = np.sum(np.sum(mask))
+    prop_pos = [x / n_pixels for x in pos_vector]
+    prop_neg = [x / n_pixels for x in neg_vector]
+
+    return pos_vector, prop_pos, neg_vector, prop_neg
+
+
+def get_latest_datafile(datadir):
+    """
+    :param datadir: where to search for datasets
+    :return: full path to latest datafile named dataset_ in the given datadir
+    """
+    latestfile = ''
+    for file in os.listdir(datadir):
+        if file.startswith("dataset"):
+            if latestfile == '' or os.path.getmtime(datadir +  '/' + file) > os.path.getmtime(datadir + '/' + latestfile):
+                latestfile = file
+            dataloc = os.path.join(datadir, latestfile)
+    return dataloc
+
