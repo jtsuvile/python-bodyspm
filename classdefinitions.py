@@ -4,10 +4,9 @@ from cv2 import GaussianBlur
 import simplejson as json
 import matplotlib.pyplot as plt
 
-# class to keep the relevant information of each stimulus together
+
 class Stimuli:
-
-
+    # class to keep the relevant information of each stimulus together
     def __init__(self, names=None, onesided=True, show_names=None, fileloc='', from_file=False):
         self.all = {}
         if not from_file:
@@ -42,6 +41,7 @@ class Stimuli:
 
     def __str__(self):
         return "Stimulus set with "+ str(len(self.all)) + " stimuli defined: " + self.all.keys()
+
 
 class Subject:
 

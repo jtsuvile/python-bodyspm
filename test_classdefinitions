@@ -8,7 +8,7 @@
 # outdataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/helsinki/processed/'
 # datafile = get_latest_datafile(outdataloc)
 #
-# data = {}
+0# data = {}
 # with h5py.File(datafile, 'r') as h:
 #     data['acute'] = h.get('pain_0').value
 #     data['chronic'] = h.get('pain_1').value

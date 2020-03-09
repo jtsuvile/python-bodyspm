@@ -47,6 +47,30 @@ def preprocess_subjects(subnums, indataloc, outdataloc, stimuli, bgfiles=None,fi
     return
 
 
+def add_background_table(new_bgdata, linking_col, subloc, exclude=[], override=True):
+    existing_subs = os.listdir(subloc)
+    group_colnames = new_bgdata.columns.tolist()
+    if linking_col in group_colnames:
+        group_colnames.remove(linking_col)
+    else:
+        return("cannot find linking identifier ", linking_col)
+    if exclude:
+        for colname in exclude:
+            group_colnames.remove(colname)
+    for subject in new_bgdata[linking_col]:
+        if str(subject) in existing_subs:
+            temp_sub = Subject(subject)
+            temp_sub.read_sub_from_file(subloc, noImages=True)
+            for column in group_colnames:
+                if column not in temp_sub.has_background() or override==True:
+                    temp_sub.add_background(column, new_bgdata.loc[new_bgdata[linking_col] == subject][column].values[0])
+                    temp_sub.write_sub_to_file(subloc)
+                else:
+                    print("not updating subject ", subject, " for ", column)
+        else:
+            print('no subject ', subject, 'found')
+    return "done"
+
 def binarize(data):
     """
     Change data from colouring (with blur) to binary 1/0 format. This is used in several analyses where data have
@@ -88,7 +112,7 @@ def combine_data(dataloc, subnums, groups=None, save=False, noImages = False):
     in the data arrays).
     """
 
-    # NB: currently noImages does not change behavior based on save false/true
+    # NB: replication of code for saving with/without images. TODO: edit to remove repeat code
 
     filename = dataloc + '/dataset_' + datetime.now().strftime("%d%m%Y-%H%M") + '.h5'
     stim = Stimuli(fileloc=dataloc, from_file=True)
@@ -98,9 +122,9 @@ def combine_data(dataloc, subnums, groups=None, save=False, noImages = False):
     all_res['bg'] = pd.DataFrame(index=subnums)
     all_res['bg']['subid'] = np.nan
     all_res['stimuli'] = stim
-    if groups is not None and np.shape(groups)==np.shape(subnums):
-        print('added group definitions')
-        all_res['bg']['groups'] = groups
+    # if groups is not None and np.shape(groups)==np.shape(subnums):
+    #     print('added group definitions')
+    #     all_res['bg']['groups'] = groups
     # first attempt with H5
     have_written_bg = False
     if noImages:
@@ -110,10 +134,21 @@ def combine_data(dataloc, subnums, groups=None, save=False, noImages = False):
             if sum(all_res['bg']['subid'] == subnum) == 0:
                 all_res['bg'].loc[subnum, 'subid'] = int(subnum)
                 for bgkey, bgvalue in temp_sub.bginfo.items():
-                    if bgkey != 'profession':  # cannot be neatly converted to numeric, excluding for now
+                    #if bgkey != 'profession':  # cannot be neatly converted to numeric, excluding for now
+                    if not isinstance(bgvalue, str):
                         if not bgkey in all_res['bg'].columns:
                             all_res['bg'][bgkey] = np.nan
                         all_res['bg'].loc[subnum, bgkey] = int(bgvalue)
+        if save:
+            with h5py.File(filename, 'a') as store:
+                if not have_written_bg:
+                    print('writing out background data')
+                    if groups is not None:
+                        dt = h5py.special_dtype(vlen=str)
+                        store.create_dataset('groups', data=groups, dtype=dt)
+                    for bgkey, bgvalue in all_res['bg'].items():
+                        store.create_dataset(bgkey, data=bgvalue.to_numpy(), dtype="int32")
+                    have_written_bg = True
     else:
         for key in tqdm(stim.all.keys(), desc="bodymap number"):
             #print(key)
@@ -129,24 +164,25 @@ def combine_data(dataloc, subnums, groups=None, save=False, noImages = False):
                 if sum(all_res['bg']['subid'] == subnum) == 0:
                     all_res['bg'].loc[subnum, 'subid'] = int(subnum)
                     for bgkey, bgvalue in temp_sub.bginfo.items():
-                        if bgkey != 'profession':  # cannot be neatly converted to numeric, excluding for now
+                        try:  # some variables cannot be neatly converted to numeric, excluding for now
+                            float(bgvalue)
                             if not bgkey in all_res['bg'].columns:
                                 all_res['bg'][bgkey] = np.nan
                             all_res['bg'].loc[subnum, bgkey] = int(bgvalue)
+                        except ValueError:
+                            pass
             if save:
                 with h5py.File(filename, 'a') as store:
                     #print('writing out ', key)
                     store.create_dataset(key, data=data_matrix)
                     if not have_written_bg:
                         print('writing out background data')
+                        if groups is not None:
+                            dt = h5py.special_dtype(vlen=str)
+                            store.create_dataset('groups', data=groups, dtype=dt)
                         for bgkey, bgvalue in all_res['bg'].items():
-                            if bgkey == 'groups':
-                                dt = h5py.special_dtype(vlen=str)
-                                store.create_dataset(bgkey, data=bgvalue.to_numpy(), dtype=dt)
-                                #print('saved group definitions')
-                            else:
-                                store.create_dataset(bgkey, data=bgvalue.to_numpy(), dtype="int32")
-                have_written_bg = True
+                            store.create_dataset(bgkey, data=bgvalue.to_numpy(), dtype="int32")
+                        have_written_bg = True
     #print("combined all data successfully ")
     return all_res
 

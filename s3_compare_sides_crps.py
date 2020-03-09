@@ -195,3 +195,12 @@ fig2.colorbar(im1)
 fig2.suptitle('CRPS patients: pain vs nonpain side', size=20, va='top')
 plt.savefig(figloc+'pain_crps_pain_vs_nopain_fdr_bh.png')
 plt.close()
+
+##
+# New thing to try when I get my data back
+##
+
+# Pseudocode
+# get pain side for CRPS
+# count number of activations on pain side and non-pain side for each category
+# ANOVA 2x7 

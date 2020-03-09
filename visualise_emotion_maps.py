@@ -16,9 +16,17 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 # outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/figures/all_controls_emotion_activations_new_order.png'
 # suptitle = 'Average emotions, all controls'
 
-dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/helsinki/processed/'
-outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/figures/FIBROMYALGIA_patients_emotion_activations_new_order.png'
-suptitle = 'Average emotions, FIBROMYALGIA patients'
+# dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/stockholm/processed/'
+# outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/figures/KI/lbp_emotion_activations.png'
+# suptitle = 'Average emotions, lower back pain patients from KI'
+#
+# dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/stockholm/processed/'
+# outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/figures/KI/fibro_emotion_activations.png'
+# suptitle = 'Average emotions, fibromyalgia patients from KI'
+
+dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/stockholm/processed/'
+outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/figures/KI/karolinska_emotion_activations.png'
+suptitle = 'Average emotions, all patients from KI'
 
 datafile = get_latest_datafile(dataloc)
 maskloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/'
@@ -47,8 +55,10 @@ for i, cond in enumerate(stim_names.keys()):
     with h5py.File(datafile, 'r') as h:
         data = h[cond].value
         kipu_diagnoses = list(h['groups'])
-        crps_indices = np.asarray([x == 'FIBROMYALGIA' for x in kipu_diagnoses])
-        data_special = data[crps_indices,:,:]
+        #crps_indices = np.asarray([x == 'LOWER_BACK' for x in kipu_diagnoses])
+        #crps_indices = np.asarray([x == 'FIBROMYALGI' for x in kipu_diagnoses])
+        #data_special = data[crps_indices,:,:]
+        data_special = data
 
     all_figs[i, :, :] = np.nanmean(binarize_posneg(data_special.copy()), axis=0)
 
@@ -78,7 +88,8 @@ cax = divider.append_axes('left', size='10%', pad="2%")
 axs[7].set_axis_off()
 fig.colorbar(im, cax=cax, orientation='vertical')
 # fig.colorbar(img1,fraction=0.046, pad=0.04)
-fig.suptitle(suptitle, size=20, va='top')
+fig.suptitle(suptitle + '\n n = ' + str(data_special.shape[0]), size=20, va='top')
+# fig.suptitle('n = ' + str(data_special.shape[0]))
 #plt.show()
 plt.savefig(outfilename)
 plt.close()
