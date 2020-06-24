@@ -1,22 +1,27 @@
 ## Python code for analysing body maps
 
-This is a experimental version of python code that can be used instead of or in addition to (Matlab-based) BodySPM by Enrico Glerean (**add link**). 
+This is a experimental version of python code that can be used instead of or in addition to (Matlab-based) BodySPM by Enrico Glerean (a version of matlab-based BodySPM is available at https://version.aalto.fi/gitlab/eglerean/sensations). 
 It is designed to work with data coming from a version of https://version.aalto.fi/gitlab/eglerean/embody . 
 
 ### Functionality
-This package takes the data from the online data collection system, and converts the topographies to .csv (with each cell representing one pixel). 
-Additional subject info and info about the stimuli is saved as JSONs. These file formats are highly suitable for long term data storage and cross-platform compatibility.
-There will also be an option to save the whole data set to a less sustainable data format for smooth analysis, as well as multiple basic data analysis options.
+#### Pre-processing
+ - read in the data from theonline data collection system, and converts the topographies to .csv (with each cell representing one pixel). 
+ - additional subject info and info about the stimuli is saved as JSONs. (Csv and JSON should be suitable for long term data storage and cross-platform compatibility)
+ - combine data from multiple subjects into one hdf5 file for analysis
 
-### TODO:
-1. prep
-    * edit read_bg to accept both list of filenames and single filename
-    * check blur size for our data
-2. analyses:
-    * glm
-3. visualise:
-    * plot_analysis_results
-    
-## Comments
-Currently including group definitions currently at combine data phase, might make more sense to have that already 
-when reading in subject?
+#### Analysis
+ - pixel-wise one sample t-test
+ - pixel-wise comparison of two groups, either using two sample t-test or z test of proportions
+ - count pixels within a given mask (e.g. within body outline)
+ - correlate maps with background variables (e.g. age)
+
+#### Utilities
+ - draw single subject colouring within mask
+ - draw single subject colouring as-collected (useful for visual quality control)
+ - easy multiple comparison correction to use with pixel-wise analyses
+ - binarise maps to coloured/not coloured
+ 
+#### Upcoming / planned additions
+ - Region of Interest analyses (currently exists as a script, to be converted to a function)
+ - correlate two maps with one another / other similarity measure
+ - potentially functions for visualising analysis outputs? (currently all except single subject visualisations are done as scripts)
