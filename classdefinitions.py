@@ -3,6 +3,7 @@ import os
 from cv2 import GaussianBlur
 import simplejson as json
 import matplotlib.pyplot as plt
+import math
 
 
 class Stimuli:
@@ -64,7 +65,7 @@ class Subject:
     def has_background(self):
         return self.bginfo.keys()
 
-    def read_data(self, dataloc, stim):
+    def read_data(self, dataloc, stim, whole_image = False):
         for stimulus in stim.all.keys():
             data_in = dataloc + '/' + str(self.name) + '/' + stimulus + '.csv'
             if os.path.isfile(data_in):
@@ -89,11 +90,16 @@ class Subject:
                 # cut out the figure area.
                 # NB: depending on the size & positioning of base image on your web interface,
                 # you might need to change the indices below to give the best possible fit
-                if stim.all[stimulus]['onesided']:
-                    raw_res = as_coloured[9:531, 32:203] - as_coloured[9:531, 697:868]  # this creates 522*171 array
+                if whole_image:
+                    raw_res = as_coloured # show the entire painting surface, great for QC
                 else:
-                    raw_res = np.hstack((as_coloured[9:531, 34:205], as_coloured[9:531, 699:870]))  # this creates 522*342 array
+                    if stim.all[stimulus]['onesided']:
+                        raw_res = as_coloured[9:531, 32:203] - as_coloured[9:531, 697:868]  # this creates 522*171 array
+                    else:
+                        raw_res = np.hstack((as_coloured[9:531, 34:205], as_coloured[9:531, 699:870]))  # this creates 522*342 array
                 self.add_data(stimulus, raw_res)
+            else:
+                raise IOError("File", data_in, "not found")
 
     def read_bg(self, dataloc, bgfile, fieldnames):
         # BN: code currently assumes that bgfile is a list and fieldnames is list of lists to accommodate situation
@@ -154,31 +160,39 @@ class Subject:
         if not noImages:
             self.data_from_file()
 
-    def draw_sub_data(self, stim, fileloc=None):
+    def draw_sub_data(self, stim, fileloc=None, qc=False):
         # make sure non coloured values are white in twosided datas
         twosided_cmap = plt.get_cmap('Greens')
         twosided_cmap.set_under('white', 1.0)
         # find out if each data item is one or twosided
-        all_onesided = [stim.all[key]['onesided'] for key in stim.all.keys()]
-        widths = []
-        for side in all_onesided:
-            if side:
-                widths.append(1)
-            else:
-                widths.append(2)
-        fig, axes = plt.subplots(figsize=(24, 3), ncols=len(self.data.keys()), gridspec_kw={'width_ratios': widths})
+        if qc:
+            fig, axes = plt.subplots(figsize=(24, 10), ncols=math.ceil(len(self.data.keys())//2), nrows=2)
+        else:
+            all_onesided = [stim.all[key]['onesided'] for key in stim.all.keys()]
+            widths = []
+            for side in all_onesided:
+                if side:
+                    widths.append(1)
+                else:
+                    widths.append(2)
+            fig, axes = plt.subplots(figsize=(24, 3), ncols=len(self.data.keys()), gridspec_kw={'width_ratios': widths})
         for i, (key, value) in enumerate(self.data.items()):
+            if i%2 == 0:
+                row=0
+            else:
+                row=1
+            col = math.floor(i/2)
             onesided = stim.all[key]['onesided']
-            if onesided:
+            if onesided and not qc:
                 img = axes[i].imshow(value, cmap='RdBu_r', vmin=-0.05, vmax=0.05)
                 fig.colorbar(img, ax=axes[i])
             else:
-                img = axes[i].imshow(value, cmap=twosided_cmap, vmin=np.finfo(float).eps, vmax=0.05)
-                fig.colorbar(img, ax=axes[i])
+                img = axes[row,col].imshow(value, cmap=twosided_cmap, vmin=np.finfo(float).eps, vmax=0.05)
+                fig.colorbar(img, ax=axes[row,col], fraction=0.04, pad=0.04)
             if 'show_name' in stim.all[key]:
-                axes[i].set_title(stim.all[key]['show_name'])
+                axes[row, col].set_title(stim.all[key]['show_name'])
             else:
-                axes[i].set_title(key)
+                axes[row, col].set_title(key)
         fig.suptitle("subject : " + self.name)
         fig.tight_layout()
         if fileloc:

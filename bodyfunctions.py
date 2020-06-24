@@ -46,6 +46,13 @@ def preprocess_subjects(subnums, indataloc, outdataloc, stimuli, bgfiles=None,fi
     print('done with preprocessing the subjects')
     return
 
+def make_qc_figures(subnums, indataloc, outdataloc, stimuli):
+    for i, subnum in enumerate(subnums):
+        print("making qc figures for subject " + str(subnum) + " which is " + str(i + 1) + "/" + str(len(subnums)))
+        sub = Subject(subnum)
+        sub.read_data(indataloc, stimuli, whole_image=True)
+        sub.draw_sub_data(stimuli, fileloc=outdataloc, qc=True)
+    return "done with qc figures"
 
 def add_background_table(new_bgdata, linking_col, subloc, exclude=[], override=True):
     existing_subs = os.listdir(subloc)
