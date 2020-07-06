@@ -3,7 +3,7 @@ import h5py
 import numpy as np
 import pandas as pd
 from scipy import stats
-
+from statsmodels.stats.multitest import multipletests
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -21,9 +21,9 @@ mask_one = read_in_mask(maskloc + 'mask_front_new.png')
 
 stim_names = {'emotions_0': ['sadness', 0], 'emotions_1': ['happiness', 0], 'emotions_2': ['anger', 0],
               'emotions_3': ['surprise', 0], 'emotions_4': ['fear', 0], 'emotions_5': ['disgust', 0],
-              'emotions_6': ['neutral', 0],
-              'pain_0': ['acute pain', 1], 'pain_1': ['chonic pain', 1], 'sensitivity_0': ['tactile sensitivity', 1],
-              'sensitivity_1': ['nociceptive sensitivity', 1], 'sensitivity_2': ['hedonic sensitivity', 1]}
+              'emotions_6': ['neutral', 0]}
+              # 'pain_0': ['acute pain', 1], 'pain_1': ['chonic pain', 1], 'sensitivity_0': ['tactile sensitivity', 1],
+              # 'sensitivity_1': ['nociceptive sensitivity', 1], 'sensitivity_2': ['hedonic sensitivity', 1]}
 
 
 curr = mask_fb.copy()
@@ -74,6 +74,11 @@ res_maps_t = np.zeros((len(stim_names.keys()), 522, 168))
 res_maps_p = np.zeros((len(stim_names.keys()), 522, 168))
 order_maps = []
 
+t_test_pos = np.zeros(((len(stim_names.keys())), 3))
+t_test_neg = np.zeros(((len(stim_names.keys())), 3))
+
+mask_half = mask_one[:, 1:85]
+
 for j, pic in enumerate(stim_names.keys()):
     order_maps.append(pic)
     with h5py.File(datafile, 'r') as h:
@@ -84,8 +89,6 @@ for j, pic in enumerate(stim_names.keys()):
     else:
         pain_side = np.zeros((crps_patients.shape[0], 522, 84))
         nonpain_side = np.zeros((crps_patients.shape[0], 522, 84))
-
-
     for subnum in crps_patients:
         sub = np.where(subids == subnum)[0][0]
         subloc = np.where(crps_patients_with_side[0] == subnum)[0][0]
@@ -104,97 +107,106 @@ for j, pic in enumerate(stim_names.keys()):
             if stim_names[pic][1] == 1:
                 pain_side[subloc, :, 84:168] = data[sub, :, 256:340]
                 nonpain_side[subloc, :, 84:168] = np.flip(data[sub, :, 172:256], axis=1)
+    pos_vector, prop_pos_pain, neg_vector, prop_neg_pain = count_pixels_posneg(pain_side, mask_half)
+    pos_vector, prop_pos_nonpain, neg_vector, prop_neg_nonpain = count_pixels_posneg(nonpain_side, mask_half)
+
+    t_result_pos = stats.ttest_rel(prop_pos_pain, prop_pos_nonpain)
+    t_test_pos[j,] = [j, t_result_pos.statistic, t_result_pos.pvalue]
+    t_result_neg = stats.ttest_rel(prop_neg_pain, prop_neg_nonpain)
+    t_test_neg[j,] = [j, t_result_neg.statistic, t_result_neg.pvalue]
+
     if stim_names[pic][1] == 1:
         res_maps_t[j, :, :], res_maps_p[j, :, :] = stats.ttest_rel(pain_side, nonpain_side, axis=0)
     else:
         res_maps_t[j, :, 0:84], res_maps_p[j, :, 0:84] = stats.ttest_rel(pain_side, nonpain_side, axis=0)
 
+# nothing remains significant!
+multipletests(np.concatenate((t_test_pos[:,2], t_test_neg[:,2])))
 
 stim_names_emotions = {'emotions_0':'sadness', 'emotions_1':'happiness', 'emotions_2':'anger', 'emotions_3':'surprise',
               'emotions_4': 'fear', 'emotions_5':'disgust', 'emotions_6':'neutral'}
 
-mask_half = mask_one[:, 1:85]
 
 
-fig, axs = plt.subplots(1,7, figsize=(15, 6), facecolor='w', sharex=True, sharey=True)
-fig.subplots_adjust(hspace= 0 , wspace= 0 )
-
-axs = axs.ravel()
-
-for b, emotion in enumerate(stim_names_emotions.keys()):
-    ind = order_maps.index(emotion)
-    fixed_p, p_reject = p_adj_maps(res_maps_p[ind, :, 0:84], mask=mask_half, method='fdr_bh')
-    temp_data = res_maps_t[ind, :, 0:84]
-    #temp_data[fixed_p > 0.05] = 0
-    temp_data[res_maps_p[ind, :, 0:84] > 0.05] = 0
-    masked_data = np.ma.masked_where(mask_half != 1, temp_data)
-    im = axs[b].imshow(masked_data, cmap='coolwarm', vmin=-10, vmax=10)
-    axs[b].set_title(stim_names_emotions[emotion])
-    axs[b].axis('off')
-
-fig.colorbar(im)
-fig.suptitle('CRPS patients: pain vs nonpain side', size=20, va='top')
-plt.savefig(figloc+'emotions_crps_pain_vs_nopain_no_fdr.png')
-plt.close()
-
-
-stim_names_sensitivity = {'sensitivity_0':'tactile sensitivity',
-                          'sensitivity_1':'nociceptive sensitivity', 'sensitivity_2':'hedonic sensitivity'}
-
-mask_one_space = np.hstack((mask_one[:, 1:85], np.zeros((522, 10)), mask_one[:, 85:169]))
-
-fig1, axs1 = plt.subplots(1, 3, figsize=(15, 6), facecolor='w', sharex=True, sharey=True)
-fig1.subplots_adjust(hspace= 0 , wspace= 0 )
-
-axs1 = axs1.ravel()
-
-for v, sense in enumerate(stim_names_sensitivity.keys()):
-    ind = order_maps.index(sense)
-    fixed_p, p_reject = p_adj_maps(res_maps_p[ind, :, :], mask=mask_one[:, 1:169], method='fdr_bh')
-    temp_data = res_maps_t[ind, :, :]
-    # temp_data[fixed_p > 0.05] = 0
-    temp_data[res_maps_p[ind, :, :] > 0.05] = 0
-    temp_data_spaced_out = np.hstack((temp_data[:,0:84], np.zeros((522, 10)), temp_data[:,84:168]))
-    masked_data = np.ma.masked_where(mask_one_space != 1, temp_data_spaced_out)
-    im1 = axs1[v].imshow(masked_data, cmap='coolwarm', vmin=-5, vmax=5)
-    axs1[v].set_title(stim_names_sensitivity[sense])
-    axs1[v].axis('off')
-    axs1[v].text(1, 80, 'front')
-    axs1[v].text(140, 80, 'back')
-
-
-fig.colorbar(im1)
-fig1.suptitle('CRPS patients: pain vs nonpain side', size=20, va='top')
-plt.savefig(figloc+'sensitivity_crps_pain_vs_nopain_no_fdr.png')
-plt.close()
-
-
-stim_names_pain = {'pain_0':'acute pain', 'pain_1': 'chonic_pain'}
-
-fig2, axs2 = plt.subplots(1, 2, figsize=(15, 6), facecolor='w', sharex=True, sharey=True)
-fig2.subplots_adjust(hspace= 0 , wspace= 0 )
-
-axs2 = axs2.ravel()
-
-for k, pain in enumerate(stim_names_pain.keys()):
-    ind = order_maps.index(pain)
-    fixed_p, p_reject = p_adj_maps(res_maps_p[ind, :, :], mask=mask_one[:, 1:169], method='fdr_bh')
-    temp_data = res_maps_t[ind, :, :]
-    temp_data[fixed_p > 0.05] = 0
-    #temp_data[res_maps_p[ind, :, :] > 0.05] = 0
-    temp_data_spaced_out = np.hstack((temp_data[:,0:84], np.zeros((522, 10)), temp_data[:,84:168]))
-    masked_data = np.ma.masked_where(mask_one_space != 1, temp_data_spaced_out)
-    im1 = axs2[k].imshow(masked_data, cmap='coolwarm', vmin=-5, vmax=5)
-    axs2[k].set_title(stim_names_pain[pain])
-    axs2[k].axis('off')
-    axs2[k].text(1, 80, 'front')
-    axs2[k].text(140, 80, 'back')
-
-
-fig2.colorbar(im1)
-fig2.suptitle('CRPS patients: pain vs nonpain side', size=20, va='top')
-plt.savefig(figloc+'pain_crps_pain_vs_nopain_fdr_bh.png')
-plt.close()
+# fig, axs = plt.subplots(1,7, figsize=(15, 6), facecolor='w', sharex=True, sharey=True)
+# fig.subplots_adjust(hspace= 0 , wspace= 0 )
+#
+# axs = axs.ravel()
+#
+# for b, emotion in enumerate(stim_names_emotions.keys()):
+#     ind = order_maps.index(emotion)
+#     fixed_p, p_reject = p_adj_maps(res_maps_p[ind, :, 0:84], mask=mask_half, method='fdr_bh')
+#     temp_data = res_maps_t[ind, :, 0:84]
+#     #temp_data[fixed_p > 0.05] = 0
+#     temp_data[res_maps_p[ind, :, 0:84] > 0.05] = 0
+#     masked_data = np.ma.masked_where(mask_half != 1, temp_data)
+#     im = axs[b].imshow(masked_data, cmap='coolwarm', vmin=-10, vmax=10)
+#     axs[b].set_title(stim_names_emotions[emotion])
+#     axs[b].axis('off')
+#
+# fig.colorbar(im)
+# fig.suptitle('CRPS patients: pain vs nonpain side', size=20, va='top')
+# plt.savefig(figloc+'emotions_crps_pain_vs_nopain_no_fdr.png')
+# plt.close()
+#
+#
+# stim_names_sensitivity = {'sensitivity_0':'tactile sensitivity',
+#                           'sensitivity_1':'nociceptive sensitivity', 'sensitivity_2':'hedonic sensitivity'}
+#
+# mask_one_space = np.hstack((mask_one[:, 1:85], np.zeros((522, 10)), mask_one[:, 85:169]))
+#
+# fig1, axs1 = plt.subplots(1, 3, figsize=(15, 6), facecolor='w', sharex=True, sharey=True)
+# fig1.subplots_adjust(hspace= 0 , wspace= 0 )
+#
+# axs1 = axs1.ravel()
+#
+# for v, sense in enumerate(stim_names_sensitivity.keys()):
+#     ind = order_maps.index(sense)
+#     fixed_p, p_reject = p_adj_maps(res_maps_p[ind, :, :], mask=mask_one[:, 1:169], method='fdr_bh')
+#     temp_data = res_maps_t[ind, :, :]
+#     # temp_data[fixed_p > 0.05] = 0
+#     temp_data[res_maps_p[ind, :, :] > 0.05] = 0
+#     temp_data_spaced_out = np.hstack((temp_data[:,0:84], np.zeros((522, 10)), temp_data[:,84:168]))
+#     masked_data = np.ma.masked_where(mask_one_space != 1, temp_data_spaced_out)
+#     im1 = axs1[v].imshow(masked_data, cmap='coolwarm', vmin=-5, vmax=5)
+#     axs1[v].set_title(stim_names_sensitivity[sense])
+#     axs1[v].axis('off')
+#     axs1[v].text(1, 80, 'front')
+#     axs1[v].text(140, 80, 'back')
+#
+#
+# fig.colorbar(im1)
+# fig1.suptitle('CRPS patients: pain vs nonpain side', size=20, va='top')
+# plt.savefig(figloc+'sensitivity_crps_pain_vs_nopain_no_fdr.png')
+# plt.close()
+#
+#
+# stim_names_pain = {'pain_0':'acute pain', 'pain_1': 'chonic_pain'}
+#
+# fig2, axs2 = plt.subplots(1, 2, figsize=(15, 6), facecolor='w', sharex=True, sharey=True)
+# fig2.subplots_adjust(hspace= 0 , wspace= 0 )
+#
+# axs2 = axs2.ravel()
+#
+# for k, pain in enumerate(stim_names_pain.keys()):
+#     ind = order_maps.index(pain)
+#     fixed_p, p_reject = p_adj_maps(res_maps_p[ind, :, :], mask=mask_one[:, 1:169], method='fdr_bh')
+#     temp_data = res_maps_t[ind, :, :]
+#     temp_data[fixed_p > 0.05] = 0
+#     #temp_data[res_maps_p[ind, :, :] > 0.05] = 0
+#     temp_data_spaced_out = np.hstack((temp_data[:,0:84], np.zeros((522, 10)), temp_data[:,84:168]))
+#     masked_data = np.ma.masked_where(mask_one_space != 1, temp_data_spaced_out)
+#     im1 = axs2[k].imshow(masked_data, cmap='coolwarm', vmin=-5, vmax=5)
+#     axs2[k].set_title(stim_names_pain[pain])
+#     axs2[k].axis('off')
+#     axs2[k].text(1, 80, 'front')
+#     axs2[k].text(140, 80, 'back')
+#
+#
+# fig2.colorbar(im1)
+# fig2.suptitle('CRPS patients: pain vs nonpain side', size=20, va='top')
+# plt.savefig(figloc+'pain_crps_pain_vs_nopain_fdr_bh.png')
+# plt.close()
 
 ##
 # New thing to try when I get my data back
