@@ -101,7 +101,7 @@ if who is not 'matched_controls_helsinki' or 'matched_controls_two_each':
     subnums = [x.strip() for x in subnums]
 
 # # read subjects from web output and write out to a more sensible format
-preprocess_subjects(subnums, dataloc, outdataloc, stim, bg_files, field_names)
+# preprocess_subjects(subnums, dataloc, outdataloc, stim, bg_files, field_names)
 
 # # Gather subjects into one dict
 #
@@ -109,24 +109,24 @@ preprocess_subjects(subnums, dataloc, outdataloc, stim, bg_files, field_names)
 #
 #
 # # Combining data (with or without pain information)
-if who == 'helsinki':# or who == 'stockholm':
-    with open(grouping_file, newline='', encoding='utf-8-sig') as csvfile:
-        grouping_data = list(csv.reader(csvfile, delimiter=';'))
-    group_df = pd.DataFrame(grouping_data)
-    group_df.columns = group_colnames
-    # cleaning up fields filled in by humans
-    group_df['diagnosis'] = group_df['diagnosis'].str.upper()
-    group_df['diagnosis'] = group_df['diagnosis'].str.replace(' ', '_')
-    group_df['subid'] = group_df['subid'].str.replace(' ', '')
-    group_df['subid'] = group_df['subid'].astype(int)
-    add_background_table(group_df, 'subid', outdataloc, override=True)
-    subs_with_diagnosis = list(set(group_df['subid'].values) & set(list(map(int, subnums))))
-    subs_and_diagnoses= group_df[group_df['subid'].isin(subs_with_diagnosis)][['diagnosis','subid']]
-    full_dataset = combine_data(outdataloc, subs_and_diagnoses['subid'].values, groups=subs_and_diagnoses['diagnosis'].values,
-                                save=True, noImages=False)
-else:
-    print("combining data from ", len(subnums), " subjects")
-    full_dataset = combine_data(outdataloc, subnums,
+# if who == 'helsinki':# or who == 'stockholm':
+#     with open(grouping_file, newline='', encoding='utf-8-sig') as csvfile:
+#         grouping_data = list(csv.reader(csvfile, delimiter=';'))
+#     group_df = pd.DataFrame(grouping_data)
+#     group_df.columns = group_colnames
+#     # cleaning up fields filled in by humans
+#     group_df['diagnosis'] = group_df['diagnosis'].str.upper()
+#     group_df['diagnosis'] = group_df['diagnosis'].str.replace(' ', '_')
+#     group_df['subid'] = group_df['subid'].str.replace(' ', '')
+#     group_df['subid'] = group_df['subid'].astype(int)
+#     add_background_table(group_df, 'subid', outdataloc, override=True)
+#     subs_with_diagnosis = list(set(group_df['subid'].values) & set(list(map(int, subnums))))
+#     subs_and_diagnoses= group_df[group_df['subid'].isin(subs_with_diagnosis)][['diagnosis','subid']]
+#     full_dataset = combine_data(outdataloc, subs_and_diagnoses['subid'].values, groups=subs_and_diagnoses['diagnosis'].values,
+#                                 save=True, noImages=False)
+# else:
+#    print("combining data from ", len(subnums), " subjects"
+full_dataset = combine_data(outdataloc, subnums,
                                 save=True, noImages=False)
 
 bg = full_dataset['bg']
