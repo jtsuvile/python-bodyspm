@@ -49,17 +49,18 @@ mask_fb = read_in_mask(maskloc + 'mask_front_new.png', maskloc + 'mask_back_new.
 mask_one = read_in_mask(maskloc + 'mask_front_new.png')
 
 all_figs = np.zeros([len(stim_names), mask_one.shape[0], mask_one.shape[1]])
+all_n = np.zeros(len(stim_names))
 
 for i, cond in enumerate(stim_names.keys()):
     print('reading in ' + cond)
     with h5py.File(datafile, 'r') as h:
         data = h[cond].value
-        kipu_diagnoses = list(h['groups'])
+        # kipu_diagnoses = list(h['groups'])
         #crps_indices = np.asarray([x == 'LOWER_BACK' for x in kipu_diagnoses])
         #crps_indices = np.asarray([x == 'FIBROMYALGI' for x in kipu_diagnoses])
         #data_special = data[crps_indices,:,:]
         data_special = data
-
+        all_n[i] = np.count_nonzero(~np.isnan(data[:,1,1]))
     all_figs[i, :, :] = np.nanmean(binarize_posneg(data_special.copy()), axis=0)
 
 
@@ -81,7 +82,7 @@ for i, cond in enumerate(stim_names.keys()):
     masked_data = np.ma.masked_where(mask_one != 1,all_figs[i,:,:])
     im = axs[i].imshow(masked_data, cmap=cmap, vmin=vmin, vmax=vmax)
     axs[i].set_axis_off()
-    axs[i].set_title(stim_names[cond][0],fontsize=18)
+    axs[i].set_title(stim_names[cond][0] + '\n n = ' + str(int(all_n[i])),fontsize=18)
 
 divider = make_axes_locatable(axs[7])
 cax = divider.append_axes('left', size='10%', pad="2%")
@@ -89,7 +90,7 @@ axs[7].set_axis_off()
 fig.colorbar(im, cax=cax, orientation='vertical')
 # fig.colorbar(img1,fraction=0.046, pad=0.04)
 fig.suptitle(suptitle + '\n n = ' + str(data_special.shape[0]), size=20, va='top')
-# fig.suptitle('n = ' + str(data_special.shape[0]))
+#fig.suptitle('n = ' + str(np.count_nonzero(~np.isnan(data[:,1,1]))))
 #plt.show()
 plt.savefig(outfilename)
 plt.close()

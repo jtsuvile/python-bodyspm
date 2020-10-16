@@ -9,7 +9,7 @@ import time
 import csv
 
 
-who = 'stockholm'
+who = 'control'
 
 start = time.time()
 # set up stimuli description
@@ -37,7 +37,7 @@ if who == 'control':
                ['feels_pain','feels_depression','feels_anxiety','feels_happy','feels_sad','feels_angry','feels_fear','feels_surprise','feels_disgust'],
                ['bpi_worst', 'bpi_least', 'bpi_average', 'bpi_now', 'bpi_painkiller_relief'],
                ['bpi_functioning', 'bpi_mood','bpi_walk','bpi_work', 'bpi_relationships','bpi_sleep','bpi_enjoyment']]
-    csvname = '/m/nbe/scratch/socbrain/kipupotilaat/data/bg_all_controls.csv'
+    csvname = '/m/nbe/scratch/socbrain/kipupotilaat/data/bg_all_controls_16_10_2020.csv'
 elif who == 'helsinki':
     dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/helsinki/subjects/'
     outdataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/helsinki/processed/'
@@ -50,7 +50,7 @@ elif who == 'helsinki':
                ['feels_pain','feels_depression','feels_anxiety','feels_happy','feels_sad','feels_angry','feels_fear','feels_surprise','feels_disgust'],
                ['bpi_worst', 'bpi_least', 'bpi_average', 'bpi_now', 'bpi_painkiller_relief'],
                ['bpi_functioning', 'bpi_mood','bpi_walk','bpi_work', 'bpi_relationships','bpi_sleep','bpi_enjoyment']]
-    csvname = '/m/nbe/scratch/socbrain/kipupotilaat/data/all_pain_patients_21_10_2019.csv'
+    csvname = '/m/nbe/scratch/socbrain/kipupotilaat/data/all_pain_patients_15_10_2020.csv'
 elif who == 'stockholm':
     dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/stockholm/subjects/'
     outdataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/stockholm/processed/'
@@ -100,16 +100,16 @@ if who is not 'matched_controls_helsinki' or 'matched_controls_two_each':
         subnums = f.readlines()
     subnums = [x.strip() for x in subnums]
 
-# read subjects from web output and write out to a more sensible format
+# # read subjects from web output and write out to a more sensible format
 preprocess_subjects(subnums, dataloc, outdataloc, stim, bg_files, field_names)
 
 # # Gather subjects into one dict
 #
 # #grouping = [groupname] * len(subnums)
 #
-
+#
 # # Combining data (with or without pain information)
-if who == 'helsinki' or who == 'stockholm':
+if who == 'helsinki':# or who == 'stockholm':
     with open(grouping_file, newline='', encoding='utf-8-sig') as csvfile:
         grouping_data = list(csv.reader(csvfile, delimiter=';'))
     group_df = pd.DataFrame(grouping_data)
@@ -124,11 +124,11 @@ if who == 'helsinki' or who == 'stockholm':
     subs_and_diagnoses= group_df[group_df['subid'].isin(subs_with_diagnosis)][['diagnosis','subid']]
     full_dataset = combine_data(outdataloc, subs_and_diagnoses['subid'].values, groups=subs_and_diagnoses['diagnosis'].values,
                                 save=True, noImages=False)
-# else:
-#     print("combining data from ", len(subnums), " subjects")
-#     full_dataset = combine_data(outdataloc, subnums,
-#                                 save=True, noImages=False)
-#
+else:
+    print("combining data from ", len(subnums), " subjects")
+    full_dataset = combine_data(outdataloc, subnums,
+                                save=True, noImages=False)
+
 bg = full_dataset['bg']
 bg.to_csv(csvname)
 

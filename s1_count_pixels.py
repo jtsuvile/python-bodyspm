@@ -1,18 +1,14 @@
 import os
 import sys
 import pandas as pd
-from classdefinitions import Subject, Stimuli
 from bodyfunctions import *
-import matplotlib.pyplot as plt
 import numpy as np
-import time
 import csv
 
 
-
-# bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/all_pain_patients_21_10_2019.csv'
-# dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/helsinki/processed/'
-# outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/data/all_pain_patients_with_activations_10_2019.csv'
+bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/all_pain_patients_03_09_2020.csv'
+dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/helsinki/processed/'
+outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/data/all_pain_patients_with_activations_09_2020_threshold_0_007.csv'
 
 # bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/bg_matched_controls_30_10_2019.csv'
 # dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/processed/matched_controls/'
@@ -22,9 +18,9 @@ import csv
 # dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/processed/double_matched_controls/'
 # outfilename ='/m/nbe/scratch/socbrain/kipupotilaat/data/double_matched_controls_with_activations_10_2019.csv'
 
-bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/bg_pain_stockholm.csv'
-dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/stockholm/processed/'
-outfilename ='/m/nbe/scratch/socbrain/kipupotilaat/data/bg_pain_stockholm_with_activations_03_2020.csv'
+# bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/bg_pain_stockholm.csv'
+# dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/stockholm/processed/'
+# outfilename ='/m/nbe/scratch/socbrain/kipupotilaat/data/bg_pain_stockholm_with_activations_09_2020_threshold_0_007.csv'
 
 # bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/bg_all_controls.csv'
 # dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/processed/'
@@ -39,15 +35,15 @@ mask_fb = read_in_mask(maskloc + 'mask_front_new.png', maskloc + 'mask_back_new.
 stim_names = {'emotions_0': ['sadness', 0], 'emotions_1': ['happiness', 0], 'emotions_2': ['anger', 0],
               'emotions_3': ['surprise', 0], 'emotions_4': ['fear', 0], 'emotions_5': ['disgust', 0],
               'emotions_6': ['neutral', 0],
-              'pain_0': ['acute pain', 1], 'pain_1': ['chonic_pain', 1], 'sensitivity_0': ['tactile sensitivity', 1],
-              'sensitivity_1': ['nociceptive sensitivity', 1], 'sensitivity_2': ['hedonic sensitivity', 1]}
+              'pain_0': ['current_pain', 1], 'pain_1': ['chonic_pain', 1], 'sensitivity_0': ['tactile_sensitivity', 1],
+              'sensitivity_1': ['nociceptive_sensitivity', 1], 'sensitivity_2': ['hedonic_sensitivity', 1]}
 
-stim_names_emotions = {'emotions_0':'sadness', 'emotions_1':'happiness', 'emotions_2':'anger', 'emotions_3':'surprise',
-              'emotions_4': 'fear', 'emotions_5':'disgust', 'emotions_6':'neutral'}
-
-stim_names_pain = {'pain_0':'acute pain', 'pain_1': 'chonic_pain'}
-stim_names_sensitivity = {'sensitivity_0':'tactile sensitivity',
-              'sensitivity_1':'nociceptive sensitivity', 'sensitivity_2':'hedonic sensitivity'}
+# stim_names_emotions = {'emotions_0':'sadness', 'emotions_1':'happiness', 'emotions_2':'anger', 'emotions_3':'surprise',
+#               'emotions_4': 'fear', 'emotions_5':'disgust', 'emotions_6':'neutral'}
+#
+# stim_names_pain = {'pain_0':'current_pain', 'pain_1': 'chonic_pain'}
+# stim_names_sensitivity = {'sensitivity_0':'tactile_sensitivity',
+#               'sensitivity_1':'nociceptive_sensitivity', 'sensitivity_2':'hedonic_sensitivity'}
 
 bg = pd.read_csv(bgdatapath)
 
@@ -66,4 +62,4 @@ for j, cond in enumerate(stim_names.keys()):
         bg[cond + '_neg_color'] = neg_prop
 
 
-bg.to_csv(outfilename)
+bg.to_csv(outfilename, na_rep='NaN')

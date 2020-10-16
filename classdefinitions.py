@@ -99,7 +99,7 @@ class Subject:
                 # NB: depending on the size & positioning of base image on your web interface,
                 # you might need to change the indices below to give the best possible fit
                 if whole_image:
-                    raw_res = as_coloured # show the entire painting surface, great for QC
+                    raw_res = as_coloured  # show the entire painting surface, great for QC
                 else:
                     if stim.all[stimulus]['onesided']:
                         raw_res = as_coloured[9:531, 32:203] - as_coloured[9:531, 697:868]  # this creates 522*171 array
@@ -182,7 +182,7 @@ class Subject:
         # define grey color to show nan's
         twosided_cmap.set_bad('grey', 0.8)
         onesided_cmap.set_bad('grey', 0.8)
-        print(stim.all)
+        # print(stim.all)
         # find out if each data item is one or twosided
         if qc:
             fig, axes = plt.subplots(figsize=(24, 10), ncols=math.ceil(len(stim.all.keys())/2), nrows=2)
@@ -196,14 +196,14 @@ class Subject:
                     widths.append(2)
             fig, axes = plt.subplots(figsize=(24, 3), ncols=len(stim.all.keys()), gridspec_kw={'width_ratios': widths})
         for i, key in enumerate(stim.all.keys()):
-            print(key)
+            # print(key)
             if i < math.ceil(len(stim.all.keys()) / 2):
                 row = 0
                 col = i
             else:
                 row = 1
                 col = i - math.ceil(len(stim.all.keys()) / 2)
-            print(row, col)
+            # print(row, col)
             is_onesided = stim.all[key]['onesided']
             value = self.data[key]
             if is_onesided and not qc:
@@ -230,7 +230,7 @@ class Subject:
             plt.show()
 
     def map_intentionally_empty(self, array):
-        area = array[530:580, 430:480] # this location is specific to pain patients!
+        area = array[530:580, 430:480] # this location is specific to pain patients in Helsinki!
         n_nonzero = np.count_nonzero(area)
         n_area = area.size
         if n_nonzero > 0.1 * n_area:

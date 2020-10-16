@@ -54,6 +54,17 @@ def make_qc_figures(subnums, indataloc, outdataloc, stimuli):
         sub.draw_sub_data(stimuli, fileloc=outdataloc, qc=True)
     return "done with qc figures"
 
+
+def intentionally_empty(array):
+    area = array[530:580,430:480]
+    n_nonzero = np.count_nonzero(area)
+    n_area = area.size
+    if n_nonzero > 0.1*n_area:
+        return True
+    else:
+        return False
+
+
 def add_background_table(new_bgdata, linking_col, subloc, exclude=[], override=True):
     existing_subs = os.listdir(subloc)
     group_colnames = new_bgdata.columns.tolist()
@@ -78,27 +89,27 @@ def add_background_table(new_bgdata, linking_col, subloc, exclude=[], override=T
             print('no subject ', subject, 'found')
     return "done"
 
-def binarize(data):
+def binarize(data, threshold=0.007):
     """
     Change data from colouring (with blur) to binary 1/0 format. This is used in several analyses where data have
     to be in binary format, such as two sample z test
 
-    NB: 0.007 chosen as limit based on what limit replicates coloring best in Aalto system (March 2019).
+    NB: Default threshold 0.007 chosen as limit based on what limit replicates coloring best in Aalto system (March 2019).
     The best value for this parameter will depend on brush & blur settings.
     If changed, I highly recommend visual inspection of the result against known colouring
 
     :param data: matrix with colouring data
     :return: same matrix, with coloured areas changed to 1 and non-coloured changed to 0
     """
-    data[data > 0.007] = 1
-    data[data <= 0.007] = 0
+    data[data > threshold] = 1
+    data[data <= threshold] = 0
     return data
 
 
-def binarize_posneg(data):
-    data[data > 0.007] = 1
-    data[(data <= 0.007) & (data >= -0.007)] = 0
-    data[data < -0.007] = -1
+def binarize_posneg(data, threshold=0.007):
+    data[data > threshold] = 1
+    data[(data <= threshold) & (data >= -threshold)] = 0
+    data[data < -threshold] = -1
     return data
 
 
@@ -359,7 +370,7 @@ def count_pixels(data, mask=None):
     prop_vector = [x / n_pixels for x in counts_vector]
     return counts_vector, prop_vector
 
-def count_pixels_posneg(data, mask=None):
+def count_pixels_posneg(data, mask=None, threshold=0.007):
     """
     Count the number and proportion of coloured pixels per subject
 
@@ -367,7 +378,7 @@ def count_pixels_posneg(data, mask=None):
     :param mask: optional. If provided, takes values inside mask into account in counting proportion colored
     :return: number of coloured pixels per subject
     """
-    data = binarize_posneg(data)
+    data = binarize_posneg(data, threshold)
     data_neg = data.copy()
     data_neg[data_neg > 0] = 0
     data_neg = data_neg * -1
@@ -381,8 +392,8 @@ def count_pixels_posneg(data, mask=None):
     inside_mask_neg = data_neg[:, mask == 1]
     neg_vector = np.sum(inside_mask_neg, axis=1)
     n_pixels = np.sum(np.sum(mask))
-    prop_pos = [x / n_pixels for x in pos_vector]
-    prop_neg = [x / n_pixels for x in neg_vector]
+    prop_pos = np.array([x / n_pixels for x in pos_vector])
+    prop_neg = np.array([x / n_pixels for x in neg_vector])
 
     return pos_vector, prop_pos, neg_vector, prop_neg
 

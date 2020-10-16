@@ -25,7 +25,7 @@ acceptable_controls_original = controls_bg.copy()
 #                                          ((controls_bg.hist_menstrual == 0) | (controls_bg.hist_menstrual == 3)) &
 #                                          ((controls_bg.hist_migraine == 0) | (controls_bg.hist_migraine == 3))].copy()
 
-dataloc_pain = '/m/nbe/scratch/socbrain/kipupotilaat/data/stockholm/processed/'
+dataloc_pain = '/m/nbe/scratch/socbrain/kipupotilaat/data/helsinki/processed/'
 datafile_pain = get_latest_datafile(dataloc_pain)
 pain_bg = pd.DataFrame(columns=['subid','age','sex','pain_now','groups'])
 
@@ -73,7 +73,7 @@ for i in range(1,500):
 
 print(best_matches[best_matches.age_diff>age_diff_cutoff])
 # #
-best_matches.to_csv('/m/nbe/scratch/socbrain/kipupotilaat/data/age_and_gender_matched_subs_pain_stockholm.csv')
+best_matches.to_csv('/m/nbe/scratch/socbrain/kipupotilaat/data/age_and_gender_matched_subs_pain_helsinki_after_qc.csv')
 # #
 # # ## Get second match per person
 # rm_subid = best_matches['control_id']

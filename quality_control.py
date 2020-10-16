@@ -2,7 +2,7 @@ import os
 import sys
 import pandas as pd
 from classdefinitions import Subject, Stimuli
-from bodyfunctions import make_qc_figures, preprocess_subjects, intentionally_empty
+from bodyfunctions import make_qc_figures, preprocess_subjects, intentionally_empty, count_pixels_posneg
 import matplotlib as mpl
 mpl.use('Agg')
 import matplotlib.pyplot as plt
@@ -20,13 +20,13 @@ if who == 'control':
     subfile = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/subs.txt'
     csvname = '/m/nbe/scratch/socbrain/kipupotilaat/data/bg_all_controls.csv'
 elif who == 'helsinki':
-    dataloc = '/Users/juusu53/Documents/projects/kipupotilaat/data/subjects/'
-    outdataloc = '/Users/juusu53/Documents/projects/kipupotilaat/data/qc/helsinki/'
-    outdataloc2 = '/Users/juusu53/Documents/projects/kipupotilaat/data/processed/'
-    #dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/helsinki/subjects/'
-    #outdataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/helsinki/qc/'
+    #dataloc = '/Users/juusu53/Documents/projects/kipupotilaat/data/subjects/'
+    #outdataloc = '/Users/juusu53/Documents/projects/kipupotilaat/data/qc/helsinki/'
+    #outdataloc2 = '/Users/juusu53/Documents/projects/kipupotilaat/data/processed/'
+    dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/helsinki/subjects/'
+    outdataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/helsinki/qc/'
     subfile = '/m/nbe/scratch/socbrain/kipupotilaat/data/helsinki/kipu_subs.txt'
-    csvname = '/m/nbe/scratch/socbrain/kipupotilaat/data/all_pain_patients_21_10_2019.csv'
+    csvname = '/m/nbe/scratch/socbrain/kipupotilaat/data/all_pain_patients_03_09_2020.csv'
 elif who == 'stockholm':
     dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/stockholm/subjects/'
     outdataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/stockholm/qc/'
@@ -45,21 +45,26 @@ onesided = [True, True, True, True, True, True, True, False, False, False, False
 data_names = ['emotions_0', 'emotions_1', 'emotions_2', 'emotions_3', 'emotions_4','emotions_5','emotions_6',
               'sensitivity_0', 'sensitivity_1', 'sensitivity_2', 'pain_0', 'pain_1']
 display_names = ['sadness', 'happiness', 'anger', 'surprise', 'fear', 'disgust', 'neutral',
-'current pain', 'chonic pain', 'tactile sensitivity','nociceptive sensitivity', 'hedonic sensitivity']
+ 'tactile sensitivity','nociceptive sensitivity', 'hedonic sensitivity','current pain', 'chonic pain']
 stim = Stimuli(data_names, onesided=onesided, show_names = display_names)
 
-# if who != 'matched_controls_helsinki' and who != 'matched_controls_two_each':
-#     print('re-reading')
-#     with open(subfile) as f:
-#         subnums = f.readlines()
-#     subnums = [x.strip() for x in subnums]
-#
+if who != 'matched_controls_helsinki' and who != 'matched_controls_two_each':
+    print('re-reading')
+    with open(subfile) as f:
+        subnums = f.readlines()
+    subnums = [x.strip() for x in subnums]
+
+#subnums = subnums[580:]
+
 # subnum='3217'
 # preprocess_subjects([subnum], dataloc, outdataloc2, stim)
 # sub = Subject(subnum)
 # sub.read_data(dataloc, stim, whole_image=False)
-#
-# #make_qc_figures(subnums, dataloc, outdataloc, stim)
+
+#data = sub.data['emotions_6']
+#pos_n, pos_prop, neg_n, neg_prop = count_pixels_posneg(data)
+
+make_qc_figures(subnums, dataloc, outdataloc, stim)
 # # NB: square for marking intentionally empty bodies approximately at
 # # [530:580,430:480] in the full image
 #

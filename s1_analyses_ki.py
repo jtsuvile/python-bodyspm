@@ -29,7 +29,7 @@ curr_fig = 'emotions_1'
 
 with h5py.File(datafile, 'r') as kipu:
     fig = kipu[curr_fig].value
-    group = kipu['groups'].value
+    #group = kipu['groups'].value
 
 
 if stim_names[curr_fig][1] == 0:
@@ -37,8 +37,8 @@ if stim_names[curr_fig][1] == 0:
 else:
     mask = mask_fb
 
-group_1 = fig[group == 'LOWER_BACK',:,:]
-group_0 = fig[group == 'FIBROMYALGI',:,:]
+#group_1 = fig[group == 'LOWER_BACK',:,:]
+#group_0 = fig[group == 'FIBROMYALGI',:,:]
 #
 # g_kipu = np.arange(0, 102)
 # g_control = np.arange(102, 204)
@@ -122,56 +122,56 @@ group_0 = fig[group == 'FIBROMYALGI',:,:]
 #     plt.savefig(figloc+cond+'.png')
 #     #plt.close()
 
-# res_crps_pix = []
-# res_crps_prop = []
-# crps_conds = []
-# res_kipu_pix = []
-# res_kipu_prop = []
-# kipu_conds = []
-#
-# for i, cond in enumerate(stim_names.keys()):
-#
-#     with h5py.File(datafile, 'r') as p:
-#         pain = p[cond].value
-#     with h5py.File(datafile_controls, 'r') as c:
-#         control = c[cond].value
-#
-#     if stim_names[cond][1]:
-#         mask_use = mask_fb
-#     else:
-#         mask_use = mask_one
-#
-#     pix_crps, prop_crps = count_pixels(pain, mask=mask_use)
-#     res_crps_pix.extend(pix_crps)
-#     res_crps_prop.extend(prop_crps)
-#     crps_conds.extend(np.repeat(stim_names[cond][0], len(pix_crps)))
-#
-#     pix_kipu, prop_kipu = count_pixels(control, mask=mask_use)
-#     res_kipu_pix.extend(pix_kipu)
-#     res_kipu_prop.extend(prop_kipu)
-#     kipu_conds.extend(np.repeat(stim_names[cond][0], len(pix_kipu)))
-#
-# res = pd.DataFrame({'condition': np.append(crps_conds, kipu_conds), 'pixels': np.append(res_crps_pix, res_kipu_pix),
-#                     'proportion': np.append(res_crps_prop, res_kipu_prop),
-#                     "group": np.append(np.repeat('pain patients', len(res_crps_pix)), np.repeat('matched controls', len(res_kipu_pix)),
-#                                        axis=0)})
-#
-# stim_names_emotions = {'emotions_0': 'sadness', 'emotions_1': 'happiness', 'emotions_2': 'anger',
-#                        'emotions_3': 'surprise',
-#                        'emotions_4': 'fear', 'emotions_5': 'disgust', 'emotions_6': 'neutral'}
-#
-# stim_names_pain = {'pain_0': 'acute pain', 'pain_1': 'chonic pain'}
-# stim_names_sensitivity = {'sensitivity_0': 'tactile sensitivity',
-#                           'sensitivity_1': 'nociceptive sensitivity', 'sensitivity_2': 'hedonic sensitivity'}
-#
-# visualise = res[res.condition.isin(stim_names_emotions.values())]
-# fig = plt.figure()
-# ax = sns.swarmplot(data=visualise, x='condition', y='proportion', hue='group', dodge=True, color=".4", size=2.5)
-# ax = sns.boxplot(data=visualise, x='condition', y='proportion', hue='group', showfliers=False, notch=True)
-# # plt.show()
-# plt.savefig(figloc + 'emotion_proportion_coloured_kipu_controls.png')
-# plt.close()
-#
+res_crps_pix = []
+res_crps_prop = []
+crps_conds = []
+res_kipu_pix = []
+res_kipu_prop = []
+kipu_conds = []
+
+for i, cond in enumerate(stim_names.keys()):
+
+    with h5py.File(datafile, 'r') as p:
+        pain = p[cond].value
+    with h5py.File(datafile_controls, 'r') as c:
+        control = c[cond].value
+
+    if stim_names[cond][1]:
+        mask_use = mask_fb
+    else:
+        mask_use = mask_one
+
+    pix_crps, prop_crps = count_pixels(pain, mask=mask_use)
+    res_crps_pix.extend(pix_crps)
+    res_crps_prop.extend(prop_crps)
+    crps_conds.extend(np.repeat(stim_names[cond][0], len(pix_crps)))
+
+    pix_kipu, prop_kipu = count_pixels(control, mask=mask_use)
+    res_kipu_pix.extend(pix_kipu)
+    res_kipu_prop.extend(prop_kipu)
+    kipu_conds.extend(np.repeat(stim_names[cond][0], len(pix_kipu)))
+
+res = pd.DataFrame({'condition': np.append(crps_conds, kipu_conds), 'pixels': np.append(res_crps_pix, res_kipu_pix),
+                    'proportion': np.append(res_crps_prop, res_kipu_prop),
+                    "group": np.append(np.repeat('pain patients', len(res_crps_pix)), np.repeat('matched controls', len(res_kipu_pix)),
+                                       axis=0)})
+
+stim_names_emotions = {'emotions_0': 'sadness', 'emotions_1': 'happiness', 'emotions_2': 'anger',
+                       'emotions_3': 'surprise',
+                       'emotions_4': 'fear', 'emotions_5': 'disgust', 'emotions_6': 'neutral'}
+
+stim_names_pain = {'pain_0': 'acute pain', 'pain_1': 'chonic pain'}
+stim_names_sensitivity = {'sensitivity_0': 'tactile sensitivity',
+                          'sensitivity_1': 'nociceptive sensitivity', 'sensitivity_2': 'hedonic sensitivity'}
+
+visualise = res[res.condition.isin(stim_names_emotions.values())]
+fig = plt.figure()
+ax = sns.swarmplot(data=visualise, x='condition', y='proportion', hue='group', dodge=True, color=".4", size=2.5)
+ax = sns.boxplot(data=visualise, x='condition', y='proportion', hue='group', showfliers=False, notch=True)
+# plt.show()
+plt.savefig(figloc + 'emotion_proportion_coloured_kipu_controls.png')
+plt.close()
+
 # stats.ttest_ind(res[(res.condition == 'surprise')&(res.group == 'pain patients')]['pixels'],res[(res.condition == 'surprise') &(res.group =='matched controls')]['pixels'])
 # stats.ttest_ind(res[(res.condition == 'fear')&(res.group == 'pain patients')]['pixels'],res[(res.condition == 'fear') &(res.group =='matched controls')]['pixels'])
 # stats.ttest_ind(res[(res.condition == 'disgust')&(res.group == 'pain patients')]['pixels'],res[(res.condition == 'disgust') &(res.group =='matched controls')]['pixels'])
