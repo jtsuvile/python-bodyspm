@@ -12,7 +12,8 @@ import h5py
 from tqdm import tqdm
 
 
-def preprocess_subjects(subnums, indataloc, outdataloc, stimuli, bgfiles=None,fieldnames=None):
+def preprocess_subjects(subnums, indataloc, outdataloc, stimuli, bgfiles=None, fieldnames=None,
+                        intentionally_empty = False):
     """Reads in data from web interface output and writes the subjects out to .csv files (colouring data) and
     .json (other sub data). Also draws single subject's data into file for quality control.
     :param subnums : list of subject numbers to process
@@ -32,7 +33,7 @@ def preprocess_subjects(subnums, indataloc, outdataloc, stimuli, bgfiles=None,fi
         print("preprocessing subject " +  str(subnum) + " which is " + str(i+1) + "/" + str(len(subnums)))
         # make subject
         sub = Subject(subnum)
-        sub.read_data(indataloc, stimuli)
+        sub.read_data(indataloc, stimuli, intentionally_empty)
         # if files with background information have been defined, save values to sub.bginfo
         if bgfiles or fieldnames is not None:
             for j,file in enumerate(bgfiles):
@@ -239,7 +240,7 @@ def compare_groups(group1, group2, testtype='t'):
         # binarize and count hits
         g0_data = binarize(g0_data)
         g1_data = binarize(g1_data)
-        successes = [np.concatenate(np.sum(g0_data, axis=0)), np.concatenate(np.sum(g1_data, axis=0))]
+        successes = [np.concatenate(np.nansum(g0_data, axis=0)), np.concatenate(np.nansum(g1_data, axis=0))]
         counts = [np.concatenate(np.nansum(~np.isnan(g0_data), axis=0)),
                   np.concatenate(np.nansum(~np.isnan(g1_data), axis=0))]
         # run proportions test for each pixel based on number of observations(counts) and number of coloured pixels (successes)

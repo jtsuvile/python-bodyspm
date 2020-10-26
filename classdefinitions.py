@@ -73,7 +73,7 @@ class Subject:
     def has_background(self):
         return self.bginfo.keys()
 
-    def read_data(self, dataloc, stim, whole_image = False):
+    def read_data(self, dataloc, stim, whole_image = False, intentionally_empty = False):
         for stimulus in stim.all.keys():
             data_in = dataloc + '/' + str(self.name) + '/' + stimulus + '.csv'
             if os.path.isfile(data_in):
@@ -107,9 +107,9 @@ class Subject:
                         raw_res = np.hstack((as_coloured[9:531, 34:205], as_coloured[9:531, 699:870]))  # this creates 522*342 array
                     # Quality control step to check if subject has filled in intentionally left empty
                     # TODO: add flag to disable for studies that don't have this!
-                    # TODO: test on larger dataset when server is back up!
-                    if np.count_nonzero(raw_res) == 0 and not self.map_intentionally_empty(as_coloured):
-                        raw_res[:] = np.nan
+                    if(intentionally_empty):
+                        if np.count_nonzero(raw_res) == 0 and not self.map_intentionally_empty(as_coloured):
+                            raw_res[:] = np.nan
                 self.add_data(stimulus, raw_res)
             else:
                 raise IOError("File", data_in, "not found")
