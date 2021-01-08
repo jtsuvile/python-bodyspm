@@ -12,6 +12,11 @@ import h5py
 from tqdm import tqdm
 
 
+## Data wrangling
+# functions for getting data into the correct format for other analyses
+# Specifically designed to work with the Aalto University emBODY system
+
+
 def preprocess_subjects(subnums, indataloc, outdataloc, stimuli, bgfiles=None, fieldnames=None,
                         intentionally_empty = False):
     """Reads in data from web interface output and writes the subjects out to .csv files (colouring data) and
@@ -33,7 +38,7 @@ def preprocess_subjects(subnums, indataloc, outdataloc, stimuli, bgfiles=None, f
         print("preprocessing subject " +  str(subnum) + " which is " + str(i+1) + "/" + str(len(subnums)))
         # make subject
         sub = Subject(subnum)
-        sub.read_data(indataloc, stimuli, intentionally_empty)
+        sub.read_data(indataloc, stimuli, False, intentionally_empty)
         # if files with background information have been defined, save values to sub.bginfo
         if bgfiles or fieldnames is not None:
             for j,file in enumerate(bgfiles):
@@ -47,26 +52,20 @@ def preprocess_subjects(subnums, indataloc, outdataloc, stimuli, bgfiles=None, f
     print('done with preprocessing the subjects')
     return
 
-def make_qc_figures(subnums, indataloc, outdataloc, stimuli):
-    for i, subnum in enumerate(subnums):
-        print("making qc figures for subject " + str(subnum) + " which is " + str(i + 1) + "/" + str(len(subnums)))
-        sub = Subject(subnum)
-        sub.read_data(indataloc, stimuli, whole_image=True)
-        sub.draw_sub_data(stimuli, fileloc=outdataloc, qc=True)
-    return "done with qc figures"
-
-
-def intentionally_empty(array):
-    area = array[530:580,430:480]
-    n_nonzero = np.count_nonzero(area)
-    n_area = area.size
-    if n_nonzero > 0.1*n_area:
-        return True
-    else:
-        return False
-
 
 def add_background_table(new_bgdata, linking_col, subloc, exclude=[], override=True):
+    """
+    Add new background information from a data frame to a subject after preprocessing.
+    Adding is done based on a linking column (subject identifier).
+    The names of the background variables are taken from columns of the data frame.
+
+    :param new_bgdata: table with the new background information
+    :param linking_col: column name for the column containing subject identifiers
+    :param subloc: path to where the preprocessed subject data files are stored
+    :param exclude: optional. column names that should be ignored (not added to the subject)
+    :param override: optional. if the subject already has a background item with the same name, should this be overriden by the new data?
+
+    """
     existing_subs = os.listdir(subloc)
     group_colnames = new_bgdata.columns.tolist()
     if linking_col in group_colnames:
@@ -89,29 +88,6 @@ def add_background_table(new_bgdata, linking_col, subloc, exclude=[], override=T
         else:
             print('no subject ', subject, 'found')
     return "done"
-
-def binarize(data, threshold=0.007):
-    """
-    Change data from colouring (with blur) to binary 1/0 format. This is used in several analyses where data have
-    to be in binary format, such as two sample z test
-
-    NB: Default threshold 0.007 chosen as limit based on what limit replicates coloring best in Aalto system (March 2019).
-    The best value for this parameter will depend on brush & blur settings.
-    If changed, I highly recommend visual inspection of the result against known colouring
-
-    :param data: matrix with colouring data
-    :return: same matrix, with coloured areas changed to 1 and non-coloured changed to 0
-    """
-    data[data > threshold] = 1
-    data[data <= threshold] = 0
-    return data
-
-
-def binarize_posneg(data, threshold=0.007):
-    data[data > threshold] = 1
-    data[(data <= threshold) & (data >= -threshold)] = 0
-    data[data < -threshold] = -1
-    return data
 
 
 def combine_data(dataloc, subnums, groups=None, save=False, noImages = False):
@@ -206,6 +182,77 @@ def combine_data(dataloc, subnums, groups=None, save=False, noImages = False):
     return all_res
 
 
+# Functions used in analyses
+# Input is always a data matrix
+
+
+def binarize(data, threshold=0.007):
+    """
+    Change data from colouring (with blur) binary(ish) coloured / not coloured format.
+    If the data have only positive values, the returned map is truly binary (0/1).
+    If the map also has negative values (e.g. emotion maps with activations and inactivations), the
+    returned map can have three values: 0, 1, and -1.
+
+    NB: Default threshold 0.007 chosen as limit based on what limit replicates coloring best in Aalto system (March 2019).
+    The best value for this parameter will depend on brush & blur settings.
+    If changed, you should definitely do a visual inspection of the result against known colouring.
+
+    :param data: matrix with colouring data
+    :return: same matrix, with coloured areas changed to 1 and non-coloured changed to 0
+    """
+    data[data > threshold] = 1
+    data[(data <= threshold) & (data >= -threshold)] = 0
+    data[data < -threshold] = -1
+    return data
+
+def count_pixels(data, mask=None):
+    """
+    Count the number and proportion of coloured pixels per subject
+
+    :param data: the 3D-data frame where to count the
+    :param mask: optional. If provided, takes values inside mask into account in counting proportion colored
+    :return: number of coloured pixels per subject
+    """
+    data = binarize(data)
+    data = np.exp2(data)
+    # sum all cells for each subject
+    if mask is None:
+        counts_vector = np.sum(np.sum(data, axis=1), axis=1)
+        n_pixels = data.shape[1]*data.shape[2]
+    else:
+        inside_mask = data[:,mask==1]
+        n_pixels = np.sum(np.sum(mask))
+        counts_vector = np.sum(inside_mask, axis=1)
+    prop_vector = [x / n_pixels for x in counts_vector]
+    return counts_vector, prop_vector
+
+def count_pixels_posneg(data, mask=None, threshold=0.007):
+    """
+    Count the number and proportion of coloured pixels per subject
+
+    :param data: matrix with the colouring data to be counted
+    :param mask: optional. If provided, takes values inside mask into account in counting proportion colored
+    :return: number of coloured pixels per subject
+    """
+    data = binarize(data, threshold)
+    data_neg = data.copy()
+    data_neg[data_neg > 0] = 0
+    data_neg = data_neg * -1
+    data_pos = data.copy()
+    data_pos[data_pos < 0] = 0
+    # sum all cells for each subject
+    if mask is None:
+        mask = np.ones((data.shape[1],data.shape[2]))
+    inside_mask_pos = data_pos[:, mask == 1]
+    pos_vector = np.sum(inside_mask_pos, axis=1)
+    inside_mask_neg = data_neg[:, mask == 1]
+    neg_vector = np.sum(inside_mask_neg, axis=1)
+    n_pixels = np.sum(np.sum(mask))
+    prop_pos = np.array([x / n_pixels for x in pos_vector])
+    prop_neg = np.array([x / n_pixels for x in neg_vector])
+
+    return pos_vector, prop_pos, neg_vector, prop_neg
+
 def one_sample_t_test(data):
     """
     one sample t-test to see if coloured data is significantly more than 0
@@ -280,6 +327,87 @@ def correlate_maps(data, corr_with, method):
     return corr_map, p_map
 
 
+
+## Helper functions
+
+
+def get_latest_datafile(datadir):
+    """
+    :param datadir: where to search for datasets
+    :return: full path to latest datafile named dataset_ in the given datadir
+    """
+    latestfile = ''
+    for file in os.listdir(datadir):
+        if file.startswith("dataset"):
+            if latestfile == '' or os.path.getmtime(datadir +  '/' + file) > os.path.getmtime(datadir + '/' + latestfile):
+                latestfile = file
+            dataloc = os.path.join(datadir, latestfile)
+    return dataloc
+
+
+# def intentionally_empty(array):
+#     """
+#     implemented in classdefinitions?
+#     """
+#     area = array[530:580,430:480]
+#     n_nonzero = np.count_nonzero(area)
+#     n_area = area.size
+#     if n_nonzero > 0.1*n_area:
+#         return True
+#     else:
+#         return False
+
+
+def make_qc_figures(subnums, indataloc, stimuli, outdataloc = None):
+    """
+    Draw the entire colouring area for the given subjects. This is particularly useful in colouring quality control.
+    :param subnums: list of subject id's whose data to inspect
+    :param indataloc: where to look for preprocessed subject data
+    :param stimuli:
+    :param outdataloc: where to save the figures (defaults to same as above)
+
+    """
+    if outdataloc is None:
+        outdataloc = indataloc
+
+    for i, subnum in enumerate(subnums):
+        print("making qc figures for subject " + str(subnum) + " which is " + str(i + 1) + "/" + str(len(subnums)))
+        sub = Subject(subnum)
+        sub.read_data(indataloc, stimuli, whole_image=True)
+        sub.draw_sub_data(stimuli, fileloc=outdataloc, qc=True)
+    return "done with qc figures"
+
+
+def read_in_mask(file1, file2=None):
+    """
+    Easily read in a black and white mask image and change to binary numpy array to use in other functions.
+    If the data need left and right mask separately, please provide the mask to use on the left-hand side as the
+    first argument.
+
+    :param file1: Black-and-white mask image, where black shows areas inside the mask (i.e. to be included) and white
+    shows areas outside of the mask (i.e. background).
+    :param file2: Mask to use for the right side, if any
+    :return: numpy array of the mask with 1=include, 0=exclude
+    """
+    mask_array = io.imread(file1, as_gray=True)
+    dims = mask_array.shape
+    if len(dims) == 3:
+        mask_array = mask_array[:, :, 0]
+    mask_array[mask_array < 1] = 0
+    mask_array = mask_array * -1
+    mask_array = mask_array + 1
+    if file2 is not None:
+        mask_other_side = io.imread(file2, as_gray=True)
+        dims = mask_other_side.shape
+        if len(dims) == 3:
+            mask_other_side = mask_other_side[:, :, 0]
+        mask_other_side[mask_other_side < 1] = 0
+        mask_other_side = mask_other_side * -1
+        mask_other_side = mask_other_side + 1
+        mask_array = np.concatenate((mask_array, mask_other_side), axis=1)
+    return mask_array
+
+
 def p_adj_maps(pval_map, mask=None, alpha = 0.05, method='fdr_bh'):
     """
     An easier interface to correct p-values for multiple comparisons. By default, implements False Detection Rate
@@ -319,96 +447,3 @@ def p_adj_maps(pval_map, mask=None, alpha = 0.05, method='fdr_bh'):
         reject_map = np.ones(dims)
         reject_map[mask.astype(int) > 0] = reject
     return pval_map_corrected, reject_map
-
-
-def read_in_mask(file1, file2=None):
-    """
-    Easily read in a black and white mask image and change to binary numpy array to use in other functions.
-    If the data need left and right mask separately, please providethe mask to use on the left-hand side as the
-    first argument.
-
-    :param file1: Black-and-white mask image, where black shows areas inside the mask (i.e. to be included) and white
-    shows areas outside of the mask (i.e. background).
-    :param file2: Mask to use for the right side, if any
-    :return: numpy array of the mask with 1=include, 0=exclude
-    """
-    mask_array = io.imread(file1, as_gray=True)
-    dims = mask_array.shape
-    if len(dims) == 3:
-        mask_array = mask_array[:, :, 0]
-    mask_array[mask_array < 1] = 0
-    mask_array = mask_array * -1
-    mask_array = mask_array + 1
-    if file2 is not None:
-        mask_other_side = io.imread(file2, as_gray=True)
-        dims = mask_other_side.shape
-        if len(dims) == 3:
-            mask_other_side = mask_other_side[:, :, 0]
-        mask_other_side[mask_other_side < 1] = 0
-        mask_other_side = mask_other_side * -1
-        mask_other_side = mask_other_side + 1
-        mask_array = np.concatenate((mask_array, mask_other_side), axis=1)
-    return mask_array
-
-
-def count_pixels(data, mask=None):
-    """
-    Count the number and proportion of coloured pixels per subject
-
-    :param data: the 3D-data frame where to count the
-    :param mask: optional. If provided, takes values inside mask into account in counting proportion colored
-    :return: number of coloured pixels per subject
-    """
-    data = binarize(data)
-    # sum all cells for each subject
-    if mask is None:
-        counts_vector = np.sum(np.sum(data, axis=1), axis=1)
-        n_pixels = data.shape[1]*data.shape[2]
-    else:
-        inside_mask = data[:,mask==1]
-        n_pixels = np.sum(np.sum(mask))
-        counts_vector = np.sum(inside_mask, axis=1)
-    prop_vector = [x / n_pixels for x in counts_vector]
-    return counts_vector, prop_vector
-
-def count_pixels_posneg(data, mask=None, threshold=0.007):
-    """
-    Count the number and proportion of coloured pixels per subject
-
-    :param data: the 3D-data frame where to count the
-    :param mask: optional. If provided, takes values inside mask into account in counting proportion colored
-    :return: number of coloured pixels per subject
-    """
-    data = binarize_posneg(data, threshold)
-    data_neg = data.copy()
-    data_neg[data_neg > 0] = 0
-    data_neg = data_neg * -1
-    data_pos = data.copy()
-    data_pos[data_pos < 0] = 0
-    # sum all cells for each subject
-    if mask is None:
-        mask = np.ones((data.shape[1],data.shape[2]))
-    inside_mask_pos = data_pos[:, mask == 1]
-    pos_vector = np.sum(inside_mask_pos, axis=1)
-    inside_mask_neg = data_neg[:, mask == 1]
-    neg_vector = np.sum(inside_mask_neg, axis=1)
-    n_pixels = np.sum(np.sum(mask))
-    prop_pos = np.array([x / n_pixels for x in pos_vector])
-    prop_neg = np.array([x / n_pixels for x in neg_vector])
-
-    return pos_vector, prop_pos, neg_vector, prop_neg
-
-
-def get_latest_datafile(datadir):
-    """
-    :param datadir: where to search for datasets
-    :return: full path to latest datafile named dataset_ in the given datadir
-    """
-    latestfile = ''
-    for file in os.listdir(datadir):
-        if file.startswith("dataset"):
-            if latestfile == '' or os.path.getmtime(datadir +  '/' + file) > os.path.getmtime(datadir + '/' + latestfile):
-                latestfile = file
-            dataloc = os.path.join(datadir, latestfile)
-    return dataloc
-

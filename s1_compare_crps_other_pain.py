@@ -53,11 +53,11 @@ for i, cond in enumerate(stim_names.keys()):
     print(np.max(crps))
 
     if stim_names[cond][1] == 1: # do not binarize for t-test
-        crps_t = np.nanmean(binarize_posneg(crps.copy()),axis=0)
-        kipu_t = np.nanmean(binarize_posneg(pain.copy()), axis=0)
+        crps_t = np.nanmean(binarize(crps.copy()),axis=0)
+        kipu_t = np.nanmean(binarize(pain.copy()), axis=0)
     else: # binarize for t-test
-        crps_t = np.nanmean(binarize_posneg(crps),axis=0)
-        kipu_t = np.nanmean(binarize_posneg(pain), axis=0)
+        crps_t = np.nanmean(binarize(crps),axis=0)
+        kipu_t = np.nanmean(binarize(pain), axis=0)
 
     masked_crps= np.ma.masked_where(mask != 1,crps_t)
     masked_kipu= np.ma.masked_where(mask != 1,kipu_t)

@@ -3,31 +3,33 @@ import numpy as np
 import pandas as pd
 import random
 
+
+dataloc_pain = '/m/nbe/scratch/socbrain/kipupotilaat/data/stockholm/processed/'
+pain_bg = pd.DataFrame(columns=['subid','age','sex','pain_now'])
+csvname = '/m/nbe/scratch/socbrain/kipupotilaat/data/age_and_gender_matched_subs_pain_stockholm_12_2020.csv'
+
+# dataloc_pain = '/m/nbe/scratch/socbrain/kipupotilaat/data/helsinki/processed/'
+# pain_bg = pd.DataFrame(columns=['subid','age','sex','pain_now','groups'])
+# csvname = '/m/nbe/scratch/socbrain/kipupotilaat/data/age_and_gender_matched_subs_pain_helsinki_11_2020.csv'
+
 dataloc_controls = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/processed/'
 datafile_controls = get_latest_datafile(dataloc_controls)
 controls_bg = pd.DataFrame(columns=['subid','age','sex','pain_now','feels_pain','pain_chronic',
                                     'hist_abdomen', 'hist_back_shoulder', 'hist_headache', 'hist_joint_limb',
-                                    'hist_menstrual', 'hist_migraine'])
+                                    'hist_menstrual', 'hist_migraine', 'bpi_now', 'bpi_average'])
 
 with h5py.File(datafile_controls, 'r') as c:
     for column in controls_bg:
         controls_bg[column] = c[column][:]
 
 controls_bg.set_index('subid', drop=False, inplace=True)
-controls_bg = controls_bg[(controls_bg.pain_chronic == 0) & (controls_bg.pain_now == 0)].copy()
+controls_bg = controls_bg[(controls_bg.pain_chronic == 0) & (controls_bg.pain_now == 0) &
+                          (controls_bg.bpi_now < 5) &
+                          (controls_bg.bpi_average < 5)].copy()
 
 acceptable_controls_original = controls_bg.copy()
-# controls_bg_more_stringent = controls_bg[((controls_bg.pain_chronic == 0) | (controls_bg.pain_chronic == 3)) &
-#                                          ((controls_bg.hist_abdomen == 0) | (controls_bg.hist_abdomen == 3)) &
-#                                          ((controls_bg.hist_back_shoulder == 0) | (controls_bg.hist_back_shoulder == 3)) &
-#                                          ((controls_bg.hist_headache == 0) | (controls_bg.hist_headache == 3)) &
-#                                          ((controls_bg.hist_joint_limb == 0) | (controls_bg.hist_joint_limb == 3)) &
-#                                          ((controls_bg.hist_menstrual == 0) | (controls_bg.hist_menstrual == 3)) &
-#                                          ((controls_bg.hist_migraine == 0) | (controls_bg.hist_migraine == 3))].copy()
 
-dataloc_pain = '/m/nbe/scratch/socbrain/kipupotilaat/data/helsinki/processed/'
 datafile_pain = get_latest_datafile(dataloc_pain)
-pain_bg = pd.DataFrame(columns=['subid','age','sex','pain_now','groups'])
 
 with h5py.File(datafile_pain, 'r') as b:
     for column in pain_bg:
@@ -45,6 +47,8 @@ for i in range(1,500):
     matches['control_pain_now'] = 0
     matches['control_feels_pain'] = 0
     matches['age_diff'] = 0
+    matches['bpi_now'] = np.nan
+    matches['bpi_average'] = np.nan
     for gender in pain_bg['sex'].unique():
         subs_temp = pain_bg.loc[pain_bg['sex'] == gender,'subid']
         subs = list(subs_temp)
@@ -58,7 +62,11 @@ for i in range(1,500):
                                                              controls.loc[ind, 'age'],
                                                              controls.loc[ind, 'pain_now'],
                                                              controls.loc[ind, 'feels_pain'],
-                                                             abs(controls.loc[ind, 'age'] - sub_age)]
+                                                             age_diff]
+            #print(controls.loc[ind, 'bpi_now'])
+            if pd.notna(controls.loc[ind, 'bpi_now']):
+                 matches.loc[subject, 'bpi_now'] = controls.loc[ind, 'bpi_now']
+                 matches.loc[subject, 'bpi_average'] = controls.loc[ind, 'bpi_average']
             controls = controls.drop(ind, axis=0)
 
     sum_diff = sum(matches['age_diff'])
@@ -73,7 +81,7 @@ for i in range(1,500):
 
 print(best_matches[best_matches.age_diff>age_diff_cutoff])
 # #
-best_matches.to_csv('/m/nbe/scratch/socbrain/kipupotilaat/data/age_and_gender_matched_subs_pain_helsinki_after_qc.csv')
+best_matches.to_csv(csvname)
 # #
 # # ## Get second match per person
 # rm_subid = best_matches['control_id']
@@ -129,9 +137,3 @@ best_matches.to_csv('/m/nbe/scratch/socbrain/kipupotilaat/data/age_and_gender_ma
 # #last_resort_controls.loc[(last_resort_controls.pain_now==3) | (last_resort_controls.feels_pain==3) | (last_resort_controls.pain_now==2) | (last_resort_controls.feels_pain==2)]
 #
 #
-# # problem subs 10.5.
-# # 2672 age 57
-# # 4296 age 56
-# # 5451 age 59
-# # 9861 age 60
-# # 9986 age 59

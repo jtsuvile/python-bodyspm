@@ -23,9 +23,10 @@ mask_one = read_in_mask(maskloc + 'mask_front_new.png')
 stim_names = {'emotions_0': ['sadness', 0], 'emotions_1': ['happiness', 0], 'emotions_2': ['anger', 0],
               'emotions_3': ['surprise', 0], 'emotions_4': ['fear', 0], 'emotions_5': ['disgust', 0],
               'emotions_6': ['neutral', 0],
-              'pain_0': ['acute pain', 1], 'pain_1': ['chonic_pain', 1], 'sensitivity_0': ['tactile sensitivity', 1],
+              'pain_0': ['current pain', 1], 'pain_1': ['chonic pain', 1], 'sensitivity_0': ['tactile sensitivity', 1],
               'sensitivity_1': ['nociceptive sensitivity', 1], 'sensitivity_2': ['hedonic sensitivity', 1]}
-
+# stim_names = {'pain_0': ['current pain', 1], 'pain_1': ['chonic pain', 1], 'sensitivity_0': ['tactile sensitivity', 1],
+#               'sensitivity_1': ['nociceptive sensitivity', 1], 'sensitivity_2': ['hedonic sensitivity', 1]}
 
 # Visualise group differences
 
@@ -55,7 +56,7 @@ for i, cond in enumerate(stim_names.keys()):
     #control_p_corrected = control_p
     control_p_corrected[np.isnan(control_p_corrected)] = 1
     control_t[control_p_corrected>0.05] = 0
-    #control_t = np.nanmean(binarize_posneg(control),axis=0)
+    #control_t = np.nanmean(binarize(control),axis=0)
     masked_control= np.ma.masked_where(mask != 1,control_t)
 
     kipu_t, kipu_p = stats.ttest_1samp(kipu, 0, nan_policy='omit', axis=0)#np.nanmean(binarize(pain), axis=0)
@@ -64,10 +65,11 @@ for i, cond in enumerate(stim_names.keys()):
     #kipu_p_corrected = kipu_p
     kipu_p_corrected[np.isnan(kipu_p_corrected)] = 1
     kipu_t[kipu_p_corrected>0.05] = 0
-    #kipu_t = np.nanmean(binarize_posneg(kipu),axis=0)
+    #kipu_t = np.nanmean(binarize(kipu),axis=0)
     masked_kipu= np.ma.masked_where(mask != 1,kipu_t)
 
     if (np.nanmin(control)==0) & (np.nanmin(kipu)==0):
+        #print('Using z test of proportions')
         twosamp_t, twosamp_p = compare_groups(kipu, control, testtype='z')
     else:
         twosamp_t, twosamp_p = stats.ttest_ind(kipu, control, axis=0, nan_policy='omit')
@@ -91,7 +93,7 @@ for i, cond in enumerate(stim_names.keys()):
 
     ax2 = plt.subplot(141)
     img2 = plt.imshow(masked_control, cmap=cmap, vmin=vmin, vmax=vmax)
-    ax2.title.set_text('control patients')
+    ax2.title.set_text('control subjects')
     fig.colorbar(img2, fraction=0.046, pad=0.04)
     ax2.axis('off')
 

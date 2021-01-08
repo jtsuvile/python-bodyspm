@@ -1,18 +1,18 @@
 from bodyfunctions import *
 import h5py
 import numpy as np
-import scipy.misc
+import imageio
 import matplotlib.pyplot as plt
 from PIL import Image
 from operator import add
 
 dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/processed/matched_controls/'
-bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/bg_matched_controls_30_10_2019.csv'
-outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/data/matched_controls_with_activations_by_roi.csv'
+bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/bg_matched_controls_18_11_2020.csv'
+outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/data/matched_controls_with_activations_by_roi_11_2020.csv'
 
-# bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/all_pain_patients_21_10_2019.csv'
+# bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/all_pain_patients_15_10_2020.csv'
 # dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/helsinki/processed/'
-# outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/data/all_pain_patients_with_activations_by_roi.csv'
+# outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/data/all_pain_patients_with_activations_by_roi_10_2020.csv'
 
 datafile = get_latest_datafile(dataloc)
 maskloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/'
@@ -24,7 +24,7 @@ stim_names = {'emotions_0': ['sadness', 0], 'emotions_1': ['happiness', 0], 'emo
               'sensitivity_1': ['nociceptive sensitivity', 1], 'sensitivity_2': ['hedonic sensitivity', 1]}
 color_defs = {'head': 26, 'arms': 102, 'hands': 204, 'torso': 51, 'crotch': 77, 'legs': 153, 'feet': 230}
 
-rois_base = scipy.misc.imread(maskloc + 'ROIs_pain.png', flatten=True, mode='L')
+rois_base = imageio.imread(maskloc + 'ROIs_pain.png', as_gray=True, pilmode='L')
 # outline_front = scipy.misc.imread(maskloc + 'outline_front.png', flatten=True, mode='L')
 # outline_back = scipy.misc.imread(maskloc + 'outline_back.png', flatten=True, mode='L')
 
