@@ -2,17 +2,17 @@ from bodyfunctions import *
 import h5py
 import numpy as np
 import imageio
-import matplotlib.pyplot as plt
-from PIL import Image
+#import matplotlib.pyplot as plt
+#from PIL import Image
 from operator import add
 
-dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/processed/matched_controls/'
-bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/bg_matched_controls_18_11_2020.csv'
-outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/data/matched_controls_with_activations_by_roi_11_2020.csv'
+# dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/processed/matched_controls/'
+# bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/bg_matched_controls_18_11_2020.csv'
+# outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/data/matched_controls_with_activations_by_roi_01_2021.csv'
 
-# bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/all_pain_patients_15_10_2020.csv'
-# dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/helsinki/processed/'
-# outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/data/all_pain_patients_with_activations_by_roi_10_2020.csv'
+bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/all_pain_patients_15_10_2020.csv'
+dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/helsinki/processed/'
+outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/data/all_pain_patients_with_activations_by_roi_01_2021.csv'
 
 datafile = get_latest_datafile(dataloc)
 maskloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/'
@@ -22,11 +22,11 @@ stim_names = {'emotions_0': ['sadness', 0], 'emotions_1': ['happiness', 0], 'emo
               'emotions_6': ['neutral', 0],
               'pain_0': ['acute pain', 1], 'pain_1': ['chonic_pain', 1], 'sensitivity_0': ['tactile sensitivity', 1],
               'sensitivity_1': ['nociceptive sensitivity', 1], 'sensitivity_2': ['hedonic sensitivity', 1]}
-color_defs = {'head': 26, 'arms': 102, 'hands': 204, 'torso': 51, 'crotch': 77, 'legs': 153, 'feet': 230}
 
-rois_base = imageio.imread(maskloc + 'ROIs_pain.png', as_gray=True, pilmode='L')
-# outline_front = scipy.misc.imread(maskloc + 'outline_front.png', flatten=True, mode='L')
-# outline_back = scipy.misc.imread(maskloc + 'outline_back.png', flatten=True, mode='L')
+color_defs = {'head': 26, 'shoulders':128, 'arms': 102, 'upper_torso': 51, 'lower_torso': 77, 'legs': 153,
+              'hands': 204, 'feet': 230}
+
+rois_base = imageio.imread(maskloc + 'kipu_ROI_new.png', as_gray=True, pilmode='L')
 
 bg = pd.read_csv(bgdatapath)
 

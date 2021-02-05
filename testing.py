@@ -28,10 +28,10 @@ dataloc = '/Users/juusu53/Documents/projects/kipupotilaat/python_code_testing/'
 
 # TEST ROI FILE
 
-data = np.genfromtxt('/Users/juusu53/Documents/projects/kipupotilaat/python_code_testing/test_sub_3/emotions_4_as_matrix.csv', delimiter=',')
+data = np.genfromtxt('/Users/juusu53/Documents/projects/kipupotilaat/python_code_testing/test_sub_1/emotions_4_as_matrix.csv', delimiter=',')
 rois = io.imread('/Users/juusu53/Documents/projects/kipupotilaat/kipu_ROI_new.png', as_gray=True, pilmode='L')
 mask_use = read_in_mask(dataloc + 'mask_front_new.png')
-color_defs = {'head': 26, 'shoulders':128, 'arms': 102, 'upper_torso': 51, 'lower_torso': 77, 'legs': 153}
+color_defs = {'head': 26, 'shoulders':128, 'arms': 102, 'upper_torso': 51, 'lower_torso': 77, 'legs': 153, 'hands': 204, 'feet': 230}
 
 unique_elements, counts_elements = np.unique(rois, return_counts=True)
 
