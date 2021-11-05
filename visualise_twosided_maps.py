@@ -26,11 +26,11 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 # outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/figures/all_pain_patients_sensitivity.png'
 # suptitle = 'Sensitivity maps, pain patients'
 
-dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/stockholm/processed/'
-# outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/figures/KI/karolinska_pain_locations_12_2020.png'
-# suptitle = 'Pain locations, all patients from KI'
-outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/figures/KI/karolinska_sensitivity_12_2020.png'
-suptitle = 'Sensitivity maps, all patients from KI'
+# dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/stockholm/processed/'
+# # outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/figures/KI/karolinska_pain_locations_12_2020.png'
+# # suptitle = 'Pain locations, all patients from KI'
+# outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/figures/KI/karolinska_sensitivity_12_2020.png'
+# suptitle = 'Sensitivity maps, all patients from KI'
 
 # dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/stockholm/processed/'
 # groupname = 'FIBROMYALGI'

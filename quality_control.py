@@ -2,7 +2,7 @@ import os
 import sys
 import pandas as pd
 from classdefinitions import Subject, Stimuli
-from bodyfunctions import make_qc_figures, preprocess_subjects, intentionally_empty, count_pixels_posneg
+from bodyfunctions import make_qc_figures, preprocess_subjects, count_pixels_posneg
 import matplotlib as mpl
 mpl.use('Agg')
 import matplotlib.pyplot as plt
@@ -12,7 +12,7 @@ import csv
 import math
 
 
-who = 'helsinki'
+who = 'helsinki_endo'
 
 if who == 'control':
     dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/subjects/'
@@ -27,6 +27,10 @@ elif who == 'helsinki':
     outdataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/helsinki/qc/'
     subfile = '/m/nbe/scratch/socbrain/kipupotilaat/data/helsinki/kipu_subs.txt'
     csvname = '/m/nbe/scratch/socbrain/kipupotilaat/data/all_pain_patients_03_09_2020.csv'
+elif who == 'helsinki_endo':
+    dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/subjects/'
+    outdataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/qc/'
+    subfile = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/subs.txt'
 elif who == 'stockholm':
     dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/stockholm/subjects/'
     outdataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/stockholm/qc/'
@@ -64,7 +68,7 @@ if who != 'matched_controls_helsinki' and who != 'matched_controls_two_each':
 #data = sub.data['emotions_6']
 #pos_n, pos_prop, neg_n, neg_prop = count_pixels_posneg(data)
 
-make_qc_figures(subnums, dataloc, outdataloc, stim)
+make_qc_figures(subnums, dataloc, stim, outdataloc)
 # # NB: square for marking intentionally empty bodies approximately at
 # # [530:580,430:480] in the full image
 #

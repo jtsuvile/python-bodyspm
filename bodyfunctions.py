@@ -125,6 +125,7 @@ def combine_data(dataloc, subnums, groups=None, save=False, noImages = False):
     if noImages:
         for j, subnum in tqdm(enumerate(subnums), desc="subjects"):
             temp_sub = Subject(subnum)
+            print(temp_sub)
             temp_sub.read_sub_from_file(dataloc, noImages)
             if sum(all_res['bg']['subid'] == subnum) == 0:
                 all_res['bg'].loc[subnum, 'subid'] = int(subnum)
@@ -344,18 +345,6 @@ def get_latest_datafile(datadir):
             dataloc = os.path.join(datadir, latestfile)
     return dataloc
 
-
-# def intentionally_empty(array):
-#     """
-#     implemented in classdefinitions?
-#     """
-#     area = array[530:580,430:480]
-#     n_nonzero = np.count_nonzero(area)
-#     n_area = area.size
-#     if n_nonzero > 0.1*n_area:
-#         return True
-#     else:
-#         return False
 
 
 def make_qc_figures(subnums, indataloc, stimuli, outdataloc = None):
