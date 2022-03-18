@@ -7,14 +7,16 @@ from scipy import stats
 import csv
 import matplotlib.pyplot as plt
 import seaborn as sns
+from matplotlib.colors import ListedColormap
 
 
-figloc = '/m/nbe/scratch/socbrain/kipupotilaat/figures/'
+
+figloc = '/m/nbe/scratch/socbrain/kipupotilaat/figures/KI/'
 maskloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/'
-dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/helsinki/processed/'
+dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/stockholm/processed/fibro/'
 datafile = get_latest_datafile(dataloc)
 
-dataloc_controls = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/processed/matched_controls/'
+dataloc_controls = '/m/nbe/scratch/socbrain/kipupotilaat/data/stockholm/processed/lbp/'
 datafile_controls = get_latest_datafile(dataloc_controls)
 
 mask_fb = read_in_mask(maskloc + 'mask_front_new.png', maskloc + 'mask_back_new.png')
@@ -30,6 +32,15 @@ stim_names = {'emotions_0': ['sadness', 0], 'emotions_1': ['happiness', 0], 'emo
 
 # Visualise group differences
 
+hot = plt.cm.get_cmap('hot', 256)
+new_cols = hot(np.linspace(0, 1, 256))
+
+cold = np.hstack((np.fliplr(new_cols[:,0:3]),new_cols[:,3][:,None]))
+newcolors = np.vstack((np.flipud(cold), new_cols))
+newcolors = np.delete(newcolors, np.arange(200, 312, 2), 0)
+
+
+
 for i, cond in enumerate(stim_names.keys()):
 
     with h5py.File(datafile, 'r') as h:
@@ -42,30 +53,33 @@ for i, cond in enumerate(stim_names.keys()):
         mask = mask_fb
         cmap = 'hot'
         vmin = 0
-        vmax = 10
+        vmax = 1
         fig = plt.figure(figsize=(25, 10))
     else:
         mask = mask_one
-        cmap = 'coolwarm'
-        vmin = -10
-        vmax = 10
+        #cmap = 'coolwarm'
+        cmap = ListedColormap(newcolors)
+        vmin = -1
+        vmax = 1
         fig= plt.figure(figsize=(14,10))
 
-    control_t, control_p = stats.ttest_1samp(control, 0, nan_policy='omit', axis=0) #np.nanmean(binarize(control), axis=0)
-    control_p_corrected, control_reject = p_adj_maps(control_p, mask, method='fdr_bh')
+    #control_t, control_p = stats.ttest_1samp(control, 0, nan_policy='omit', axis=0) #np.nanmean(binarize(control), axis=0)
+    #control_p_corrected, control_reject = p_adj_maps(control_p, mask, method='fdr_bh')
     #control_p_corrected = control_p
-    control_p_corrected[np.isnan(control_p_corrected)] = 1
-    control_t[control_p_corrected>0.05] = 0
+    #control_p_corrected[np.isnan(control_p_corrected)] = 1
+    #control_t[control_p_corrected>0.05] = 0
     #control_t = np.nanmean(binarize(control),axis=0)
+    control_t = np.nanmean(binarize(control.copy()), axis=0)
     masked_control= np.ma.masked_where(mask != 1,control_t)
 
-    kipu_t, kipu_p = stats.ttest_1samp(kipu, 0, nan_policy='omit', axis=0)#np.nanmean(binarize(pain), axis=0)
+    #kipu_t, kipu_p = stats.ttest_1samp(kipu, 0, nan_policy='omit', axis=0)#np.nanmean(binarize(pain), axis=0)
 
-    kipu_p_corrected, kipu_reject = p_adj_maps(kipu_p, mask, method='fdr_bh')
+    #kipu_p_corrected, kipu_reject = p_adj_maps(kipu_p, mask, method='fdr_bh')
     #kipu_p_corrected = kipu_p
-    kipu_p_corrected[np.isnan(kipu_p_corrected)] = 1
-    kipu_t[kipu_p_corrected>0.05] = 0
+    #kipu_p_corrected[np.isnan(kipu_p_corrected)] = 1
+    #kipu_t[kipu_p_corrected>0.05] = 0
     #kipu_t = np.nanmean(binarize(kipu),axis=0)
+    kipu_t = np.nanmean(binarize(kipu.copy()), axis=0)
     masked_kipu= np.ma.masked_where(mask != 1,kipu_t)
 
     if (np.nanmin(control)==0) & (np.nanmin(kipu)==0):
@@ -87,13 +101,13 @@ for i, cond in enumerate(stim_names.keys()):
 
     ax1 = plt.subplot(142)
     img1 = plt.imshow(masked_kipu, cmap=cmap, vmin=vmin, vmax=vmax)
-    ax1.title.set_text('pain patients')
+    ax1.title.set_text('Fibromyalgia patients')
     fig.colorbar(img1,fraction=0.046, pad=0.04)
     ax1.axis('off')
 
     ax2 = plt.subplot(141)
     img2 = plt.imshow(masked_control, cmap=cmap, vmin=vmin, vmax=vmax)
-    ax2.title.set_text('control subjects')
+    ax2.title.set_text('LBP patients')
     fig.colorbar(img2, fraction=0.046, pad=0.04)
     ax2.axis('off')
 
@@ -114,75 +128,3 @@ for i, cond in enumerate(stim_names.keys()):
     #plt.show()
     plt.savefig(figloc+cond+'_controls_pain_pixelwise.png')
     plt.close()
-
-#
-#
-#
-# res_crps_pix = []
-# res_crps_prop = []
-# crps_conds = []
-# res_kipu_pix = []
-# res_kipu_prop = []
-# kipu_conds = []
-# for i, cond in enumerate(stim_names.keys()):
-#     with h5py.File(datafile, 'r') as h:
-#         kipu = h[cond].value
-#         kipu_diagnoses = list(h['groups'])
-#
-#     crps_indices = np.asarray([x == 'CRPS' for x in kipu_diagnoses])
-#     pain = kipu[~crps_indices]
-#     crps = kipu[crps_indices]
-#
-#     if stim_names[cond][1] == 1:
-#         mask_use = mask_fb
-#     else:
-#         mask_use = mask_one
-#     pix_crps, prop_crps = count_pixels(crps, mask=mask_use)
-#     res_crps_pix.extend(pix_crps)
-#     res_crps_prop.extend(prop_crps)
-#     crps_conds.extend(np.repeat(stim_names[cond][0], len(pix_crps)))
-#
-#     pix_kipu, prop_kipu = count_pixels(pain, mask=mask_use)
-#     res_kipu_pix.extend(pix_kipu)
-#     res_kipu_prop.extend(prop_kipu)
-#     kipu_conds.extend(np.repeat(stim_names[cond][0], len(pix_kipu)))
-#
-#
-# res = pd.DataFrame({'condition':np.append(crps_conds, kipu_conds), 'pixels':np.append(res_crps_pix, res_kipu_pix), 'proportion':np.append(res_crps_prop, res_kipu_prop), "group":np.append(np.repeat('crps', len(res_crps_pix)), np.repeat('kipu', len(res_kipu_pix)), axis=0)})
-#
-#
-# stim_names_emotions = {'emotions_0':'sadness', 'emotions_1':'happiness', 'emotions_2':'anger', 'emotions_3':'surprise',
-#               'emotions_4': 'fear', 'emotions_5':'disgust', 'emotions_6':'neutral'}
-#
-# stim_names_pain = {'pain_0':'acute pain', 'pain_1': 'chonic_pain'}
-# stim_names_sensitivity = {'sensitivity_0':'tactile sensitivity',
-#               'sensitivity_1':'nociceptive sensitivity', 'sensitivity_2':'hedonic sensitivity'}
-#
-# visualise = res[res.condition.isin(stim_names_emotions.values())]
-# fig = plt.figure()
-# ax = sns.swarmplot(data=visualise, x='condition', y = 'proportion', hue='group', dodge=True, color=".4", size=5)
-# ax = sns.boxplot(data=visualise, x='condition', y = 'proportion', hue='group', showfliers=False, notch=True)
-# #plt.show()
-# plt.savefig(figloc+'emotions_proportion_coloured_kipu_crps.png')
-# plt.close()
-# #
-# kipu['bg'][crps][['age','work_sitting','work_physical', 'sex']].astype(float).describe(include='all')
-# sum(kipu['bg'][crps]['sex'].astype(int))
-# kipu['bg'][~crps][['age','work_sitting','work_physical', 'sex']].astype(float).describe(include='all')
-# sum(kipu['bg'][~crps]['sex'].astype(int))
-#
-# kipu['bg'][crps][['feels_pain','feels_depression','feels_anxiety','feels_happy','feels_sad','feels_angry',
-#                   'feels_surprise','feels_disgust']].astype(int).describe(include='all')
-# kipu['bg'][~crps][['feels_pain','feels_depression','feels_anxiety','feels_happy','feels_sad','feels_angry',
-#                    'feels_surprise','feels_disgust']].astype(int).describe(include='all')
-#
-#
-# kipu['bg'][crps][['pain_now','pain_last_day','hist_migraine','hist_headache','hist_abdomen','hist_back_shoulder','hist_joint_limb','hist_menstrual',
-#                 'painkillers_overcounter','painkillers_prescription', 'painkillers_othercns','hist_crps','hist_fibro']].astype(int).describe(include='all')
-# kipu['bg'][~crps][['pain_now','pain_last_day','hist_migraine','hist_headache','hist_abdomen','hist_back_shoulder','hist_joint_limb','hist_menstrual',
-#                 'painkillers_overcounter','painkillers_prescription', 'painkillers_othercns']].crosstab(columns="count")
-#
-# pd.crosstab(kipu['bg'][crps]['pain_now'], columns="count")
-# #'pain_last_day','hist_migraine','hist_headache','hist_abdomen','hist_back_shoulder','hist_joint_limb','hist_menstrual', 'hist_crps', 'hist_fibro'
-# # 'painkillers_overcounter','painkillers_prescription', 'painkillers_othercns'
-# stats.ttest_ind(res[(res.condition == 'surprise')&(res.group == 'crps')]['pixels'],res[(res.condition == 'surprise') &(res.group =='kipu')]['pixels'])

@@ -18,13 +18,21 @@ import csv
 # dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/processed/double_matched_controls/'
 # outfilename ='/m/nbe/scratch/socbrain/kipupotilaat/data/double_matched_controls_with_activations_10_2019.csv'
 
-# bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/bg_pain_stockholm.csv'
-# dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/stockholm/processed/'
-# outfilename ='/m/nbe/scratch/socbrain/kipupotilaat/data/bg_pain_stockholm_with_activations_09_2021.csv'
+# bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/bg_pain_stockholm_lbp.csv'
+# dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/stockholm/processed/lbp/'
+# outfilename ='/m/nbe/scratch/socbrain/kipupotilaat/data/bg_pain_stockholm_lbp_with_activations_02_2022.csv'
 
-bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/endometriosis_patients_05_11_2021.csv'
-dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/processed/'
-outfilename ='/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/endometriosis_with_activations_11_2021.csv'
+bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/bg_pain_stockholm_fibro.csv'
+dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/stockholm/processed/fibro/'
+outfilename ='/m/nbe/scratch/socbrain/kipupotilaat/data/bg_pain_stockholm_fibro_with_activations_02_2022.csv'
+
+# bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/endometriosis_patients_05_11_2021.csv'
+# dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/processed/'
+# outfilename ='/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/endometriosis_with_activations_11_2021.csv'
+
+# bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/endometriosis_controls_12_11_2021.csv'
+# dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/matched_controls/'
+# outfilename ='/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/endometriosis_controls_with_activations_11_2021.csv'
 
 # bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/bg_matched_controls_stockholm_12_2020.csv'
 # dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/processed/matched_controls_stockholm/'

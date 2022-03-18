@@ -9,7 +9,7 @@ import time
 import csv
 
 
-who = 'helsinki_endo'
+who = 'helsinki_endo_controls'
 start = time.time()
 # set up stimuli description
 onesided = [True, True, True, True, True, True, True, False, False, False, False, False]
@@ -120,6 +120,21 @@ elif who == 'helsinki_endo':
                ['bpi_worst', 'bpi_least', 'bpi_average', 'bpi_now', 'bpi_painkiller_relief'],
                ['bpi_functioning', 'bpi_mood','bpi_walk','bpi_work', 'bpi_relationships','bpi_sleep','bpi_enjoyment']]
     csvname = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/endometriosis_patients_05_11_2021.csv'
+elif who == 'helsinki_endo_controls':
+    dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/subjects/'
+    outdataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/matched_controls/'
+    subfile = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/control_subs.txt'
+    field_names = [
+        ['sex', 'age', 'weight', 'height', 'handedness', 'education', 'work_physical', 'work_sitting', 'profession',
+         'psychologist', 'psychiatrist', 'neurologist'],
+        ['pain_now', 'pain_last_day', 'pain_chronic', 'hist_migraine', 'hist_headache', 'hist_abdomen',
+         'hist_back_shoulder', 'hist_joint_limb', 'hist_menstrual',
+         'painkillers_overcounter', 'painkillers_prescription', 'painkillers_othercns'],
+        ['feels_pain', 'feels_depression', 'feels_anxiety', 'feels_happy', 'feels_sad', 'feels_angry', 'feels_fear',
+         'feels_surprise', 'feels_disgust'],
+        ['bpi_worst', 'bpi_least', 'bpi_average', 'bpi_now', 'bpi_painkiller_relief'],
+        ['bpi_functioning', 'bpi_mood', 'bpi_walk', 'bpi_work', 'bpi_relationships', 'bpi_sleep', 'bpi_enjoyment']]
+    csvname = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/endometriosis_controls_12_11_2021.csv'
 elif who == 'stockholm':
     dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/stockholm/subjects/'
     outdataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/stockholm/processed/'

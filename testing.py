@@ -2,7 +2,7 @@ from bodyfunctions import *
 import numpy as np
 import matplotlib.pyplot as plt
 
-dataloc = '/Users/juusu53/Documents/projects/kipupotilaat/python_code_testing/'
+#dataloc = '/Users/juusu53/Documents/projects/kipupotilaat/python_code_testing/'
 # data= np.genfromtxt('/Users/juusu53/Documents/projects/kipupotilaat/python_code_testing/test_sub_4/sensitivity_1_as_matrix.csv', delimiter=',')
 # mask_use = read_in_mask(dataloc + 'mask_front_new.png',dataloc + 'mask_back_new.png')
 #
@@ -28,18 +28,29 @@ dataloc = '/Users/juusu53/Documents/projects/kipupotilaat/python_code_testing/'
 
 # TEST ROI FILE
 
-data = np.genfromtxt('/Users/juusu53/Documents/projects/kipupotilaat/python_code_testing/test_sub_1/emotions_4_as_matrix.csv', delimiter=',')
-rois = io.imread('/Users/juusu53/Documents/projects/kipupotilaat/kipu_ROI_new.png', as_gray=True, pilmode='L')
-mask_use = read_in_mask(dataloc + 'mask_front_new.png')
-color_defs = {'head': 26, 'shoulders':128, 'arms': 102, 'upper_torso': 51, 'lower_torso': 77, 'legs': 153, 'hands': 204, 'feet': 230}
+# data = np.genfromtxt('/Users/juusu53/Documents/projects/kipupotilaat/python_code_testing/test_sub_1/emotions_4_as_matrix.csv', delimiter=',')
+# rois = io.imread('/Users/juusu53/Documents/projects/kipupotilaat/kipu_ROI_new.png', as_gray=True, pilmode='L')
+# mask_use = read_in_mask(dataloc + 'mask_front_new.png')
+# color_defs = {'head': 26, 'shoulders':128, 'arms': 102, 'upper_torso': 51, 'lower_torso': 77, 'legs': 153, 'hands': 204, 'feet': 230}
+#
+# unique_elements, counts_elements = np.unique(rois, return_counts=True)
+#
+#
+# data_show = data.copy() #rois.copy()
+# data_show[rois != color_defs['legs']] = 0
+#
+# fig = plt.figure()
+# img = plt.imshow(data_show)
+# fig.colorbar(img)
+# plt.show()
+maskloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/'
 
-unique_elements, counts_elements = np.unique(rois, return_counts=True)
+mask_fb = read_in_mask(maskloc + 'mask_front_new.png', maskloc + 'mask_back_new.png')
 
+inside_mask = np.sum(mask_fb==1)
+outside_mask = np.sum(mask_fb==0)
 
-data_show = data.copy() #rois.copy()
-data_show[rois != color_defs['legs']] = 0
+mask = read_in_mask(maskloc + 'mask_front_new.png')
 
-fig = plt.figure()
-img = plt.imshow(data_show)
-fig.colorbar(img)
-plt.show()
+inside_mask_norm = np.sum(mask==1)
+outside_mask_norm = np.sum(mask==0)

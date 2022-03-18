@@ -4,13 +4,18 @@ import pandas as pd
 import random
 
 
-dataloc_pain = '/m/nbe/scratch/socbrain/kipupotilaat/data/stockholm/processed/'
-pain_bg = pd.DataFrame(columns=['subid','age','sex','pain_now'])
-csvname = '/m/nbe/scratch/socbrain/kipupotilaat/data/age_and_gender_matched_subs_pain_stockholm_12_2020.csv'
+# dataloc_pain = '/m/nbe/scratch/socbrain/kipupotilaat/data/stockholm/processed/'
+# pain_bg = pd.DataFrame(columns=['subid','age','sex','pain_now'])
+# csvname = '/m/nbe/scratch/socbrain/kipupotilaat/data/age_and_gender_matched_subs_pain_stockholm_12_2020.csv'
 
 # dataloc_pain = '/m/nbe/scratch/socbrain/kipupotilaat/data/helsinki/processed/'
 # pain_bg = pd.DataFrame(columns=['subid','age','sex','pain_now','groups'])
 # csvname = '/m/nbe/scratch/socbrain/kipupotilaat/data/age_and_gender_matched_subs_pain_helsinki_11_2020.csv'
+
+dataloc_pain = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/processed/'
+pain_bg = pd.DataFrame(columns=['subid','age','sex','pain_now'])
+csvname = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/age_and_gender_matched_subs_endo_helsinki_11_2021.csv'
+
 
 dataloc_controls = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/processed/'
 datafile_controls = get_latest_datafile(dataloc_controls)

@@ -5,12 +5,12 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 from matplotlib.colors import ListedColormap, LinearSegmentedColormap
 
-figloc = '/m/nbe/scratch/socbrain/kipupotilaat/figures/'
+figloc = '/m/nbe/scratch/socbrain/kipupotilaat/figures/KI/'
 maskloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/'
-dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/helsinki/processed/'
+dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/stockholm/processed/fibro/'
 datafile = get_latest_datafile(dataloc)
 
-dataloc_controls = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/processed/matched_controls/'
+dataloc_controls = '/m/nbe/scratch/socbrain/kipupotilaat/data/stockholm/processed/lbp/'
 datafile_controls = get_latest_datafile(dataloc_controls)
 
 mask_fb = read_in_mask(maskloc + 'mask_front_new.png', maskloc + 'mask_back_new.png')
@@ -146,11 +146,11 @@ cbar2_ax = fig.add_axes([x02+pad, y20+pad, width, y02-y20-2*pad])
 ax2cb = fig.colorbar(img6, cax=cbar2_ax)
 ax2cb.set_label(label='Difference', fontsize=20)
 ax2cb.ax.tick_params(labelsize=20)
-ax2cb.ax.set_title('patients >\ncontrols', fontsize=20)
-ax2cb.ax.set_xlabel('controls >\npatients', fontsize=20)
+ax2cb.ax.set_title('fibro >\nlbp', fontsize=20)
+ax2cb.ax.set_xlabel('lbp >\nfibro', fontsize=20)
 
-plt.gcf().text(0.03, 0.88, "Pain patients", fontsize=24, rotation=90)
-plt.gcf().text(0.03, 0.57, "Matched controls", fontsize=24, rotation=90)
+plt.gcf().text(0.03, 0.88, "Fibromyaliga patients", fontsize=24, rotation=90)
+plt.gcf().text(0.03, 0.57, "LBP patients", fontsize=24, rotation=90)
 plt.gcf().text(0.03, 0.23, "Difference", fontsize=24, rotation=90)
 
 plt.savefig(figloc+'sensitivity_location_controls_pain_manuscript_fig.png')

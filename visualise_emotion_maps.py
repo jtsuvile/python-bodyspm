@@ -24,13 +24,17 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 # outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/figures/KI/lbp_emotion_activations.png'
 # suptitle = 'Average emotions, lower back pain patients from KI'
 #
-# dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/stockholm/processed/'
+# dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/stockholm/processed/fibro/'
 # outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/figures/KI/fibro_emotion_activations.png'
 # suptitle = 'Average emotions, fibromyalgia patients from KI'
 
-dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/stockholm/processed/'
-outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/figures/KI/karolinska_emotion_activations_12_2020.png'
-suptitle = 'Average emotions, all patients from KI'
+dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/stockholm/processed/lbp/'
+outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/figures/KI/lbp_emotion_activations.png'
+suptitle = 'Average emotions, lower back pain patients from KI'
+
+# dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/processed/'
+# outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/figures/endometriosis/endometriosis_emotion_activations_11_2021.png'
+# suptitle = 'Average emotions, all endometriosis patients'
 
 datafile = get_latest_datafile(dataloc)
 maskloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/'

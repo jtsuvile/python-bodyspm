@@ -9,9 +9,9 @@ from PIL import Image
 from operator import add
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 #
-dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/processed/matched_controls/'
-dataloc1 = '/m/nbe/scratch/socbrain/kipupotilaat/data/helsinki/processed/'
-outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/figures/emotions_manuscript_fig.png'
+dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/matched_controls/'
+dataloc1 = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/processed/'
+outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/figures/endometriosis/emotions_endo_control.png'
 suptitle = 'Average emotions'
 
 
