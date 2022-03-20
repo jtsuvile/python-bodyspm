@@ -5,42 +5,13 @@ from bodyfunctions import *
 import numpy as np
 import csv
 
-
-# bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/all_pain_patients_15_10_2020.csv'
-# dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/helsinki/processed/'
-# outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/data/all_pain_patients_with_activations_19_10_2020.csv'
-
-# bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/bg_matched_controls_18_11_2020.csv'
-# dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/processed/matched_controls/'
-# outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/data/matched_controls_with_activations_18_11_2020.csv'
-
-# bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/bg_double_matched_controls_30_10_2019.csv'
-# dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/processed/double_matched_controls/'
-# outfilename ='/m/nbe/scratch/socbrain/kipupotilaat/data/double_matched_controls_with_activations_10_2019.csv'
-
-# bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/bg_pain_stockholm_lbp.csv'
-# dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/stockholm/processed/lbp/'
-# outfilename ='/m/nbe/scratch/socbrain/kipupotilaat/data/bg_pain_stockholm_lbp_with_activations_02_2022.csv'
-
-bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/bg_pain_stockholm_fibro.csv'
-dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/stockholm/processed/fibro/'
-outfilename ='/m/nbe/scratch/socbrain/kipupotilaat/data/bg_pain_stockholm_fibro_with_activations_02_2022.csv'
-
-# bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/endometriosis_patients_05_11_2021.csv'
+# bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/endometriosis_patients_18_03_2022.csv'
 # dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/processed/'
-# outfilename ='/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/endometriosis_with_activations_11_2021.csv'
+# outfilename ='/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/endometriosis_with_activations_03_2022.csv'
 
-# bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/endometriosis_controls_12_11_2021.csv'
-# dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/matched_controls/'
-# outfilename ='/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/endometriosis_controls_with_activations_11_2021.csv'
-
-# bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/bg_matched_controls_stockholm_12_2020.csv'
-# dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/processed/matched_controls_stockholm/'
-# outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/data/matched_controls_stockholm_with_activations_12_2020.csv'
-
-# bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/bg_all_controls_16_10_2020.csv'
-# dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/processed/'
-# outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/data/all_healthy_with_activations_29_10_2020.csv'
+bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/endometriosis_controls_18_03_2022.csv'
+dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/matched_controls/'
+outfilename ='/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/endometriosis_controls_with_activations_03_2022.csv'
 
 maskloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/'
 datafile = get_latest_datafile(dataloc)

@@ -3,18 +3,9 @@ import numpy as np
 import pandas as pd
 import random
 
-
-# dataloc_pain = '/m/nbe/scratch/socbrain/kipupotilaat/data/stockholm/processed/'
-# pain_bg = pd.DataFrame(columns=['subid','age','sex','pain_now'])
-# csvname = '/m/nbe/scratch/socbrain/kipupotilaat/data/age_and_gender_matched_subs_pain_stockholm_12_2020.csv'
-
-# dataloc_pain = '/m/nbe/scratch/socbrain/kipupotilaat/data/helsinki/processed/'
-# pain_bg = pd.DataFrame(columns=['subid','age','sex','pain_now','groups'])
-# csvname = '/m/nbe/scratch/socbrain/kipupotilaat/data/age_and_gender_matched_subs_pain_helsinki_11_2020.csv'
-
 dataloc_pain = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/processed/'
 pain_bg = pd.DataFrame(columns=['subid','age','sex','pain_now'])
-csvname = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/age_and_gender_matched_subs_endo_helsinki_11_2021.csv'
+csvname = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/age_and_gender_matched_subs_endo_helsinki_03_2022.csv'
 
 
 dataloc_controls = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/processed/'
@@ -30,7 +21,8 @@ with h5py.File(datafile_controls, 'r') as c:
 controls_bg.set_index('subid', drop=False, inplace=True)
 controls_bg = controls_bg[(controls_bg.pain_chronic == 0) & (controls_bg.pain_now == 0) &
                           (controls_bg.bpi_now < 5) &
-                          (controls_bg.bpi_average < 5)].copy()
+                          (controls_bg.bpi_average < 5) &
+                          (controls_bg.hist_menstrual == 0)].copy()
 
 acceptable_controls_original = controls_bg.copy()
 

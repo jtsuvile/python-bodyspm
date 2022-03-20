@@ -2,17 +2,16 @@ from bodyfunctions import *
 import h5py
 import numpy as np
 import imageio
-#import matplotlib.pyplot as plt
-#from PIL import Image
 from operator import add
 
-# dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/processed/matched_controls/'
-# bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/bg_matched_controls_18_11_2020.csv'
-# outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/data/matched_controls_with_activations_by_roi_01_2021.csv'
 
-bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/all_pain_patients_15_10_2020.csv'
-dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/helsinki/processed/'
-outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/data/all_pain_patients_with_activations_by_roi_01_2021.csv'
+bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/endometriosis_patients_18_03_2022.csv'
+dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/processed/'
+outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/endometriosis_patients_with_activations_by_ROI_03_2022.csv'
+
+# bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/endometriosis_controls_18_03_2022.csv'
+# dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/matched_controls/'
+# outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/endometriosis_controls_with_activations_by_ROI_03_2022.csv'
 
 datafile = get_latest_datafile(dataloc)
 maskloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/'
@@ -49,59 +48,3 @@ for j, cond in enumerate(stim_names.keys()):
 
 bg.to_csv(outfilename)
 
-#
-# outline_back_better = outline_back.copy()
-# outline_back_better[outline_back_better <= 20] = 0
-# outline_back_better[outline_back_better > 20] = 1
-# outline_front_better = outline_front.copy()
-# outline_front_better[outline_front_better <= 20] = 0
-# outline_front_better[outline_front_better > 20] = 1
-#
-# for roi in color_defs:
-#
-
-## sanity checks for masks etc
-# scipy.misc.imsave(maskloc + 'outline_binary.png', outline_back_better)
-
-# sensitivity_all = np.sum(kipu, axis=0)
-#
-# rois_with_outline = sensitivity_all + np.hstack((outline_front_better, outline_back_better))
-#
-# plt.imshow(rois_with_outline)
-# plt.colorbar()
-# plt.savefig(maskloc + 'data_with_outline_twosided.png')
-# scipy.misc.imsave(maskloc + 'roi_with_outline_twosided.png', rois)
-# #
-# plt.hist(kipu.flatten())
-# plt.savefig(maskloc + 'hedonic_sensitivity_values.png')
-# # plt.hist(outline_back)
-# # plt.savefig(maskloc + 'outline_back_values.png')
-#
-# # Visualizing ROIs to confirm colours
-# rois = rois_base.copy()
-# rois[rois!=color_defs['feet']] = 0
-# scipy.misc.imsave(maskloc + 'roi_test_feet.png', rois)
-#
-# rois = rois_base.copy()
-# rois[rois!=color_defs['legs']] = 0
-# scipy.misc.imsave(maskloc + 'roi_test_legs.png', rois)
-#
-# rois = rois_base.copy()
-# rois[rois!=color_defs['crotch']] = 0
-# scipy.misc.imsave(maskloc + 'roi_test_crotch.png', rois)
-#
-# rois = rois_base.copy()
-# rois[rois!=color_defs['head']] = 0
-# scipy.misc.imsave(maskloc + 'roi_test_head.png', rois)
-#
-# rois = rois_base.copy()
-# rois[rois!=color_defs['arms']] = 0
-# scipy.misc.imsave(maskloc + 'roi_test_arms.png', rois)
-#
-# rois = rois_base.copy()
-# rois[rois!=color_defs['hands']] = 0
-# scipy.misc.imsave(maskloc + 'roi_test_hands.png', rois)
-#
-# rois = rois_base.copy()
-# rois[rois!=color_defs['torso']] = 0
-# scipy.misc.imsave(maskloc + 'roi_test_torso.png', rois)
