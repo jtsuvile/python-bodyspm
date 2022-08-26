@@ -19,7 +19,7 @@ datafile_lbp = get_latest_datafile(dataloc_lbp)
 datafile_fibro = get_latest_datafile(dataloc_fibro)
 datafile_np = get_latest_datafile(dataloc_np)
 
-cond = 'sensitivity_2'
+cond = 'pain_0'
 outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/figures/compare_pain_locations_by_pain_type_' + cond + '.png'
 suptitle = 'Hedonic sensitivity'
 
