@@ -6,13 +6,13 @@ import numpy as np
 import csv
 
 
-bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/all_pain_patients_03_09_2020.csv'
-dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/helsinki/processed/'
-outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/data/all_pain_patients_with_activations_09_2020_threshold_0_007.csv'
+# bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/all_pain_patients_15_10_2020.csv'
+# dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/helsinki/processed/'
+# outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/data/all_pain_patients_with_activations_19_10_2020.csv'
 
-# bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/bg_matched_controls_30_10_2019.csv'
+# bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/bg_matched_controls_18_11_2020.csv'
 # dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/processed/matched_controls/'
-# outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/data/matched_controls_with_activations_10_2019.csv'
+# outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/data/matched_controls_with_activations_18_11_2020.csv'
 
 # bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/bg_double_matched_controls_30_10_2019.csv'
 # dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/processed/double_matched_controls/'
@@ -20,11 +20,15 @@ outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/data/all_pain_patients_with_
 
 # bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/bg_pain_stockholm.csv'
 # dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/stockholm/processed/'
-# outfilename ='/m/nbe/scratch/socbrain/kipupotilaat/data/bg_pain_stockholm_with_activations_09_2020_threshold_0_007.csv'
+# outfilename ='/m/nbe/scratch/socbrain/kipupotilaat/data/bg_pain_stockholm_with_activations_12_2020.csv'
 
-# bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/bg_all_controls.csv'
+bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/bg_matched_controls_stockholm_12_2020.csv'
+dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/processed/matched_controls_stockholm/'
+outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/data/matched_controls_stockholm_with_activations_12_2020.csv'
+
+# bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/bg_all_controls_16_10_2020.csv'
 # dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/processed/'
-# outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/data/all_healthy_with_activations.csv'
+# outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/data/all_healthy_with_activations_29_10_2020.csv'
 
 maskloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/'
 datafile = get_latest_datafile(dataloc)
@@ -37,13 +41,6 @@ stim_names = {'emotions_0': ['sadness', 0], 'emotions_1': ['happiness', 0], 'emo
               'emotions_6': ['neutral', 0],
               'pain_0': ['current_pain', 1], 'pain_1': ['chonic_pain', 1], 'sensitivity_0': ['tactile_sensitivity', 1],
               'sensitivity_1': ['nociceptive_sensitivity', 1], 'sensitivity_2': ['hedonic_sensitivity', 1]}
-
-# stim_names_emotions = {'emotions_0':'sadness', 'emotions_1':'happiness', 'emotions_2':'anger', 'emotions_3':'surprise',
-#               'emotions_4': 'fear', 'emotions_5':'disgust', 'emotions_6':'neutral'}
-#
-# stim_names_pain = {'pain_0':'current_pain', 'pain_1': 'chonic_pain'}
-# stim_names_sensitivity = {'sensitivity_0':'tactile_sensitivity',
-#               'sensitivity_1':'nociceptive_sensitivity', 'sensitivity_2':'hedonic_sensitivity'}
 
 bg = pd.read_csv(bgdatapath)
 

@@ -106,8 +106,6 @@ class Subject:
                     else:
                         raw_res = np.hstack((as_coloured[9:531, 34:205], as_coloured[9:531, 699:870]))  # this creates 522*342 array
                     # Quality control step to check if subject has filled in intentionally left empty
-                    # TODO: add flag to disable for studies that don't have this!
-
                     if(intentionally_empty):
                         if np.count_nonzero(raw_res) == 0 and not self.map_intentionally_empty(as_coloured):
                             raw_res[:] = np.nan

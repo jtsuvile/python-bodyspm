@@ -21,15 +21,15 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 # suptitle = 'Sensitivity maps, general population'
 
 # dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/helsinki/processed/'
-# outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/figures/misc_patients_pain_locations.png'
-# suptitle = 'Pain locations, non-CRPS patients'
-# outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/figures/misc_pain_patients_sensitivity.png'
-# suptitle = 'Sensitivity maps, non-CRPS patients'
+# # outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/figures/all_patients_pain_locations.png'
+# # suptitle = 'Pain locations'
+# outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/figures/all_pain_patients_sensitivity.png'
+# suptitle = 'Sensitivity maps, pain patients'
 
 dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/stockholm/processed/'
-# outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/figures/KI/karolinska_pain_locations.png'
+# outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/figures/KI/karolinska_pain_locations_12_2020.png'
 # suptitle = 'Pain locations, all patients from KI'
-outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/figures/KI/karolinska_sensitivity.png'
+outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/figures/KI/karolinska_sensitivity_12_2020.png'
 suptitle = 'Sensitivity maps, all patients from KI'
 
 # dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/stockholm/processed/'
@@ -52,7 +52,7 @@ maskloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/'
 # stim_names = {'pain_0': ['current pain', 1], 'pain_1': ['chonic pain', 1]}
 # n_maps = len(stim_names.keys())
 # fig, axs = plt.subplots(1,n_maps+1, figsize=(11, 8), facecolor='w', edgecolor='k')
-
+#
 stim_names = {'sensitivity_0': ['tactile sensitivity',1],
               'sensitivity_1': ['nociceptive sensitivity',1], 'sensitivity_2': ['hedonic sensitivity',1]}
 n_maps = len(stim_names.keys())
@@ -84,7 +84,7 @@ for i, cond in enumerate(stim_names.keys()):
         # data_special = data[crps_indices,:,:]
         data_special = data
         all_n[i] = np.count_nonzero(~np.isnan(data[:, 1, 1]))
-    all_figs[i, :, :] = np.nanmean(binarize_posneg(data_special.copy()), axis=0)
+    all_figs[i, :, :] = np.nanmean(binarize(data_special.copy()), axis=0)
 
 #
 cmap = plt.cm.get_cmap('hot', 256)

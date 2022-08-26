@@ -9,8 +9,7 @@ import time
 import csv
 
 
-who = 'control'
-
+who = 'matched_controls_stockholm'
 start = time.time()
 # set up stimuli description
 onesided = [True, True, True, True, True, True, True, False, False, False, False, False]
@@ -66,7 +65,7 @@ elif who == 'stockholm':
 elif who == 'matched_controls_helsinki':
     dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/subjects/'
     outdataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/processed/matched_controls/'
-    subfile = '/m/nbe/scratch/socbrain/kipupotilaat/data/age_and_gender_matched_subs_pain_helsinki_after_qc.csv'
+    subfile = '/m/nbe/scratch/socbrain/kipupotilaat/data/age_and_gender_matched_subs_pain_helsinki_18_11_2020.csv'
     field_names = [['sex', 'age', 'weight','height','handedness','education','work_physical','work_sitting','profession','psychologist','psychiatrist', 'neurologist'],
                ['pain_now','pain_last_day', 'pain_chronic','hist_migraine','hist_headache','hist_abdomen','hist_back_shoulder','hist_joint_limb','hist_menstrual',
                 'painkillers_overcounter','painkillers_prescription', 'painkillers_othercns'],
@@ -75,7 +74,20 @@ elif who == 'matched_controls_helsinki':
                ['bpi_functioning', 'bpi_mood','bpi_walk','bpi_work', 'bpi_relationships','bpi_sleep','bpi_enjoyment']]
     matchdata = pd.read_csv(subfile)
     subnums = list(matchdata['control_id'])
-    csvname = '/m/nbe/scratch/socbrain/kipupotilaat/data/bg_matched_controls_19_10_2020.csv'
+    csvname = '/m/nbe/scratch/socbrain/kipupotilaat/data/bg_matched_controls_18_11_2020.csv'
+elif who == 'matched_controls_stockholm':
+    dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/subjects/'
+    outdataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/processed/matched_controls_stockholm/'
+    subfile = '/m/nbe/scratch/socbrain/kipupotilaat/data/age_and_gender_matched_subs_pain_stockholm_12_2020.csv'
+    field_names = [['sex', 'age', 'weight','height','handedness','education','work_physical','work_sitting','profession','psychologist','psychiatrist', 'neurologist'],
+               ['pain_now','pain_last_day', 'pain_chronic','hist_migraine','hist_headache','hist_abdomen','hist_back_shoulder','hist_joint_limb','hist_menstrual',
+                'painkillers_overcounter','painkillers_prescription', 'painkillers_othercns'],
+               ['feels_pain','feels_depression','feels_anxiety','feels_happy','feels_sad','feels_angry','feels_fear','feels_surprise','feels_disgust'],
+               ['bpi_worst', 'bpi_least', 'bpi_average', 'bpi_now', 'bpi_painkiller_relief'],
+               ['bpi_functioning', 'bpi_mood','bpi_walk','bpi_work', 'bpi_relationships','bpi_sleep','bpi_enjoyment']]
+    matchdata = pd.read_csv(subfile)
+    subnums = list(matchdata['control_id'])
+    csvname = '/m/nbe/scratch/socbrain/kipupotilaat/data/bg_matched_controls_stockholm_12_2020.csv'
 elif who == 'matched_controls_two_each':
     dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/subjects/'
     outdataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/processed/'
@@ -94,12 +106,13 @@ elif who == 'matched_controls_two_each':
     csvname = '/m/nbe/scratch/socbrain/kipupotilaat/data/bg_double_matched_controls_30_10_2019.csv'
 
 
-if who is not 'matched_controls_helsinki' and who is not 'matched_controls_two_each':
+if who is not 'matched_controls_helsinki' and who is not 'matched_controls_two_each' and who is not 'matched_controls_stockholm':
     with open(subfile) as f:
         subnums = f.readlines()
     subnums = [x.strip() for x in subnums]
 
-# # read subjects from web output and write out to a more sensible format
+
+# read subjects from web output and write out to a more sensible format
 if who is 'helsinki' or who is 'stockholm':
     preprocess_subjects(subnums, dataloc, outdataloc, stim, bg_files, field_names, intentionally_empty=True)
 else:
@@ -128,6 +141,7 @@ if who == 'helsinki':# or who == 'stockholm':
                                 save=True, noImages=False)
 else:
     print("combining data from ", len(subnums), " subjects")
+    print("getting started")
     full_dataset = combine_data(outdataloc, subnums,
                                 save=True, noImages=False)
 

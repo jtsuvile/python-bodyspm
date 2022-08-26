@@ -12,6 +12,10 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 # outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/figures/matched_controls_emotion_activations_new_order.png'
 # suptitle = 'Average emotions, matched controls'
 
+# dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/helsinki/processed/'
+# outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/figures/all_pain_patients_emotion_activations_new_order.png'
+# suptitle = 'Average emotions, all pain patients'
+
 # dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/processed/'
 # outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/figures/all_controls_emotion_activations_new_order.png'
 # suptitle = 'Average emotions, all controls'
@@ -25,7 +29,7 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 # suptitle = 'Average emotions, fibromyalgia patients from KI'
 
 dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/stockholm/processed/'
-outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/figures/KI/karolinska_emotion_activations.png'
+outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/figures/KI/karolinska_emotion_activations_12_2020.png'
 suptitle = 'Average emotions, all patients from KI'
 
 datafile = get_latest_datafile(dataloc)
@@ -34,16 +38,6 @@ maskloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/'
 stim_names = {'emotions_2': ['anger', 0],'emotions_4': ['fear', 0],  'emotions_5': ['disgust', 0],
               'emotions_1': ['happiness', 0], 'emotions_0': ['sadness', 0],
               'emotions_3': ['surprise', 0], 'emotions_6': ['neutral', 0]}
-
-# outline_front = scipy.misc.imread(maskloc + 'outline_front.png', flatten=True, mode='L')
-# outline_back = scipy.misc.imread(maskloc + 'outline_back.png', flatten=True, mode='L')
-#
-# outline_back_better = outline_back.copy()
-# outline_back_better[outline_back_better <= 20] = 0
-# outline_back_better[outline_back_better > 20] = 1
-# outline_front_better = outline_front.copy()
-# outline_front_better[outline_front_better <= 20] = 0
-# outline_front_better[outline_front_better > 20] = 1
 
 mask_fb = read_in_mask(maskloc + 'mask_front_new.png', maskloc + 'mask_back_new.png')
 mask_one = read_in_mask(maskloc + 'mask_front_new.png')
@@ -61,7 +55,7 @@ for i, cond in enumerate(stim_names.keys()):
         #data_special = data[crps_indices,:,:]
         data_special = data
         all_n[i] = np.count_nonzero(~np.isnan(data[:,1,1]))
-    all_figs[i, :, :] = np.nanmean(binarize_posneg(data_special.copy()), axis=0)
+    all_figs[i, :, :] = np.nanmean(binarize(data_special.copy()), axis=0)
 
 
 hot = plt.cm.get_cmap('hot', 256)
