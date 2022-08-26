@@ -4,14 +4,13 @@ import numpy as np
 import imageio
 from operator import add
 
+# bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/endometriosis_patients_18_03_2022.csv'
+# dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/processed/'
+# outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/endometriosis_patients_with_activations_by_ROI_03_2022.csv'
 
-bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/endometriosis_patients_18_03_2022.csv'
-dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/processed/'
-outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/endometriosis_patients_with_activations_by_ROI_03_2022.csv'
-
-# bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/endometriosis_controls_18_03_2022.csv'
-# dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/matched_controls/'
-# outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/endometriosis_controls_with_activations_by_ROI_03_2022.csv'
+bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/endometriosis_controls_18_03_2022.csv'
+dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/matched_controls/'
+outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/endometriosis_controls_with_activations_by_ROI_03_2022.csv'
 
 datafile = get_latest_datafile(dataloc)
 maskloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/'
@@ -35,8 +34,10 @@ for j, cond in enumerate(stim_names.keys()):
     for roi in color_defs:
         print('working on', cond, ':', roi)
         if stim_names[cond][1] == 0:
+            # if emotions, use just one ROI image
             rois = rois_base.copy()
         else:
+            # if sensitivity or pain, use two (one for the front of the body, one for the back)
             rois = np.hstack((rois_base, rois_base))
         rois[rois != color_defs[roi]] = 0
         rois[rois > 0] = 1

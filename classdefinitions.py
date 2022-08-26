@@ -217,7 +217,7 @@ class Subject:
                 axes[row, col].set_title(stim.all[key]['show_name'])
             else:
                 axes[row, col].set_title(key)
-        fig.suptitle("subject : " + self.name)
+        fig.suptitle("subject : " + str(self.name))
         fig.tight_layout()
         if fileloc:
             fileloc_fig = fileloc + '/figures/'
