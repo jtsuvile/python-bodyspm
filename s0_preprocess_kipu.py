@@ -9,7 +9,7 @@ import time
 import csv
 
 
-who = 'matched_controls_stockholm'
+who = 'helsinki_fibro'
 start = time.time()
 # set up stimuli description
 onesided = [True, True, True, True, True, True, True, False, False, False, False, False]
@@ -49,6 +49,66 @@ elif who == 'helsinki':
                ['bpi_worst', 'bpi_least', 'bpi_average', 'bpi_now', 'bpi_painkiller_relief'],
                ['bpi_functioning', 'bpi_mood','bpi_walk','bpi_work', 'bpi_relationships','bpi_sleep','bpi_enjoyment']]
     csvname = '/m/nbe/scratch/socbrain/kipupotilaat/data/all_pain_patients_15_10_2020.csv'
+elif who == 'helsinki_crps':
+    dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/helsinki/subjects/'
+    outdataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/helsinki/processed/crps/'
+    subfile = '/m/nbe/scratch/socbrain/kipupotilaat/data/helsinki/subs_crps_07_10_2022.txt'
+    field_names = [
+        ['sex', 'age', 'weight', 'height', 'handedness', 'education', 'work_physical', 'work_sitting', 'profession',
+         'psychologist', 'psychiatrist', 'neurologist'],
+        ['pain_now', 'pain_last_day', 'pain_chronic', 'hist_migraine', 'hist_headache', 'hist_abdomen',
+         'hist_back_shoulder', 'hist_joint_limb', 'hist_menstrual',
+         'painkillers_overcounter', 'painkillers_prescription', 'painkillers_othercns', 'hist_crps', 'hist_fibro'],
+        ['feels_pain', 'feels_depression', 'feels_anxiety', 'feels_happy', 'feels_sad', 'feels_angry', 'feels_fear',
+         'feels_surprise', 'feels_disgust'],
+        ['bpi_worst', 'bpi_least', 'bpi_average', 'bpi_now', 'bpi_painkiller_relief'],
+        ['bpi_functioning', 'bpi_mood', 'bpi_walk', 'bpi_work', 'bpi_relationships', 'bpi_sleep', 'bpi_enjoyment']]
+    csvname = '/m/nbe/scratch/socbrain/kipupotilaat/data/crps_helsinki_07_10_2022.csv'
+elif who == 'helsinki_np':
+    dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/helsinki/subjects/'
+    outdataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/helsinki/processed/np/'
+    subfile = '/m/nbe/scratch/socbrain/kipupotilaat/data/helsinki/subs_np_07_10_2022.txt'
+    field_names = [
+        ['sex', 'age', 'weight', 'height', 'handedness', 'education', 'work_physical', 'work_sitting', 'profession',
+         'psychologist', 'psychiatrist', 'neurologist'],
+        ['pain_now', 'pain_last_day', 'pain_chronic', 'hist_migraine', 'hist_headache', 'hist_abdomen',
+         'hist_back_shoulder', 'hist_joint_limb', 'hist_menstrual',
+         'painkillers_overcounter', 'painkillers_prescription', 'painkillers_othercns', 'hist_crps', 'hist_fibro'],
+        ['feels_pain', 'feels_depression', 'feels_anxiety', 'feels_happy', 'feels_sad', 'feels_angry', 'feels_fear',
+         'feels_surprise', 'feels_disgust'],
+        ['bpi_worst', 'bpi_least', 'bpi_average', 'bpi_now', 'bpi_painkiller_relief'],
+        ['bpi_functioning', 'bpi_mood', 'bpi_walk', 'bpi_work', 'bpi_relationships', 'bpi_sleep', 'bpi_enjoyment']]
+    csvname = '/m/nbe/scratch/socbrain/kipupotilaat/data/np_helsinki_07_10_2022.csv'
+elif who == 'helsinki_lbp':
+    dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/helsinki/subjects/'
+    outdataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/helsinki/processed/lbp/'
+    subfile = '/m/nbe/scratch/socbrain/kipupotilaat/data/helsinki/subs_lbp_07_10_2022.txt'
+    field_names = [
+        ['sex', 'age', 'weight', 'height', 'handedness', 'education', 'work_physical', 'work_sitting', 'profession',
+         'psychologist', 'psychiatrist', 'neurologist'],
+        ['pain_now', 'pain_last_day', 'pain_chronic', 'hist_migraine', 'hist_headache', 'hist_abdomen',
+         'hist_back_shoulder', 'hist_joint_limb', 'hist_menstrual',
+         'painkillers_overcounter', 'painkillers_prescription', 'painkillers_othercns', 'hist_crps', 'hist_fibro'],
+        ['feels_pain', 'feels_depression', 'feels_anxiety', 'feels_happy', 'feels_sad', 'feels_angry', 'feels_fear',
+         'feels_surprise', 'feels_disgust'],
+        ['bpi_worst', 'bpi_least', 'bpi_average', 'bpi_now', 'bpi_painkiller_relief'],
+        ['bpi_functioning', 'bpi_mood', 'bpi_walk', 'bpi_work', 'bpi_relationships', 'bpi_sleep', 'bpi_enjoyment']]
+    csvname = '/m/nbe/scratch/socbrain/kipupotilaat/data/lbp_helsinki_07_10_2022.csv'
+elif who == 'helsinki_fibro':
+    dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/helsinki/subjects/'
+    outdataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/helsinki/processed/fibro/'
+    subfile = '/m/nbe/scratch/socbrain/kipupotilaat/data/helsinki/subs_fibro_07_10_2022.txt'
+    field_names = [
+        ['sex', 'age', 'weight', 'height', 'handedness', 'education', 'work_physical', 'work_sitting', 'profession',
+         'psychologist', 'psychiatrist', 'neurologist'],
+        ['pain_now', 'pain_last_day', 'pain_chronic', 'hist_migraine', 'hist_headache', 'hist_abdomen',
+         'hist_back_shoulder', 'hist_joint_limb', 'hist_menstrual',
+         'painkillers_overcounter', 'painkillers_prescription', 'painkillers_othercns', 'hist_crps', 'hist_fibro'],
+        ['feels_pain', 'feels_depression', 'feels_anxiety', 'feels_happy', 'feels_sad', 'feels_angry', 'feels_fear',
+         'feels_surprise', 'feels_disgust'],
+        ['bpi_worst', 'bpi_least', 'bpi_average', 'bpi_now', 'bpi_painkiller_relief'],
+        ['bpi_functioning', 'bpi_mood', 'bpi_walk', 'bpi_work', 'bpi_relationships', 'bpi_sleep', 'bpi_enjoyment']]
+    csvname = '/m/nbe/scratch/socbrain/kipupotilaat/data/fibro_helsinki_07_10_2022.csv'
 elif who == 'stockholm':
     dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/stockholm/subjects/'
     outdataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/stockholm/processed/'
