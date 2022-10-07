@@ -30,7 +30,6 @@ def preprocess_subjects(subnums, indataloc, outdataloc, stimuli, bgfiles=None, f
     supply a list of files to include
     :param fieldnames: list of lists, optional. List for each background information file giving the names of the
     fields (used as keys in background info dictionary)
-
     Does not return anything, data are stored as files to outdataloc
     """
 
@@ -58,13 +57,11 @@ def add_background_table(new_bgdata, linking_col, subloc, exclude=[], override=T
     Add new background information from a data frame to a subject after preprocessing.
     Adding is done based on a linking column (subject identifier).
     The names of the background variables are taken from columns of the data frame.
-
     :param new_bgdata: table with the new background information
     :param linking_col: column name for the column containing subject identifiers
     :param subloc: path to where the preprocessed subject data files are stored
     :param exclude: optional. column names that should be ignored (not added to the subject)
     :param override: optional. if the subject already has a background item with the same name, should this be overriden by the new data?
-
     """
     existing_subs = os.listdir(subloc)
     group_colnames = new_bgdata.columns.tolist()
@@ -93,7 +90,6 @@ def add_background_table(new_bgdata, linking_col, subloc, exclude=[], override=T
 def combine_data(dataloc, subnums, groups=None, save=False, noImages = False):
     """
     Combines a data set from subjects who have been written to file.
-
     :param dataloc: where the subject data files have been saved. Assumes .json files for subjects and
     stimuli are located in this folder
     :param subnums: which subjects to combine (list). Assumes one .json file per subject
@@ -125,6 +121,7 @@ def combine_data(dataloc, subnums, groups=None, save=False, noImages = False):
     if noImages:
         for j, subnum in tqdm(enumerate(subnums), desc="subjects"):
             temp_sub = Subject(subnum)
+            print(temp_sub)
             temp_sub.read_sub_from_file(dataloc, noImages)
             if sum(all_res['bg']['subid'] == subnum) == 0:
                 all_res['bg'].loc[subnum, 'subid'] = int(subnum)
@@ -192,11 +189,9 @@ def binarize(data, threshold=0.007):
     If the data have only positive values, the returned map is truly binary (0/1).
     If the map also has negative values (e.g. emotion maps with activations and inactivations), the
     returned map can have three values: 0, 1, and -1.
-
     NB: Default threshold 0.007 chosen as limit based on what limit replicates coloring best in Aalto system (March 2019).
     The best value for this parameter will depend on brush & blur settings.
     If changed, you should definitely do a visual inspection of the result against known colouring.
-
     :param data: matrix with colouring data
     :return: same matrix, with coloured areas changed to 1 and non-coloured changed to 0
     """
@@ -208,7 +203,6 @@ def binarize(data, threshold=0.007):
 def count_pixels(data, mask=None):
     """
     Count the number and proportion of coloured pixels per subject
-
     :param data: the 3D-data frame where to count the
     :param mask: optional. If provided, takes values inside mask into account in counting proportion colored
     :return: number of coloured pixels per subject
@@ -229,7 +223,6 @@ def count_pixels(data, mask=None):
 def count_pixels_posneg(data, mask=None, threshold=0.007):
     """
     Count the number and proportion of coloured pixels per subject
-
     :param data: matrix with the colouring data to be counted
     :param mask: optional. If provided, takes values inside mask into account in counting proportion colored
     :return: number of coloured pixels per subject
@@ -256,7 +249,6 @@ def count_pixels_posneg(data, mask=None, threshold=0.007):
 def one_sample_t_test(data):
     """
     one sample t-test to see if coloured data is significantly more than 0
-
     :param data: a 3-D matrix of subject-wise colouring maps
     :return: statistics: t statistic for each pixel
     :return: p-value for each pixel (uncorrected)
@@ -268,7 +260,6 @@ def one_sample_t_test(data):
 def compare_groups(group1, group2, testtype='t'):
     """
     Compares the maps of two groups of subjects pixel-wise
-
     :param data:
     :param group1: Data for group 1. 3-D data matrix of subject-wise colouring maps. Axis 0 represents subjects.
     :param group2: Data for group 2. 3-D data matrix of subject-wise colouring maps. Axis 0 represents subjects.
@@ -305,7 +296,6 @@ def compare_groups(group1, group2, testtype='t'):
 def correlate_maps(data, corr_with, method):
     """
     Correlates a set of subject-wise colouring maps with a vector of values (e.g. a background factor)
-
     :param data: 3-D data matrix of the subject-wise colouring maps. Axis 0 represents subjects.
     :param corr_with: vector of values (1 per subject) to correlate with.
     :return: map with correlation coefficient for each and map with p-values
@@ -345,18 +335,6 @@ def get_latest_datafile(datadir):
     return dataloc
 
 
-# def intentionally_empty(array):
-#     """
-#     implemented in classdefinitions?
-#     """
-#     area = array[530:580,430:480]
-#     n_nonzero = np.count_nonzero(area)
-#     n_area = area.size
-#     if n_nonzero > 0.1*n_area:
-#         return True
-#     else:
-#         return False
-
 
 def make_qc_figures(subnums, indataloc, stimuli, outdataloc = None):
     """
@@ -365,7 +343,6 @@ def make_qc_figures(subnums, indataloc, stimuli, outdataloc = None):
     :param indataloc: where to look for preprocessed subject data
     :param stimuli:
     :param outdataloc: where to save the figures (defaults to same as above)
-
     """
     if outdataloc is None:
         outdataloc = indataloc
@@ -383,7 +360,6 @@ def read_in_mask(file1, file2=None):
     Easily read in a black and white mask image and change to binary numpy array to use in other functions.
     If the data need left and right mask separately, please provide the mask to use on the left-hand side as the
     first argument.
-
     :param file1: Black-and-white mask image, where black shows areas inside the mask (i.e. to be included) and white
     shows areas outside of the mask (i.e. background).
     :param file2: Mask to use for the right side, if any
@@ -412,10 +388,8 @@ def p_adj_maps(pval_map, mask=None, alpha = 0.05, method='fdr_bh'):
     """
     An easier interface to correct p-values for multiple comparisons. By default, implements False Detection Rate
     correction (Benjamini/Hochberg), but multiple other methods can be selected.
-
     Implements
     https://www.statsmodels.org/dev/generated/statsmodels.stats.multitest.multipletests.html
-
     :param pval_map: a 2-D matrix of p-values
     :param mask: optional. A boolean matrix with the areas inside the body outline set to 1/TRUE. If provided, will
     reduce the number of comparisons to correct for, as only areas inside the body outline (i.e. areas of interest)
