@@ -131,7 +131,7 @@ fig.subplots_adjust(wspace=-0.1, hspace=0, left=0.05, right=0.9)
 
 [[x00,y00],[x01,y01]] = axs[3].get_position().get_points()
 [[x10,y10],[x11,y11]] = axs[11].get_position().get_points()
-pad = 0.02; width = 0.025
+pad = 0.02; width = 0.019
 cbar_ax = fig.add_axes([x11+pad, y10+pad, width, y01-y10-2*pad])
 axcb = fig.colorbar(im, cax=cbar_ax)
 axcb.set_label(label='Proportion of subjects', fontsize=20)

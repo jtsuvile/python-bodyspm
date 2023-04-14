@@ -4,19 +4,20 @@ import pandas as pd
 import random
 
 
-dataloc_pain = '/m/nbe/scratch/socbrain/kipupotilaat/data/stockholm/processed/'
-pain_bg = pd.DataFrame(columns=['subid','age','sex','pain_now'])
-csvname = '/m/nbe/scratch/socbrain/kipupotilaat/data/age_and_gender_matched_subs_pain_stockholm_12_2020.csv'
+#dataloc_pain = '/m/nbe/scratch/socbrain/kipupotilaat/data/stockholm/processed/'
+#pain_bg = pd.DataFrame(columns=['subid','age','sex','pain_now'])
+#csvname = '/m/nbe/scratch/socbrain/kipupotilaat/data/age_and_gender_matched_subs_pain_stockholm_12_2020.csv'
 
-# dataloc_pain = '/m/nbe/scratch/socbrain/kipupotilaat/data/helsinki/processed/'
-# pain_bg = pd.DataFrame(columns=['subid','age','sex','pain_now','groups'])
-# csvname = '/m/nbe/scratch/socbrain/kipupotilaat/data/age_and_gender_matched_subs_pain_helsinki_11_2020.csv'
+dataloc_pain = '/m/nbe/scratch/socbrain/kipupotilaat/data/helsinki/processed/'
+pain_bg = pd.DataFrame(columns=['subid','age','sex','pain_now','groups'])
+csvname = '/m/nbe/scratch/socbrain/kipupotilaat/data/age_and_gender_matched_extremely_nonpain_subs_pain_helsinki_03_2023.csv'
 
 dataloc_controls = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/processed/'
 datafile_controls = get_latest_datafile(dataloc_controls)
 controls_bg = pd.DataFrame(columns=['subid','age','sex','pain_now','feels_pain','pain_chronic',
                                     'hist_abdomen', 'hist_back_shoulder', 'hist_headache', 'hist_joint_limb',
-                                    'hist_menstrual', 'hist_migraine', 'bpi_now', 'bpi_average'])
+                                    'hist_menstrual', 'hist_migraine', 
+                                    'bpi_now', 'bpi_average', 'bpi_worst'])
 
 with h5py.File(datafile_controls, 'r') as c:
     for column in controls_bg:
@@ -24,8 +25,9 @@ with h5py.File(datafile_controls, 'r') as c:
 
 controls_bg.set_index('subid', drop=False, inplace=True)
 controls_bg = controls_bg[(controls_bg.pain_chronic == 0) & (controls_bg.pain_now == 0) &
-                          (controls_bg.bpi_now < 5) &
-                          (controls_bg.bpi_average < 5)].copy()
+                          (controls_bg.feels_pain == 0) &
+                          (controls_bg.bpi_now < 3) &
+                          (controls_bg.bpi_average < 3)].copy()
 
 acceptable_controls_original = controls_bg.copy()
 
