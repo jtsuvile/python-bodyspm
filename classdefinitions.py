@@ -3,12 +3,14 @@ import os
 from cv2 import GaussianBlur
 import simplejson as json
 import matplotlib.pyplot as plt
+import math
 
-# class to keep the relevant information of each stimulus together
+
 class Stimuli:
-
+    # class to keep the relevant information of each stimulus together
     def __init__(self, names=None, onesided=True, show_names=None, fileloc='', from_file=False):
         self.all = {}
+        self.has_show_names = False
         if not from_file:
             if not names:
                 print("Need stimulus names")
@@ -26,6 +28,7 @@ class Stimuli:
                 self.all[name] = {'onesided': new_onesided[i]}
                 if show_names and show_names[i]:
                     self.all[name]['show_name'] = show_names[i]
+                    self.has_show_names = True
         # NB: surely there is a more elegant way to read stimuli from file?
         else:
             filename = fileloc + '/stimuli_info.json'
@@ -34,13 +37,20 @@ class Stimuli:
             for key, value in indata.items():
                 self.all[key] = value
 
+    def has_show_names(self):
+        return self.has_show_names
+
     def write_stim_to_file(self, fileloc):
         filename = fileloc + '/stimuli_info.json'
         with open(filename, 'w') as json_file:
             json.dump(self.all, json_file)
 
     def __str__(self):
-        return "Stimulus set with "+ str(len(self.all)) + " stimuli defined: " + self.all.keys()
+        if(self.has_show_names):
+            return "Stimulus set with "+ str(len(self.all)) + " stimuli defined: " + (', '.join({value['show_name'] for value in self.all.values()}))
+        else:
+            return "Stimulus set with "+ str(len(self.all)) + " stimuli defined: " + (', '.join(self.all.keys()))
+
 
 class Subject:
 
@@ -63,7 +73,7 @@ class Subject:
     def has_background(self):
         return self.bginfo.keys()
 
-    def read_data(self, dataloc, stim):
+    def read_data(self, dataloc, stim, whole_image = False, intentionally_empty = False):
         for stimulus in stim.all.keys():
             data_in = dataloc + '/' + str(self.name) + '/' + stimulus + '.csv'
             if os.path.isfile(data_in):
@@ -77,7 +87,9 @@ class Subject:
                 # transfer data from a list of indices to array
                 arr_color = np.zeros((600, 900))
                 (x, y) = [paint[:, 2], paint[:, 1]]
+                x[x <=0] = 0
                 x[x >= 600] = 599
+                y[y <=0] = 0
                 y[y >= 900] = 899
                 arr_color[x.astype(int), y.astype(int)] = arr_color[x.astype(int), y.astype(int)] + 1
                 # add blur to replicate the effect of spray can in the web interface
@@ -86,11 +98,20 @@ class Subject:
                 # cut out the figure area.
                 # NB: depending on the size & positioning of base image on your web interface,
                 # you might need to change the indices below to give the best possible fit
-                if stim.all[stimulus]['onesided']:
-                    raw_res = as_coloured[9:531, 32:203] - as_coloured[9:531, 697:868]  # this creates 522*171 array
+                if whole_image:
+                    raw_res = as_coloured  # show the entire painting surface, great for QC
                 else:
-                    raw_res = np.hstack((as_coloured[9:531, 34:205], as_coloured[9:531, 699:870]))  # this creates 522*342 array
+                    if stim.all[stimulus]['onesided']:
+                        raw_res = as_coloured[9:531, 32:203] - as_coloured[9:531, 697:868]  # this creates 522*171 array
+                    else:
+                        raw_res = np.hstack((as_coloured[9:531, 34:205], as_coloured[9:531, 699:870]))  # this creates 522*342 array
+                    # Quality control step to check if subject has filled in intentionally left empty
+                    if(intentionally_empty):
+                        if np.count_nonzero(raw_res) == 0 and not self.map_intentionally_empty(as_coloured):
+                            raw_res[:] = np.nan
                 self.add_data(stimulus, raw_res)
+            else:
+                raise IOError("File", data_in, "not found")
 
     def read_bg(self, dataloc, bgfile, fieldnames):
         # BN: code currently assumes that bgfile is a list and fieldnames is list of lists to accommodate situation
@@ -151,32 +172,52 @@ class Subject:
         if not noImages:
             self.data_from_file()
 
-    def draw_sub_data(self, stim, fileloc=None):
+    def draw_sub_data(self, stim, fileloc=None, qc=False):
+        # edit colormaps in twosided [0,1] and twosided [-1,1] cases
         # make sure non coloured values are white in twosided datas
         twosided_cmap = plt.get_cmap('Greens')
         twosided_cmap.set_under('white', 1.0)
+        onesided_cmap = plt.get_cmap('RdBu_r')
+        # define grey color to show nan's
+        twosided_cmap.set_bad('grey', 0.8)
+        onesided_cmap.set_bad('grey', 0.8)
+        # print(stim.all)
         # find out if each data item is one or twosided
-        all_onesided = [stim.all[key]['onesided'] for key in stim.all.keys()]
-        widths = []
-        for side in all_onesided:
-            if side:
-                widths.append(1)
+        if qc:
+            fig, axes = plt.subplots(figsize=(24, 10), ncols=math.ceil(len(stim.all.keys())/2), nrows=2)
+        else:
+            all_onesided = [stim.all[key]['onesided'] for key in stim.all.keys()]
+            widths = []
+            for side in all_onesided:
+                if side:
+                    widths.append(1)
+                else:
+                    widths.append(2)
+            fig, axes = plt.subplots(figsize=(24, 3), ncols=len(stim.all.keys()), gridspec_kw={'width_ratios': widths})
+        for i, key in enumerate(stim.all.keys()):
+            # print(key)
+            if i < math.ceil(len(stim.all.keys()) / 2):
+                row = 0
+                col = i
             else:
-                widths.append(2)
-        fig, axes = plt.subplots(figsize=(24, 3), ncols=len(self.data.keys()), gridspec_kw={'width_ratios': widths})
-        for i, (key, value) in enumerate(self.data.items()):
-            onesided = stim.all[key]['onesided']
-            if onesided:
-                img = axes[i].imshow(value, cmap='RdBu_r', vmin=-0.05, vmax=0.05)
+                row = 1
+                col = i - math.ceil(len(stim.all.keys()) / 2)
+            # print(row, col)
+            is_onesided = stim.all[key]['onesided']
+            value = self.data[key]
+            if is_onesided and not qc:
+                map_to_plot = np.ma.masked_where(np.isnan(value), value)
+                img = axes[i].imshow(map_to_plot, cmap=onesided_cmap, vmin=-0.05, vmax=0.05)
                 fig.colorbar(img, ax=axes[i])
             else:
-                img = axes[i].imshow(value, cmap=twosided_cmap, vmin=np.finfo(float).eps, vmax=0.05)
-                fig.colorbar(img, ax=axes[i])
+                map_to_plot = np.ma.masked_where(np.isnan(value), value)
+                img = axes[row,col].imshow(map_to_plot, cmap=twosided_cmap, vmin=np.finfo(float).eps, vmax=0.05)
+                fig.colorbar(img, ax=axes[row,col], fraction=0.04, pad=0.04)
             if 'show_name' in stim.all[key]:
-                axes[i].set_title(stim.all[key]['show_name'])
+                axes[row, col].set_title(stim.all[key]['show_name'])
             else:
-                axes[i].set_title(key)
-        fig.suptitle("subject : " + self.name)
+                axes[row, col].set_title(key)
+        fig.suptitle("subject : " + str(self.name))
         fig.tight_layout()
         if fileloc:
             fileloc_fig = fileloc + '/figures/'
@@ -186,6 +227,15 @@ class Subject:
             plt.savefig(filename, bbox_inches='tight')
         else:
             plt.show()
+
+    def map_intentionally_empty(self, array):
+        area = array[530:580, 430:480] # this location is specific to pain patients in Helsinki!
+        n_nonzero = np.count_nonzero(area)
+        n_area = area.size
+        if n_nonzero > 0.1 * n_area:
+            return True
+        else:
+            return False
 
     def __str__(self):
         return "subject with id "+str(self.name)+', has '+str(len(self.data.keys()))+' colour maps'
