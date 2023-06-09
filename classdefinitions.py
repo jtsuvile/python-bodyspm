@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import math
 
 
+# class to keep the relevant information of each stimulus together
 class Stimuli:
     # class to keep the relevant information of each stimulus together
     def __init__(self, names=None, onesided=True, show_names=None, fileloc='', from_file=False):
