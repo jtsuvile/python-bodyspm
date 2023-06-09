@@ -5,13 +5,13 @@ from bodyfunctions import *
 import numpy as np
 import csv
 
-# bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/endometriosis_patients_18_03_2022.csv'
-# dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/processed/'
-# outfilename ='/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/endometriosis_with_activations_03_2022.csv'
+bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/endometriosis_patients_26_05_2023.csv'
+dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/processed/'
+outfilename ='/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/endometriosis_with_activations_05_2023.csv'
 
-bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/endometriosis_controls_18_03_2022.csv'
-dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/matched_controls/'
-outfilename ='/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/endometriosis_controls_with_activations_03_2022.csv'
+# bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/endometriosis_controls_26_05_2023.csv'
+# dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/matched_controls/'
+# outfilename ='/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/endometriosis_controls_with_activations_05_2023.csv'
 
 maskloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/'
 datafile = get_latest_datafile(dataloc)
@@ -27,11 +27,12 @@ stim_names = {'emotions_0': ['sadness', 0], 'emotions_1': ['happiness', 0], 'emo
 
 bg = pd.read_csv(bgdatapath)
 
+
 for j, cond in enumerate(stim_names.keys()):
     with h5py.File(datafile, 'r') as h:
-        data = h[cond].value
+        data = h[cond][()]
         ## yes I have double checked that the subjects are in the same order in csv and in hdf5 file
-        #subids = h['subid'].value
+        #subids = h['subid'][()]
     if stim_names[cond][1] == 1:
         mask_use = mask_fb
     else:

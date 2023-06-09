@@ -4,7 +4,7 @@ import pandas as pd
 import os
 from scipy import stats
 from skimage import io
-from statsmodels.stats.proportion import proportions_ztest
+from statsmodels.stats.proportion import proportions_ztest, proportions_chisquare
 from statsmodels.stats.multitest import multipletests
 from classdefinitions import Subject, Stimuli
 from datetime import datetime
@@ -291,8 +291,13 @@ def compare_groups(group1, group2, testtype='t'):
         successes = [np.concatenate(np.nansum(g0_data, axis=0)), np.concatenate(np.nansum(g1_data, axis=0))]
         counts = [np.concatenate(np.nansum(~np.isnan(g0_data), axis=0)),
                   np.concatenate(np.nansum(~np.isnan(g1_data), axis=0))]
+        # tried an ugly solution to division by 0 in cases of extreme difference
+        successes[0] = successes[0]+1
+        successes[1] = successes[1]+1
+        
         # run proportions test for each pixel based on number of observations(counts) and number of coloured pixels (successes)
         map_out = list(map(lambda x, y: proportions_ztest(x,y), np.transpose(successes), np.transpose(counts))) # a little slow, is there a better iteration?
+        #map_out = list(map(lambda x, y: proportions_chisquare(x,y), np.transpose(successes), np.transpose(counts))) # a little slow, is there a better iteration?
         statistics_twosamp = np.reshape(np.transpose(map_out)[0], (dims[1],dims[2]))
         pval_twosamp = np.reshape(np.transpose(map_out)[1], (dims[1],dims[2]))
     elif testtype=='t':
@@ -415,7 +420,7 @@ def p_adj_maps(pval_map, mask=None, alpha = 0.05, method='fdr_bh'):
     """
     dims = pval_map.shape
     if mask is None:
-        data_reshaped = np.reshape(pval_map, (-1, 1))
+        data_reshaped = np.reshape(pval_map, (-1, 1)).flatten()
         #print(dims)
         #print(data_reshaped.shape)
     else:

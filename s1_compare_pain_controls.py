@@ -11,12 +11,12 @@ from matplotlib.colors import ListedColormap
 
 
 
-figloc = '/m/nbe/scratch/socbrain/kipupotilaat/figures/KI/'
+figloc = '/m/nbe/scratch/socbrain/kipupotilaat/figures/endometriosis/'
 maskloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/'
-dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/stockholm/processed/fibro/'
+dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/processed'
 datafile = get_latest_datafile(dataloc)
 
-dataloc_controls = '/m/nbe/scratch/socbrain/kipupotilaat/data/stockholm/processed/lbp/'
+dataloc_controls = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/matched_controls'
 datafile_controls = get_latest_datafile(dataloc_controls)
 
 mask_fb = read_in_mask(maskloc + 'mask_front_new.png', maskloc + 'mask_back_new.png')
@@ -27,10 +27,8 @@ stim_names = {'emotions_0': ['sadness', 0], 'emotions_1': ['happiness', 0], 'emo
               'emotions_6': ['neutral', 0],
               'pain_0': ['current pain', 1], 'pain_1': ['chonic pain', 1], 'sensitivity_0': ['tactile sensitivity', 1],
               'sensitivity_1': ['nociceptive sensitivity', 1], 'sensitivity_2': ['hedonic sensitivity', 1]}
-# stim_names = {'pain_0': ['current pain', 1], 'pain_1': ['chonic pain', 1], 'sensitivity_0': ['tactile sensitivity', 1],
-#               'sensitivity_1': ['nociceptive sensitivity', 1], 'sensitivity_2': ['hedonic sensitivity', 1]}
 
-# Visualise group differences
+#stim_names = {'pain_0': ['current pain', 1], 'pain_1': ['chonic pain', 1]}
 
 hot = plt.cm.get_cmap('hot', 256)
 new_cols = hot(np.linspace(0, 1, 256))
@@ -44,10 +42,10 @@ newcolors = np.delete(newcolors, np.arange(200, 312, 2), 0)
 for i, cond in enumerate(stim_names.keys()):
 
     with h5py.File(datafile, 'r') as h:
-        kipu = h[cond].value
+        kipu = h[cond][()]
 
     with h5py.File(datafile_controls, 'r') as c:
-        control = c[cond].value
+        control = c[cond][()]
 
     if stim_names[cond][1] == 1:
         mask = mask_fb
@@ -63,33 +61,28 @@ for i, cond in enumerate(stim_names.keys()):
         vmax = 1
         fig= plt.figure(figsize=(14,10))
 
-    #control_t, control_p = stats.ttest_1samp(control, 0, nan_policy='omit', axis=0) #np.nanmean(binarize(control), axis=0)
-    #control_p_corrected, control_reject = p_adj_maps(control_p, mask, method='fdr_bh')
-    #control_p_corrected = control_p
-    #control_p_corrected[np.isnan(control_p_corrected)] = 1
-    #control_t[control_p_corrected>0.05] = 0
-    #control_t = np.nanmean(binarize(control),axis=0)
     control_t = np.nanmean(binarize(control.copy()), axis=0)
-    masked_control= np.ma.masked_where(mask != 1,control_t)
+    masked_control= np.ma.masked_where(mask != 1, control_t)
 
-    #kipu_t, kipu_p = stats.ttest_1samp(kipu, 0, nan_policy='omit', axis=0)#np.nanmean(binarize(pain), axis=0)
-
-    #kipu_p_corrected, kipu_reject = p_adj_maps(kipu_p, mask, method='fdr_bh')
-    #kipu_p_corrected = kipu_p
-    #kipu_p_corrected[np.isnan(kipu_p_corrected)] = 1
-    #kipu_t[kipu_p_corrected>0.05] = 0
-    #kipu_t = np.nanmean(binarize(kipu),axis=0)
     kipu_t = np.nanmean(binarize(kipu.copy()), axis=0)
-    masked_kipu= np.ma.masked_where(mask != 1,kipu_t)
+    masked_kipu= np.ma.masked_where(mask != 1, kipu_t)
 
-    if (np.nanmin(control)==0) & (np.nanmin(kipu)==0):
-        #print('Using z test of proportions')
+    if stim_names[cond][1]==1:
+        # something wrong with this code
+        # print('Using z test of proportions')
         twosamp_t, twosamp_p = compare_groups(kipu, control, testtype='z')
     else:
         twosamp_t, twosamp_p = stats.ttest_ind(kipu, control, axis=0, nan_policy='omit')
-
+        
     twosamp_p_corrected, twosamp_reject = p_adj_maps(twosamp_p, mask=mask, method='fdr_bh')
     #twosamp_p_corrected = twosamp_p
+    # sns.displot(data=pd.DataFrame({"data": twosamp_p.ravel(),
+    #                           "column": np.repeat(np.arange(twosamp_p.shape[0]), twosamp_p.shape[1])}),
+    #        x="data", kde=True, color='blueviolet', height=3)
+    # plt.savefig(figloc+cond+'_twosamp_p.png')
+    # plt.close()
+    ### Check np.isnan(twosamp_p_corrected) -> do we have too much stuff there?
+    
     twosamp_p_corrected[np.isnan(twosamp_p_corrected)] = 1
     twosamp_t_no_fdr = twosamp_t.copy()
 
@@ -101,13 +94,13 @@ for i, cond in enumerate(stim_names.keys()):
 
     ax1 = plt.subplot(142)
     img1 = plt.imshow(masked_kipu, cmap=cmap, vmin=vmin, vmax=vmax)
-    ax1.title.set_text('Fibromyalgia patients')
+    ax1.title.set_text('Endometriosis patients')
     fig.colorbar(img1,fraction=0.046, pad=0.04)
     ax1.axis('off')
 
     ax2 = plt.subplot(141)
     img2 = plt.imshow(masked_control, cmap=cmap, vmin=vmin, vmax=vmax)
-    ax2.title.set_text('LBP patients')
+    ax2.title.set_text('Pain-free controls')
     fig.colorbar(img2, fraction=0.046, pad=0.04)
     ax2.axis('off')
 

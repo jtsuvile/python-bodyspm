@@ -9,7 +9,7 @@ import time
 import csv
 
 
-who = 'helsinki_endo_controls'
+who = 'helsinki_endo'
 start = time.time()
 # set up stimuli description
 onesided = [True, True, True, True, True, True, True, False, False, False, False, False]
@@ -35,11 +35,11 @@ if who == 'helsinki_endo':
                ['feels_pain','feels_depression','feels_anxiety','feels_happy','feels_sad','feels_angry','feels_fear','feels_surprise','feels_disgust'],
                ['bpi_worst', 'bpi_least', 'bpi_average', 'bpi_now', 'bpi_painkiller_relief'],
                ['bpi_functioning', 'bpi_mood','bpi_walk','bpi_work', 'bpi_relationships','bpi_sleep','bpi_enjoyment']]
-    csvname = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/endometriosis_patients_18_03_2022.csv'
+    csvname = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/endometriosis_patients_26_05_2023.csv'
 elif who == 'helsinki_endo_controls':
     dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/subjects/'
     outdataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/matched_controls/'
-    subfile = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/control_subs.txt'
+    subfile = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/control_subs_painfree.txt'
     field_names = [
         ['sex', 'age', 'weight', 'height', 'handedness', 'education', 'work_physical', 'work_sitting', 'profession',
          'psychologist', 'psychiatrist', 'neurologist'],
@@ -63,7 +63,7 @@ subnums = [x.strip() for x in subnums]
 #
 #
 # # read subjects from web output and write out to a more sensible format
-if who is 'helsinki' or who is 'stockholm' or who is 'helsinki_endo':
+if who == 'helsinki' or who == 'stockholm' or who == 'helsinki_endo':
    preprocess_subjects(subnums, dataloc, outdataloc, stim, bg_files, field_names, intentionally_empty=True)
 else:
    preprocess_subjects(subnums, dataloc, outdataloc, stim, bg_files, field_names)

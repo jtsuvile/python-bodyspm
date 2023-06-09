@@ -5,7 +5,7 @@ import random
 
 dataloc_pain = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/processed/'
 pain_bg = pd.DataFrame(columns=['subid','age','sex','pain_now'])
-csvname = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/age_and_gender_matched_subs_endo_helsinki_03_2022.csv'
+csvname = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/age_and_gender_matched_subs_endo_helsinki_05_2023.csv'
 
 
 dataloc_controls = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/processed/'
@@ -19,9 +19,11 @@ with h5py.File(datafile_controls, 'r') as c:
         controls_bg[column] = c[column][:]
 
 controls_bg.set_index('subid', drop=False, inplace=True)
-controls_bg = controls_bg[(controls_bg.pain_chronic == 0) & (controls_bg.pain_now == 0) &
-                          (controls_bg.bpi_now < 5) &
-                          (controls_bg.bpi_average < 5) &
+controls_bg = controls_bg[(controls_bg.pain_chronic == 0) &
+                          ((controls_bg.bpi_now < 3) | (np.isnan(controls_bg.bpi_now))) &
+                          ((controls_bg.bpi_average < 3) | (np.isnan(controls_bg.bpi_average))) &
+                          ((controls_bg.feels_pain < 3) | (np.isnan(controls_bg.feels_pain))) &
+                          (controls_bg.hist_abdomen == 0) &
                           (controls_bg.hist_menstrual == 0)].copy()
 
 acceptable_controls_original = controls_bg.copy()
@@ -34,7 +36,7 @@ with h5py.File(datafile_pain, 'r') as b:
 
 pain_bg.set_index('subid', inplace=True, drop=False)
 #
-age_diff_cutoff = 3
+age_diff_cutoff = 5
 min_sum = 1000
 for i in range(1,500):
     matches = pain_bg.copy()

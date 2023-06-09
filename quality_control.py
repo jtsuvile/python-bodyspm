@@ -12,7 +12,7 @@ import csv
 import math
 
 
-who = 'stockholm'
+who = 'helsinki_endo'
 
 if who == 'control':
     dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/subjects/'
@@ -31,6 +31,11 @@ elif who == 'helsinki_endo':
     dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/subjects/'
     outdataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/qc/'
     subfile = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/subs.txt'
+elif who == 'endo_controls':
+    dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/subjects/'
+    outdataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/qc/controls/'
+    subfile = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/control_subs_painfree.txt'
+    csvname = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/endometriosis_controls_26_05_2023.csv'
 elif who == 'stockholm':
     dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/stockholm/subjects/'
     #dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/stockholm/test_sub_after_server_upgrade'

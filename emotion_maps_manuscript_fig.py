@@ -27,22 +27,6 @@ stim_names = {'emotions_2': ['Anger', 0],'emotions_4': ['Fear', 0],  'emotions_5
 mask_fb = read_in_mask(maskloc + 'mask_front_new.png', maskloc + 'mask_back_new.png')
 mask_one = read_in_mask(maskloc + 'mask_front_new.png')
 
-# all_figs1 = np.zeros([len(stim_names), mask_one.shape[0], mask_one.shape[1]])
-# all_n = np.zeros(len(stim_names))
-# all_n1 = np.zeros(len(stim_names))
-
-# for i, cond in enumerate(stim_names.keys()):
-#     print('reading in ' + cond)
-#     with h5py.File(datafile, 'r') as h:
-#         data = h[cond].value
-#         all_n[i] = np.count_nonzero(~np.isnan(data[:,1,1]))
-#     all_figs[i, :, :] = np.nanmean(binarize(data.copy()), axis=0)
-#     with h5py.File(datafile1, 'r') as h:
-#         data1 = h[cond].value
-#         all_n1[i] = np.count_nonzero(~np.isnan(data1[:,1,1]))
-#         all_figs1[i, :, :] = np.nanmean(binarize(data1.copy()), axis=0)
-
-
 hot = plt.cm.get_cmap('hot', 256)
 new_cols = hot(np.linspace(0, 1, 256))
 
@@ -62,7 +46,7 @@ for i, cond in enumerate(stim_names.keys()):
     for j, file in enumerate([datafile1, datafile]):
         print('reading in ' + cond)
         with h5py.File(file, 'r') as h:
-            data = h[cond].value
+            data = h[cond][()]
             all_n = np.count_nonzero(~np.isnan(data[:,1,1]))
             all_figs = np.nanmean(binarize(data.copy()), axis=0)
             masked_data = np.ma.masked_where(mask_one != 1,all_figs)
@@ -85,12 +69,10 @@ cbar_ax = fig.add_axes([x11+pad, y10+pad, width, y01-y10-2*pad])
 axcb = fig.colorbar(im, cax=cbar_ax)
 axcb.set_label(label='Proportion of subjects', fontsize=20, labelpad=-120)
 axcb.ax.tick_params(labelsize=20)
-#axcb.ax.set_title('Activation', fontsize=20)
-#axcb.ax.set_xlabel('Inactivation', fontsize=20)
 
 
-plt.gcf().text(0.11, 0.77, "Pain patients", fontsize=24, rotation=90)
-plt.gcf().text(0.11, 0.4, "Matched controls", fontsize=24, rotation=90)
+plt.gcf().text(0.11, 0.65, "Pain patients", fontsize=24, rotation=90)
+plt.gcf().text(0.11, 0.25, "Matched controls", fontsize=24, rotation=90)
 plt.gcf().text(0.88, 0.875, "Activation", fontsize=20)
 plt.gcf().text(0.88, 0.1, "Inactivation", fontsize=20)
 

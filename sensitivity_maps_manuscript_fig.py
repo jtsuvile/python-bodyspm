@@ -5,12 +5,12 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 from matplotlib.colors import ListedColormap, LinearSegmentedColormap
 
-figloc = '/m/nbe/scratch/socbrain/kipupotilaat/figures/KI/'
+figloc = '/m/nbe/scratch/socbrain/kipupotilaat/figures/endometriosis/'
 maskloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/'
-dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/stockholm/processed/fibro/'
+dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/processed'
 datafile = get_latest_datafile(dataloc)
 
-dataloc_controls = '/m/nbe/scratch/socbrain/kipupotilaat/data/stockholm/processed/lbp/'
+dataloc_controls = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/matched_controls'
 datafile_controls = get_latest_datafile(dataloc_controls)
 
 mask_fb = read_in_mask(maskloc + 'mask_front_new.png', maskloc + 'mask_back_new.png')
@@ -48,10 +48,10 @@ newcmp = ListedColormap(newcolors)
 for i, cond in enumerate(stim_names.keys()):
     print("working on " + cond)
     with h5py.File(datafile, 'r') as h:
-        kipu = h[cond].value
+        kipu = h[cond][()]
 
     with h5py.File(datafile_controls, 'r') as c:
-        control = c[cond].value
+        control = c[cond][()]
 
     prop_control = np.nanmean(binarize(control.copy()), axis=0)
     prop_control = prop_control + mask_array
@@ -146,12 +146,12 @@ cbar2_ax = fig.add_axes([x02+pad, y20+pad, width, y02-y20-2*pad])
 ax2cb = fig.colorbar(img6, cax=cbar2_ax)
 ax2cb.set_label(label='Difference', fontsize=20)
 ax2cb.ax.tick_params(labelsize=20)
-ax2cb.ax.set_title('fibro >\nlbp', fontsize=20)
-ax2cb.ax.set_xlabel('lbp >\nfibro', fontsize=20)
+ax2cb.ax.set_title('pain >\ncontrol', fontsize=20)
+ax2cb.ax.set_xlabel('control >\npain', fontsize=20)
 
-plt.gcf().text(0.03, 0.88, "Fibromyaliga patients", fontsize=24, rotation=90)
-plt.gcf().text(0.03, 0.57, "LBP patients", fontsize=24, rotation=90)
-plt.gcf().text(0.03, 0.23, "Difference", fontsize=24, rotation=90)
+plt.gcf().text(0.03, 0.85, "Patients", fontsize=24, rotation=90)
+plt.gcf().text(0.03, 0.47, "Pain-free controls", fontsize=24, rotation=90)
+plt.gcf().text(0.03, 0.18, "Difference", fontsize=24, rotation=90)
 
 plt.savefig(figloc+'sensitivity_location_controls_pain_manuscript_fig.png')
 plt.close()

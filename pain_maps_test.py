@@ -27,14 +27,15 @@ if len(dims) == 3:
     mask_other_side = mask_other_side[:, :, 0]
 mask_array = np.concatenate((mask_array, mask_other_side), axis=1)
 
-stim_names = {'pain_0': ['Current pain', 1],
-              'pain_1': ['Chonic pain', 1]}
+stim_names = {'pain_0': ['Pain0', 1],
+              'pain_1': ['Pain1', 1],
+              'sensitivity_2': ['Hedonic sensitivity', 1]}
 
 mask = mask_fb
 cmap = 'hot'
 vmin = 0
 vmax = 1
-fig = plt.figure(figsize=(13, 25))
+fig = plt.figure(figsize=(20, 25))
 
 hotcool = cm.get_cmap('bwr', 256)
 newcolors = hotcool(np.linspace(0, 1, 256))
@@ -70,40 +71,60 @@ for i, cond in enumerate(stim_names.keys()):
     masked_twosamp = masked_twosamp - mask_array*30
 
     if i==0:
-        ax1 = plt.subplot(321)
+        ax1 = plt.subplot(331)
         img1 = plt.imshow(masked_kipu, cmap=cmap, vmin=vmin, vmax=vmax)
-        ax1.set_title('Current pain', size=30)
+        ax1.set_title('Tactile sensitivity', size=30)
         ax1.set_xticklabels([])
         ax1.set_yticklabels([])
         ax1.set_axis_off()
 
-        ax3 = plt.subplot(323)
+        ax3 = plt.subplot(334)
         img3 = plt.imshow(masked_control, cmap=cmap, vmin=vmin, vmax=vmax)
         ax3.set_xticklabels([])
         ax3.set_yticklabels([])
         ax3.set_axis_off()
 
-        ax5 = plt.subplot(325)
+        ax5 = plt.subplot(337)
         img5 = plt.imshow(masked_twosamp, cmap=newcmp, vmin=-8, vmax=8)
         ax5.set_xticklabels([])
         ax5.set_yticklabels([])
         ax5.set_axis_off()
 
     elif i==1:
-        ax2 = plt.subplot(322)
+        ax2 = plt.subplot(332)
         img2 = plt.imshow(masked_kipu, cmap=cmap, vmin=vmin, vmax=vmax)
         ax2.set_xticklabels([])
         ax2.set_yticklabels([])
-        ax2.set_title('Chronic pain', size=30)
+        ax2.set_title('Nociceptive sensitivity', size=30)
         ax2.set_axis_off()
 
-        ax4 = plt.subplot(324)
+        ax4 = plt.subplot(335)
         img4 = plt.imshow(masked_control, cmap=cmap, vmin=vmin, vmax=vmax)
         ax4.set_xticklabels([])
         ax4.set_yticklabels([])
         ax4.set_axis_off()
 
-        ax6 = plt.subplot(326)
+        ax6 = plt.subplot(338)
+        img6 = plt.imshow(masked_twosamp, cmap=newcmp, vmin=-8, vmax=8)
+        ax6.set_xticklabels([])
+        ax6.set_yticklabels([])
+        ax6.set_axis_off()
+
+    elif i==2:
+        ax2 = plt.subplot(333)
+        img2 = plt.imshow(masked_kipu, cmap=cmap, vmin=vmin, vmax=vmax)
+        ax2.set_xticklabels([])
+        ax2.set_yticklabels([])
+        ax2.set_title('Hedonic sensitivity', size=30)
+        ax2.set_axis_off()
+
+        ax4 = plt.subplot(336)
+        img4 = plt.imshow(masked_control, cmap=cmap, vmin=vmin, vmax=vmax)
+        ax4.set_xticklabels([])
+        ax4.set_yticklabels([])
+        ax4.set_axis_off()
+
+        ax6 = plt.subplot(339)
         img6 = plt.imshow(masked_twosamp, cmap=newcmp, vmin=-8, vmax=8)
         ax6.set_xticklabels([])
         ax6.set_yticklabels([])
@@ -128,9 +149,9 @@ ax2cb.ax.tick_params(labelsize=20)
 ax2cb.ax.set_title('pain >\ncontrol', fontsize=20)
 ax2cb.ax.set_xlabel('control >\npain', fontsize=20)
 
-plt.gcf().text(0.03, 0.88, "Patients", fontsize=24, rotation=90)
-plt.gcf().text(0.03, 0.57, "Pain-free controls", fontsize=24, rotation=90)
-plt.gcf().text(0.03, 0.23, "Difference", fontsize=24, rotation=90)
+plt.gcf().text(0.03, 0.85, "Patients", fontsize=24, rotation=90)
+plt.gcf().text(0.03, 0.47, "Pain-free controls", fontsize=24, rotation=90)
+plt.gcf().text(0.03, 0.18, "Difference", fontsize=24, rotation=90)
 
-plt.savefig(figloc+'pain_location_controls_pain_manuscript_fig.png')
+plt.savefig(figloc+'pain_location_controls_pain_testing_fdr.png')
 plt.close()
