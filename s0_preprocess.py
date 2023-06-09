@@ -19,7 +19,7 @@ stim_names = ['stim1','stim2','stim3','stim4','stim5', 'pain1', 'pain2'] # poten
 dataloc = '/home/bodymaps/subjects/'
 outdataloc = '/home/bodymaps/processed/'
 
-csvname = '/home/subject_background.csv'
+csvname = '/home/bodymaps/subject_background.csv'
 subnums = ['test_sub_1', 'test_sub_2', 'test_sub_3','test_sub_4']
 bg_files = ['data.txt']
 fieldnames = [['sex','age','height','weight','handedness','education','physical_work','sitting_work','profession','history_of_x','history_of_y','history_of_z']]
