@@ -11,7 +11,7 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 #
 dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/processed/matched_controls/'
 dataloc1 = '/m/nbe/scratch/socbrain/kipupotilaat/data/helsinki/processed/'
-outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/figures/emotions_manuscript_fig.png'
+outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/figures/emotions_manuscript_fig_highres_nomask.png'
 suptitle = 'Average emotions'
 
 
@@ -62,10 +62,11 @@ for i, cond in enumerate(stim_names.keys()):
     for j, file in enumerate([datafile1, datafile]):
         print('reading in ' + cond)
         with h5py.File(file, 'r') as h:
-            data = h[cond].value
+            data = h[cond][()]
             all_n = np.count_nonzero(~np.isnan(data[:,1,1]))
             all_figs = np.nanmean(binarize(data.copy()), axis=0)
-            masked_data = np.ma.masked_where(mask_one != 1,all_figs)
+            masked_data = all_figs
+            #masked_data = np.ma.masked_where(mask_one != 1,all_figs)
         if j == 0:
             imind = i
         else:
@@ -89,11 +90,11 @@ axcb.ax.tick_params(labelsize=20)
 #axcb.ax.set_xlabel('Inactivation', fontsize=20)
 
 
-plt.gcf().text(0.11, 0.77, "Pain patients", fontsize=24, rotation=90)
-plt.gcf().text(0.11, 0.4, "Matched controls", fontsize=24, rotation=90)
+plt.gcf().text(0.11, 0.65, "Pain patients", fontsize=24, rotation=90)
+plt.gcf().text(0.11, 0.25, "Matched controls", fontsize=24, rotation=90)
 plt.gcf().text(0.88, 0.875, "Activation", fontsize=20)
-plt.gcf().text(0.88, 0.1, "Inactivation", fontsize=20)
+plt.gcf().text(0.88, 0.1, "Deactivation", fontsize=20)
 
-plt.savefig(outfilename)
+plt.savefig(outfilename, dpi=400)
 plt.close()
 

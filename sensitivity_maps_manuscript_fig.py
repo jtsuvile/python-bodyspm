@@ -48,18 +48,20 @@ newcmp = ListedColormap(newcolors)
 for i, cond in enumerate(stim_names.keys()):
     print("working on " + cond)
     with h5py.File(datafile, 'r') as h:
-        kipu = h[cond].value
+        kipu = h[cond][()]
 
     with h5py.File(datafile_controls, 'r') as c:
-        control = c[cond].value
+        control = c[cond][()]
 
     prop_control = np.nanmean(binarize(control.copy()), axis=0)
-    prop_control = prop_control + mask_array
-    masked_control= np.ma.masked_where(mask != 1,prop_control)
+    masked_control = prop_control
+    #prop_control = prop_control + mask_array
+    #masked_control= np.ma.masked_where(mask != 1,prop_control)
 
     prop_kipu = np.nanmean(binarize(kipu.copy()), axis=0)
-    prop_kipu = prop_kipu + mask_array
-    masked_kipu = np.ma.masked_where(mask != 1, prop_kipu)
+    masked_kipu = prop_kipu
+    #prop_kipu = prop_kipu + mask_array
+    #masked_kipu = np.ma.masked_where(mask != 1, prop_kipu)
 
     twosamp_t, twosamp_p = compare_groups(kipu, control, testtype='z')
     twosamp_p_corrected, twosamp_reject = p_adj_maps(twosamp_p, mask=mask, method='fdr_bh')
@@ -67,8 +69,8 @@ for i, cond in enumerate(stim_names.keys()):
 
     twosamp_t[twosamp_p_corrected > 0.05] = 0
     masked_twosamp = twosamp_t.copy()
-    masked_twosamp[mask != 1 ] = 0
-    masked_twosamp = masked_twosamp - mask_array*30
+    #masked_twosamp[mask != 1 ] = 0
+    #masked_twosamp = masked_twosamp - mask_array*30
 
     if i==0:
         ax1 = plt.subplot(331)
@@ -153,5 +155,5 @@ plt.gcf().text(0.03, 0.88, "Pain patients", fontsize=24, rotation=90)
 plt.gcf().text(0.03, 0.57, "Matched controls", fontsize=24, rotation=90)
 plt.gcf().text(0.03, 0.23, "Difference", fontsize=24, rotation=90)
 
-plt.savefig(figloc+'sensitivity_location_controls_pain_manuscript_fig.png')
+plt.savefig(figloc+'sensitivity_location_controls_pain_manuscript_fig_nomask.png')
 plt.close()

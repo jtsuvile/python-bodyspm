@@ -47,16 +47,16 @@ newcmp = ListedColormap(newcolors)
 for i, cond in enumerate(stim_names.keys()):
     print("working on " + cond)
     with h5py.File(datafile, 'r') as h:
-        kipu = h[cond].value
+        kipu = h[cond][()]
 
     with h5py.File(datafile_controls, 'r') as c:
-        control = c[cond].value
+        control = c[cond][()]
 
     prop_control = np.nanmean(binarize(control.copy()), axis=0)
     prop_control = prop_control + mask_array
     masked_control= np.ma.masked_where(mask != 1,prop_control)
-
-    prop_kipu = np.nanmean(binarize(kipu.copy()), axis=0)
+    
+    prop_kipu = np.nanmean(binarize(kipu.copy()), axis=0)    
     prop_kipu = prop_kipu + mask_array
     masked_kipu = np.ma.masked_where(mask != 1, prop_kipu)
 
@@ -132,5 +132,5 @@ plt.gcf().text(0.03, 0.88, "Pain patients", fontsize=24, rotation=90)
 plt.gcf().text(0.03, 0.57, "Matched controls", fontsize=24, rotation=90)
 plt.gcf().text(0.03, 0.23, "Difference", fontsize=24, rotation=90)
 
-plt.savefig(figloc+'pain_location_controls_pain_manuscript_fig.png')
+plt.savefig(figloc+'pain_location_controls_pain_manuscript_fig_nomask.png')
 plt.close()
