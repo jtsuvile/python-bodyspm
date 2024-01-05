@@ -12,30 +12,18 @@ import csv
 import math
 
 
-who = 'helsinki_endo'
+who = 'stockholm'
 
 if who == 'control':
     dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/subjects/'
     outdataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/qc/'
     subfile = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/subs.txt'
     csvname = '/m/nbe/scratch/socbrain/kipupotilaat/data/bg_all_controls.csv'
-elif who == 'helsinki':
-    #dataloc = '/Users/juusu53/Documents/projects/kipupotilaat/data/subjects/'
-    #outdataloc = '/Users/juusu53/Documents/projects/kipupotilaat/data/qc/helsinki/'
-    #outdataloc2 = '/Users/juusu53/Documents/projects/kipupotilaat/data/processed/'
-    dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/helsinki/subjects/'
-    outdataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/helsinki/qc/'
-    subfile = '/m/nbe/scratch/socbrain/kipupotilaat/data/helsinki/kipu_subs.txt'
-    csvname = '/m/nbe/scratch/socbrain/kipupotilaat/data/all_pain_patients_03_09_2020.csv'
-elif who == 'helsinki_endo':
-    dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/subjects/'
-    outdataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/qc/'
-    subfile = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/subs.txt'
 elif who == 'stockholm':
     dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/stockholm/subjects/'
     outdataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/stockholm/qc/'
     subfile = '/m/nbe/scratch/socbrain/kipupotilaat/data/stockholm/subs.txt'
-    csvname = '/m/nbe/scratch/socbrain/kipupotilaat/data/bg_pain_stockholm.csv'
+    csvname = '/m/nbe/scratch/socbrain/kipupotilaat/data/bg_pain_stockholm_2023-10-06.csv'
 elif who == 'matched_controls_helsinki':
     dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/subjects/'
     outdataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/qc/'
