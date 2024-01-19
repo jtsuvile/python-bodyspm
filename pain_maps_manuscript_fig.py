@@ -5,12 +5,12 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 from matplotlib.colors import ListedColormap, LinearSegmentedColormap
 
-figloc = '/m/nbe/scratch/socbrain/kipupotilaat/figures/KI/'
-maskloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/'
-dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/stockholm/processed/fibro/'
+figloc = '/Users/juusu53/Documents/projects/kipupotilaat/stockholm/figures/'
+maskloc = '/Users/juusu53/Documents/projects/kipupotilaat/python_code/sample_data/'
+dataloc = '/Volumes/Shield1/kipupotilaat-data/stockholm/processed/fibro/'
 datafile = get_latest_datafile(dataloc)
 
-dataloc_controls = '/m/nbe/scratch/socbrain/kipupotilaat/data/stockholm/processed/lbp/'
+dataloc_controls = '/Volumes/Shield1/kipupotilaat-data/stockholm/processed/lbp/'
 datafile_controls = get_latest_datafile(dataloc_controls)
 
 mask_fb = read_in_mask(maskloc + 'mask_front_new.png', maskloc + 'mask_back_new.png')

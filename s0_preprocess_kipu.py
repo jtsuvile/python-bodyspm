@@ -9,7 +9,7 @@ import time
 import csv
 
 
-who = 'stockholm'
+who = 'stockholm_lbp'
 start = time.time()
 # set up stimuli description
 onesided = [True, True, True, True, True, True, True, False, False, False, False, False]
@@ -50,27 +50,27 @@ elif who == 'stockholm':
                ['bpi_functioning', 'bpi_mood','bpi_walk','bpi_work', 'bpi_relationships','bpi_sleep','bpi_enjoyment']]
     csvname = '/m/nbe/scratch/socbrain/kipupotilaat/data/bg_pain_stockholm_2024-01-05.csv'
 elif who == 'stockholm_lbp':
-    dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/stockholm/subjects/'
-    outdataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/stockholm/processed/lbp/'
-    subfile = '/m/nbe/scratch/socbrain/kipupotilaat/data/stockholm/subs_lbp_29_10_2021.txt'
+    dataloc = '/Volumes/Shield1/backups_aalto_scratch/kipupotilaat/data/stockholm/subjects/'
+    outdataloc = '/Volumes/Shield1/kipupotilaat-data/stockholm/processed/lbp/'
+    subfile = '/Volumes/Shield1/kipupotilaat-data/stockholm/subs_lbp_19_01_2024.txt'
     field_names = [['sex', 'age', 'weight','height','handedness','education','work_physical','work_sitting','psychologist','psychiatrist','neurologist'],
                ['pain_now','pain_last_day', 'pain_chronic','hist_migraine','hist_headache','hist_abdomen','hist_back_shoulder','hist_joint_limb','hist_menstrual',
                 'painkillers_overcounter','painkillers_prescription', 'painkillers_othercns'],
                ['feels_pain','feels_depression','feels_anxiety','feels_happy','feels_sad','feels_angry','feels_fear','feels_surprise','feels_disgust'],
                ['bpi_worst', 'bpi_least', 'bpi_average', 'bpi_now', 'bpi_painkiller_relief'],
                ['bpi_functioning', 'bpi_mood','bpi_walk','bpi_work', 'bpi_relationships','bpi_sleep','bpi_enjoyment']]
-    csvname = '/m/nbe/scratch/socbrain/kipupotilaat/data/bg_pain_stockholm_lbp.csv'
+    csvname = '/Volumes/Shield1/kipupotilaat-data/bg_pain_stockholm_lbp_19_01_2024.csv'
 elif who == 'stockholm_fibro':
-    dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/stockholm/subjects/'
-    outdataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/stockholm/processed/fibro/'
-    subfile = '/m/nbe/scratch/socbrain/kipupotilaat/data/stockholm/subs_fibro_29_10_2021.txt'
+    dataloc = '/Volumes/Shield1/backups_aalto_scratch/kipupotilaat/data/stockholm/subjects/'
+    outdataloc = '/Volumes/Shield1/kipupotilaat-data/stockholm/processed/fibro/'
+    subfile = '/Volumes/Shield1/kipupotilaat-data/stockholm/subs_fibro_19_01_2024.txt'
     field_names = [['sex', 'age', 'weight','height','handedness','education','work_physical','work_sitting','psychologist','psychiatrist','neurologist'],
                ['pain_now','pain_last_day', 'pain_chronic','hist_migraine','hist_headache','hist_abdomen','hist_back_shoulder','hist_joint_limb','hist_menstrual',
                 'painkillers_overcounter','painkillers_prescription', 'painkillers_othercns'],
                ['feels_pain','feels_depression','feels_anxiety','feels_happy','feels_sad','feels_angry','feels_fear','feels_surprise','feels_disgust'],
                ['bpi_worst', 'bpi_least', 'bpi_average', 'bpi_now', 'bpi_painkiller_relief'],
                ['bpi_functioning', 'bpi_mood','bpi_walk','bpi_work', 'bpi_relationships','bpi_sleep','bpi_enjoyment']]
-    csvname = '/m/nbe/scratch/socbrain/kipupotilaat/data/bg_pain_stockholm_fibro.csv'
+    csvname = '/Volumes/Shield1/kipupotilaat-data/bg_pain_stockholm_fibro_19_01_2024.csv'
 elif who == 'matched_controls_stockholm':
     dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/subjects/'
     outdataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/processed/matched_controls_stockholm/'
@@ -86,10 +86,10 @@ elif who == 'matched_controls_stockholm':
     csvname = '/m/nbe/scratch/socbrain/kipupotilaat/data/bg_matched_controls_stockholm_12_2020.csv'
 
 
-if who == 'helsinki' or who == 'control':
-    with open(subfile) as f:
-        subnums = f.readlines()
-    subnums = [x.strip() for x in subnums]
+# if who is 'helsinki' or who is 'control':
+with open(subfile) as f:
+    subnums = f.readlines()
+subnums = [x.strip() for x in subnums]
 #
 #
 # # read subjects from web output and write out to a more sensible format
