@@ -7,10 +7,10 @@ from matplotlib.colors import ListedColormap, LinearSegmentedColormap
 
 figloc = '/Users/juusu53/Documents/projects/kipupotilaat/stockholm/figures/'
 maskloc = '/Users/juusu53/Documents/projects/kipupotilaat/python_code/sample_data/'
-dataloc = '/Volumes/Shield1/kipupotilaat-data/stockholm/processed/fibro/'
+dataloc = '/Volumes/Shield1/kipupotilaat/data/stockholm/processed/fibro/'
 datafile = get_latest_datafile(dataloc)
 
-dataloc_controls = '/Volumes/Shield1/kipupotilaat-data/stockholm/processed/lbp/'
+dataloc_controls = '/Volumes/Shield1/kipupotilaat/data/stockholm/processed/lbp/'
 datafile_controls = get_latest_datafile(dataloc_controls)
 
 mask_fb = read_in_mask(maskloc + 'mask_front_new.png', maskloc + 'mask_back_new.png')
@@ -47,10 +47,10 @@ newcmp = ListedColormap(newcolors)
 for i, cond in enumerate(stim_names.keys()):
     print("working on " + cond)
     with h5py.File(datafile, 'r') as h:
-        kipu = h[cond].value
+        kipu = h[cond][()]
 
     with h5py.File(datafile_controls, 'r') as c:
-        control = c[cond].value
+        control = c[cond][()]
 
     prop_control = np.nanmean(binarize(control.copy()), axis=0)
     prop_control = prop_control + mask_array
