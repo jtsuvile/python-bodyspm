@@ -128,9 +128,9 @@ ax2cb.ax.tick_params(labelsize=20)
 ax2cb.ax.set_title('fibro >\nlbp', fontsize=20)
 ax2cb.ax.set_xlabel('lbp >\nfibro', fontsize=20)
 
-plt.gcf().text(0.03, 0.88, "Fibromyalgia patients", fontsize=24, rotation=90)
-plt.gcf().text(0.03, 0.57, "LBP patients", fontsize=24, rotation=90)
-plt.gcf().text(0.03, 0.23, "Difference", fontsize=24, rotation=90)
+plt.gcf().text(0.03, 0.76, "Fibromyalgia patients", fontsize=24, rotation=90)
+plt.gcf().text(0.03, 0.47, "LBP patients", fontsize=24, rotation=90)
+plt.gcf().text(0.03, 0.18, "Difference", fontsize=24, rotation=90)
 
-plt.savefig(figloc+'pain_location_controls_pain_manuscript_fig.png')
+plt.savefig(figloc+'pain_location_fibro_lbp.png')
 plt.close()

@@ -11,12 +11,12 @@ from matplotlib.colors import ListedColormap
 
 
 
-figloc = '/m/nbe/scratch/socbrain/kipupotilaat/figures/KI/'
-maskloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/'
-dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/stockholm/processed/fibro/'
+figloc = '/Users/juusu53/Documents/projects/kipupotilaat/stockholm/figures/'
+maskloc = '/Users/juusu53/Documents/projects/kipupotilaat/python_code/sample_data/'
+dataloc = '/Volumes/Shield1/kipupotilaat-data/stockholm/processed/fibro/'
 datafile = get_latest_datafile(dataloc)
 
-dataloc_controls = '/m/nbe/scratch/socbrain/kipupotilaat/data/stockholm/processed/lbp/'
+dataloc_controls = '/Volumes/Shield1/kipupotilaat-data/stockholm/processed/lbp/'
 datafile_controls = get_latest_datafile(dataloc_controls)
 
 mask_fb = read_in_mask(maskloc + 'mask_front_new.png', maskloc + 'mask_back_new.png')
@@ -27,10 +27,6 @@ stim_names = {'emotions_0': ['sadness', 0], 'emotions_1': ['happiness', 0], 'emo
               'emotions_6': ['neutral', 0],
               'pain_0': ['current pain', 1], 'pain_1': ['chonic pain', 1], 'sensitivity_0': ['tactile sensitivity', 1],
               'sensitivity_1': ['nociceptive sensitivity', 1], 'sensitivity_2': ['hedonic sensitivity', 1]}
-# stim_names = {'pain_0': ['current pain', 1], 'pain_1': ['chonic pain', 1], 'sensitivity_0': ['tactile sensitivity', 1],
-#               'sensitivity_1': ['nociceptive sensitivity', 1], 'sensitivity_2': ['hedonic sensitivity', 1]}
-
-# Visualise group differences
 
 hot = plt.cm.get_cmap('hot', 256)
 new_cols = hot(np.linspace(0, 1, 256))
@@ -63,12 +59,7 @@ for i, cond in enumerate(stim_names.keys()):
         vmax = 1
         fig= plt.figure(figsize=(14,10))
 
-    #control_t, control_p = stats.ttest_1samp(control, 0, nan_policy='omit', axis=0) #np.nanmean(binarize(control), axis=0)
-    #control_p_corrected, control_reject = p_adj_maps(control_p, mask, method='fdr_bh')
-    #control_p_corrected = control_p
-    #control_p_corrected[np.isnan(control_p_corrected)] = 1
-    #control_t[control_p_corrected>0.05] = 0
-    #control_t = np.nanmean(binarize(control),axis=0)
+
     control_t = np.nanmean(binarize(control.copy()), axis=0)
     masked_control= np.ma.masked_where(mask != 1,control_t)
 
