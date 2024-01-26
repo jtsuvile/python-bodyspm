@@ -6,43 +6,20 @@ import numpy as np
 import csv
 
 
-# bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/all_pain_patients_15_10_2020.csv'
-# dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/helsinki/processed/'
-# outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/data/all_pain_patients_with_activations_19_10_2020.csv'
+bgdatapath = '/Volumes/Shield1/kipupotilaat/data/stockholm/bg_pain_stockholm_lbp_26_01_2024.csv'
+dataloc = '/Volumes/Shield1/kipupotilaat/data/stockholm/processed/lbp/'
+outfilename ='/Volumes/Shield1/kipupotilaat/data/stockholm/bg_pain_stockholm_lbp_with_activations_01_2024.csv'
 
-# bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/bg_matched_controls_18_11_2020.csv'
-# dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/processed/matched_controls/'
-# outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/data/matched_controls_with_activations_18_11_2020.csv'
+# bgdatapath = '/Volumes/Shield1/kipupotilaat/data/stockholm/bg_pain_stockholm_fibro_26_01_2024.csv'
+# dataloc = '/Volumes/Shield1/kipupotilaat/data/stockholm/processed/fibro/'
+# outfilename ='/Volumes/Shield1/kipupotilaat/data/stockholm/bg_pain_stockholm_fibro_with_activations_01_2024.csv'
 
-# bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/bg_double_matched_controls_30_10_2019.csv'
-# dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/processed/double_matched_controls/'
-# outfilename ='/m/nbe/scratch/socbrain/kipupotilaat/data/double_matched_controls_with_activations_10_2019.csv'
-
-# bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/bg_pain_stockholm_lbp.csv'
-# dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/stockholm/processed/lbp/'
-# outfilename ='/m/nbe/scratch/socbrain/kipupotilaat/data/bg_pain_stockholm_lbp_with_activations_02_2022.csv'
-
-bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/bg_pain_stockholm_fibro.csv'
-dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/stockholm/processed/fibro/'
-outfilename ='/m/nbe/scratch/socbrain/kipupotilaat/data/bg_pain_stockholm_fibro_with_activations_02_2022.csv'
-
-# bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/endometriosis_patients_05_11_2021.csv'
-# dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/processed/'
-# outfilename ='/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/endometriosis_with_activations_11_2021.csv'
-
-# bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/endometriosis_controls_12_11_2021.csv'
-# dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/matched_controls/'
-# outfilename ='/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/endometriosis_controls_with_activations_11_2021.csv'
-
-# bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/bg_matched_controls_stockholm_12_2020.csv'
-# dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/processed/matched_controls_stockholm/'
-# outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/data/matched_controls_stockholm_with_activations_12_2020.csv'
 
 # bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/bg_all_controls_16_10_2020.csv'
 # dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/processed/'
 # outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/data/all_healthy_with_activations_29_10_2020.csv'
 
-maskloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/'
+maskloc = '/Users/juusu53/Documents/projects/kipupotilaat/python_code/sample_data/'
 datafile = get_latest_datafile(dataloc)
 
 mask_one = read_in_mask(maskloc + 'mask_front_new.png')
@@ -58,7 +35,7 @@ bg = pd.read_csv(bgdatapath)
 
 for j, cond in enumerate(stim_names.keys()):
     with h5py.File(datafile, 'r') as h:
-        data = h[cond].value
+        data = h[cond][0] # TODO: something off here, must check
         ## yes I have double checked that the subjects are in the same order in csv and in hdf5 file
         #subids = h['subid'].value
     if stim_names[cond][1] == 1:

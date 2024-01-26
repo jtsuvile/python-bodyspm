@@ -369,6 +369,7 @@ def make_qc_figures(subnums, indataloc, stimuli, outdataloc = None):
         sub = Subject(subnum)
         sub.read_data(indataloc, stimuli, whole_image=True)
         sub.draw_sub_data(stimuli, fileloc=outdataloc, qc=True)
+    
     return "done with qc figures"
 
 

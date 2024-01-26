@@ -5,21 +5,20 @@ import random
 
 
 
-bg_pain = '/Volumes/Shield1/kipupotilaat/data/bg_pain_stockholm_fibro_19_01_2024.csv'
-pain_bg = pd.DataFrame(columns=['subid','age','sex','pain_now'])
-csvname = '/Volumes/Shield1/kipupotilaat/data/stockholm/age_and_gender_matched_subs_fibro_KI_19-01-2024.csv'
+bg_pain = pd.read_csv('/Volumes/Shield1/kipupotilaat/data/bg_pain_stockholm_fibro_19_01_2024.csv')
 
-
-bg_controls = '/Users/juusu53/Documents/projects/kipupotilaat/data/controls/bg_all_controls_16_10_2020.csv'
-controls_bg = pd.DataFrame(columns=['subid','age','sex','pain_now','feels_pain','pain_chronic',
+outcsvname = '/Volumes/Shield1/kipupotilaat/data/stockholm/age_and_gender_matched_subs_fibro_KI_19-01-2024.csv'
+bg_controls = pd.read_csv('/Users/juusu53/Documents/projects/kipupotilaat/data/controls/bg_all_controls_16_10_2020.csv')
+keep_cols = ['subid','age','sex','pain_now','feels_pain','pain_chronic',
                                     'hist_abdomen', 'hist_back_shoulder', 'hist_headache', 'hist_joint_limb',
-                                    'hist_menstrual', 'hist_migraine', 'bpi_now', 'bpi_average'])
+                                    'hist_menstrual', 'hist_migraine', 'bpi_now', 'bpi_average']
 
+controls_bg = bg_controls[keep_cols]
+pain_bg = bg_pain[keep_cols]
 
 controls_bg.set_index('subid', drop=False, inplace=True)
 controls_bg = controls_bg[(controls_bg.pain_chronic == 0) & (controls_bg.pain_now == 0) &
-                          (controls_bg.bpi_now < 5) &
-                          (controls_bg.bpi_average < 5)].copy()
+                          (controls_bg.feels_pain < 3)].copy()
 
 acceptable_controls_original = controls_bg.copy()
 

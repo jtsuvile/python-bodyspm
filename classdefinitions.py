@@ -173,6 +173,14 @@ class Subject:
             self.data_from_file()
 
     def draw_sub_data(self, stim, fileloc=None, qc=False):
+        if fileloc:
+            fileloc_fig = fileloc + '/figures/'
+            if not os.path.exists(fileloc_fig):
+                os.makedirs(fileloc_fig)
+            filename = fileloc_fig+ '/sub_' + str(self.name) + '_data.png'
+            if os.path.isfile(filename):
+                print(f"qc file for subject {str(self.name)} exists, skipping")
+                return
         # edit colormaps in twosided [0,1] and twosided [-1,1] cases
         # make sure non coloured values are white in twosided datas
         twosided_cmap = plt.get_cmap('Greens')
@@ -217,16 +225,16 @@ class Subject:
                 axes[row, col].set_title(stim.all[key]['show_name'])
             else:
                 axes[row, col].set_title(key)
-        fig.suptitle("subject : " + self.name)
+        fig.suptitle("subject : " + str(self.name))
         fig.tight_layout()
         if fileloc:
-            fileloc_fig = fileloc + '/figures/'
             if not os.path.exists(fileloc_fig):
                 os.makedirs(fileloc_fig)
             filename = fileloc_fig+ '/sub_' + str(self.name) + '_data.png'
             plt.savefig(filename, bbox_inches='tight')
         else:
             plt.show()
+        plt.close()
 
     def map_intentionally_empty(self, array):
         area = array[530:580, 430:480] # this location is specific to pain patients in Helsinki!
