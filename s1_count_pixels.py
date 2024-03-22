@@ -5,15 +5,15 @@ from bodyfunctions import *
 import numpy as np
 import csv
 
-bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/endometriosis_patients_26_05_2023.csv'
-dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/processed/'
-outfilename ='/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/endometriosis_with_activations_05_2023.csv'
+#bgdatapath = '/Volumes/Shield1/kipupotilaat/data/endometriosis/endometriosis_patients_2024_03_22.csv'
+#dataloc = '/Volumes/Shield1/kipupotilaat/data/endometriosis/processed/'
+#outfilename ='/Volumes/Shield1/kipupotilaat/data/endometriosis/endometriosis_patients_with_activations_2024_03_22.csv'
 
-# bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/endometriosis_controls_26_05_2023.csv'
-# dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/matched_controls/'
-# outfilename ='/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/endometriosis_controls_with_activations_05_2023.csv'
+bgdatapath = '/Volumes/Shield1/kipupotilaat/data/endometriosis/endometriosis_controls_2024_03_22.csv'
+dataloc = '/Volumes/Shield1/kipupotilaat/data/endometriosis/matched_controls/'
+outfilename ='/Volumes/Shield1/kipupotilaat/data/endometriosis/endometriosis_controls_with_activations_2024_03_22.csv'
 
-maskloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/'
+maskloc = '/Users/juusu53/Documents/projects/kipupotilaat/python_code/sample_data/'
 datafile = get_latest_datafile(dataloc)
 
 mask_one = read_in_mask(maskloc + 'mask_front_new.png')

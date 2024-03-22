@@ -5,12 +5,12 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 from matplotlib.colors import ListedColormap, LinearSegmentedColormap
 
-figloc = '/m/nbe/scratch/socbrain/kipupotilaat/figures/endometriosis/'
-maskloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/'
-dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/processed'
+figloc = '/Users/juusu53/Documents/projects/endometrioosi/figures/'
+maskloc = '/Users/juusu53/Documents/projects/kipupotilaat/python_code/sample_data/'
+dataloc = '/Volumes/Shield1/kipupotilaat/data/endometriosis/processed/'
 datafile = get_latest_datafile(dataloc)
 
-dataloc_controls = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/matched_controls'
+dataloc_controls = '/Volumes/Shield1/kipupotilaat/data/endometriosis/matched_controls/'
 datafile_controls = get_latest_datafile(dataloc_controls)
 
 mask_fb = read_in_mask(maskloc + 'mask_front_new.png', maskloc + 'mask_back_new.png')
@@ -149,9 +149,9 @@ ax2cb.ax.tick_params(labelsize=20)
 ax2cb.ax.set_title('pain >\ncontrol', fontsize=20)
 ax2cb.ax.set_xlabel('control >\npain', fontsize=20)
 
-plt.gcf().text(0.03, 0.85, "Patients", fontsize=24, rotation=90)
-plt.gcf().text(0.03, 0.47, "Pain-free controls", fontsize=24, rotation=90)
-plt.gcf().text(0.03, 0.18, "Difference", fontsize=24, rotation=90)
+plt.gcf().text(0.03, 0.73, "Endometriosis patients", fontsize=30, rotation=90)
+plt.gcf().text(0.03, 0.43, "Pain-free controls", fontsize=30, rotation=90)
+plt.gcf().text(0.03, 0.15, "Difference", fontsize=30, rotation=90)
 
 plt.savefig(figloc+'sensitivity_location_controls_pain_manuscript_fig.png')
 plt.close()

@@ -9,7 +9,7 @@ import time
 import csv
 
 
-who = 'helsinki_endo'
+who = 'helsinki_endo_controls'
 start = time.time()
 # set up stimuli description
 onesided = [True, True, True, True, True, True, True, False, False, False, False, False]
@@ -26,20 +26,20 @@ stim = Stimuli(data_names, onesided=onesided)
 
 # inputs
 if who == 'helsinki_endo':
-    dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/subjects/'
-    outdataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/processed/'
-    subfile = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/subs.txt'
+    dataloc = '/Volumes/Shield1/kipupotilaat/data/endometriosis/subjects/'
+    outdataloc = '/Volumes/Shield1/kipupotilaat/data/endometriosis/processed/'
+    subfile = '/Volumes/Shield1/kipupotilaat/data/endometriosis/subs_2024_03_22.txt'
     field_names = [['sex', 'age', 'weight','height','handedness','education','work_physical','work_sitting','profession','psychologist','psychiatrist','neurologist'],
                ['pain_now','pain_last_day', 'pain_chronic','hist_migraine','hist_headache','hist_abdomen','hist_back_shoulder','hist_joint_limb','hist_menstrual',
                 'painkillers_overcounter','painkillers_prescription', 'painkillers_othercns','hist_crps','hist_fibro'],
                ['feels_pain','feels_depression','feels_anxiety','feels_happy','feels_sad','feels_angry','feels_fear','feels_surprise','feels_disgust'],
                ['bpi_worst', 'bpi_least', 'bpi_average', 'bpi_now', 'bpi_painkiller_relief'],
                ['bpi_functioning', 'bpi_mood','bpi_walk','bpi_work', 'bpi_relationships','bpi_sleep','bpi_enjoyment']]
-    csvname = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/endometriosis_patients_26_05_2023.csv'
+    csvname = '/Volumes/Shield1/kipupotilaat/data/endometriosis/endometriosis_patients_2024_03_22.csv'
 elif who == 'helsinki_endo_controls':
-    dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/subjects/'
-    outdataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/matched_controls/'
-    subfile = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/control_subs_painfree.txt'
+    dataloc = '/Volumes/Shield1/kipupotilaat/data/controls/subjects/'
+    outdataloc = '/Volumes/Shield1/kipupotilaat/data/endometriosis/matched_controls/'
+    subfile = '/Volumes/Shield1/kipupotilaat/data/endometriosis/endo_controls_2024_03_22.txt'
     field_names = [
         ['sex', 'age', 'weight', 'height', 'handedness', 'education', 'work_physical', 'work_sitting', 'profession',
          'psychologist', 'psychiatrist', 'neurologist'],
@@ -50,7 +50,7 @@ elif who == 'helsinki_endo_controls':
          'feels_surprise', 'feels_disgust'],
         ['bpi_worst', 'bpi_least', 'bpi_average', 'bpi_now', 'bpi_painkiller_relief'],
         ['bpi_functioning', 'bpi_mood', 'bpi_walk', 'bpi_work', 'bpi_relationships', 'bpi_sleep', 'bpi_enjoyment']]
-    csvname = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/endometriosis_controls_18_03_2022.csv'
+    csvname = '/Volumes/Shield1/kipupotilaat/data/endometriosis/endometriosis_controls_2024_03_22.csv'
 else:
     print('wrong branch')
 
@@ -64,9 +64,9 @@ subnums = [x.strip() for x in subnums]
 #
 # # read subjects from web output and write out to a more sensible format
 if who == 'helsinki' or who == 'stockholm' or who == 'helsinki_endo':
-   preprocess_subjects(subnums, dataloc, outdataloc, stim, bg_files, field_names, intentionally_empty=True)
+  preprocess_subjects(subnums, dataloc, outdataloc, stim, bg_files, field_names, intentionally_empty=True)
 else:
-   preprocess_subjects(subnums, dataloc, outdataloc, stim, bg_files, field_names)
+  preprocess_subjects(subnums, dataloc, outdataloc, stim, bg_files, field_names)
 
 # # # Gather subjects into one dict
 # #

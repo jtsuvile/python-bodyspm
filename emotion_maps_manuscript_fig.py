@@ -9,16 +9,16 @@ from PIL import Image
 from operator import add
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 #
-dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/matched_controls/'
-dataloc1 = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/processed/'
-outfilename = '/m/nbe/scratch/socbrain/kipupotilaat/figures/endometriosis/emotions_endo_control.png'
+dataloc = '/Volumes/Shield1/kipupotilaat/data/endometriosis/matched_controls/'
+dataloc1 = '/Volumes/Shield1/kipupotilaat/data/endometriosis/processed/'
+outfilename = '/Users/juusu53/Documents/projects/endometrioosi/figures/emotions_endo_control_2024_03_22.png'
 suptitle = 'Average emotions'
 
 
 datafile1 = get_latest_datafile(dataloc1)
 datafile = get_latest_datafile(dataloc)
 
-maskloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/'
+maskloc = '/Users/juusu53/Documents/projects/kipupotilaat/python_code/sample_data/'
 
 stim_names = {'emotions_2': ['Anger', 0],'emotions_4': ['Fear', 0],  'emotions_5': ['Disgust', 0],
               'emotions_1': ['Happiness', 0], 'emotions_0': ['Sadness', 0],
@@ -71,8 +71,8 @@ axcb.set_label(label='Proportion of subjects', fontsize=20, labelpad=-120)
 axcb.ax.tick_params(labelsize=20)
 
 
-plt.gcf().text(0.11, 0.65, "Pain patients", fontsize=24, rotation=90)
-plt.gcf().text(0.11, 0.25, "Matched controls", fontsize=24, rotation=90)
+plt.gcf().text(0.11, 0.65, "Endometriosis patients", fontsize=24, rotation=90)
+plt.gcf().text(0.11, 0.25, "Pain-free controls", fontsize=24, rotation=90)
 plt.gcf().text(0.88, 0.875, "Activation", fontsize=20)
 plt.gcf().text(0.88, 0.1, "Inactivation", fontsize=20)
 
