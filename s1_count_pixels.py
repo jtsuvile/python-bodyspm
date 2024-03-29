@@ -5,14 +5,13 @@ from bodyfunctions import *
 import numpy as np
 import csv
 
-
-bgdatapath = '/Volumes/Shield1/kipupotilaat/data/stockholm/bg_pain_stockholm_lbp_26_01_2024.csv'
+bgdatapath = '/Volumes/Shield1/kipupotilaat/data/stockholm/bg_pain_stockholm_lbp_2024_03_22.csv'
 dataloc = '/Volumes/Shield1/kipupotilaat/data/stockholm/processed/lbp/'
-outfilename ='/Volumes/Shield1/kipupotilaat/data/stockholm/bg_pain_stockholm_lbp_with_activations_01_2024.csv'
+outfilename ='/Volumes/Shield1/kipupotilaat/data/stockholm/bg_pain_stockholm_lbp_with_activations_post_qc_03_2024.csv'
 
-# bgdatapath = '/Volumes/Shield1/kipupotilaat/data/stockholm/bg_pain_stockholm_fibro_26_01_2024.csv'
+# bgdatapath = '/Volumes/Shield1/kipupotilaat/data/stockholm/bg_pain_stockholm_fibro_2024_03_22.csv'
 # dataloc = '/Volumes/Shield1/kipupotilaat/data/stockholm/processed/fibro/'
-# outfilename ='/Volumes/Shield1/kipupotilaat/data/stockholm/bg_pain_stockholm_fibro_with_activations_01_2024.csv'
+# outfilename ='/Volumes/Shield1/kipupotilaat/data/stockholm/bg_pain_stockholm_fibro_with_activations_post_qc_03_2024.csv'
 
 
 # bgdatapath = '/m/nbe/scratch/socbrain/kipupotilaat/data/bg_all_controls_16_10_2020.csv'
@@ -35,7 +34,7 @@ bg = pd.read_csv(bgdatapath)
 
 for j, cond in enumerate(stim_names.keys()):
     with h5py.File(datafile, 'r') as h:
-        data = h[cond][0] # TODO: something off here, must check
+        data = h[cond][()] 
         ## yes I have double checked that the subjects are in the same order in csv and in hdf5 file
         #subids = h['subid'].value
     if stim_names[cond][1] == 1:
