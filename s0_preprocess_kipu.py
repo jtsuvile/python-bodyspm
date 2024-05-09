@@ -9,7 +9,7 @@ import time
 import csv
 
 
-who = 'helsinki_endo_controls'
+who = 'helsinki_endo_other_mixed'
 start = time.time()
 # set up stimuli description
 onesided = [True, True, True, True, True, True, True, False, False, False, False, False]
@@ -51,6 +51,29 @@ elif who == 'helsinki_endo_controls':
         ['bpi_worst', 'bpi_least', 'bpi_average', 'bpi_now', 'bpi_painkiller_relief'],
         ['bpi_functioning', 'bpi_mood', 'bpi_walk', 'bpi_work', 'bpi_relationships', 'bpi_sleep', 'bpi_enjoyment']]
     csvname = '/Volumes/Shield1/kipupotilaat/data/endometriosis/endometriosis_controls_2024_03_22.csv'
+elif who == 'helsinki_endo_peritoneal':
+    dataloc = '/Volumes/Shield1/kipupotilaat/data/endometriosis/subjects/'
+    outdataloc = '/Volumes/Shield1/kipupotilaat/data/endometriosis/processed_peritoneal/'
+    subfile = '/Volumes/Shield1/kipupotilaat/data/endometriosis/peritoneal_subs_12_04_2024.txt'
+    field_names = [['sex', 'age', 'weight','height','handedness','education','work_physical','work_sitting','profession','psychologist','psychiatrist','neurologist'],
+               ['pain_now','pain_last_day', 'pain_chronic','hist_migraine','hist_headache','hist_abdomen','hist_back_shoulder','hist_joint_limb','hist_menstrual',
+                'painkillers_overcounter','painkillers_prescription', 'painkillers_othercns','hist_crps','hist_fibro'],
+               ['feels_pain','feels_depression','feels_anxiety','feels_happy','feels_sad','feels_angry','feels_fear','feels_surprise','feels_disgust'],
+               ['bpi_worst', 'bpi_least', 'bpi_average', 'bpi_now', 'bpi_painkiller_relief'],
+               ['bpi_functioning', 'bpi_mood','bpi_walk','bpi_work', 'bpi_relationships','bpi_sleep','bpi_enjoyment']]
+    csvname = '/Volumes/Shield1/kipupotilaat/data/endometriosis/endometriosis_patients_peritoneal_2024_04_12.csv'
+elif who == 'helsinki_endo_other_mixed':
+    dataloc = '/Volumes/Shield1/kipupotilaat/data/endometriosis/subjects/'
+    outdataloc = '/Volumes/Shield1/kipupotilaat/data/endometriosis/processed_other_mixed/'
+    subfile = '/Volumes/Shield1/kipupotilaat/data/endometriosis/other-mixed_subs_12_04_2024.txt'
+    field_names = [['sex', 'age', 'weight','height','handedness','education','work_physical','work_sitting','profession','psychologist','psychiatrist','neurologist'],
+               ['pain_now','pain_last_day', 'pain_chronic','hist_migraine','hist_headache','hist_abdomen','hist_back_shoulder','hist_joint_limb','hist_menstrual',
+                'painkillers_overcounter','painkillers_prescription', 'painkillers_othercns','hist_crps','hist_fibro'],
+               ['feels_pain','feels_depression','feels_anxiety','feels_happy','feels_sad','feels_angry','feels_fear','feels_surprise','feels_disgust'],
+               ['bpi_worst', 'bpi_least', 'bpi_average', 'bpi_now', 'bpi_painkiller_relief'],
+               ['bpi_functioning', 'bpi_mood','bpi_walk','bpi_work', 'bpi_relationships','bpi_sleep','bpi_enjoyment']]
+    csvname = '/Volumes/Shield1/kipupotilaat/data/endometriosis/endometriosis_patients_other-mixed_2024_04_12.csv'
+
 else:
     print('wrong branch')
 
@@ -59,11 +82,9 @@ with open(subfile) as f:
     subnums = f.readlines()
 subnums = [x.strip() for x in subnums]
 
-#subnums = [84002, 50436, 55419, 95848, 63165, 79662, 49764, 68328, 64110, 97405, 56216, 26270, 28358]
-#
 #
 # # read subjects from web output and write out to a more sensible format
-if who == 'helsinki' or who == 'stockholm' or who == 'helsinki_endo':
+if who == 'helsinki' or who == 'stockholm' or who == 'helsinki_endo' or who == 'helsinki_endo_peritoneal' or who=='helsinki_endo_other_mixed':
   preprocess_subjects(subnums, dataloc, outdataloc, stim, bg_files, field_names, intentionally_empty=True)
 else:
   preprocess_subjects(subnums, dataloc, outdataloc, stim, bg_files, field_names)

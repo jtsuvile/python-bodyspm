@@ -11,9 +11,9 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 from matplotlib import cm
 from matplotlib.colors import ListedColormap, LinearSegmentedColormap
 #
-dataloc = '/Volumes/Shield1/kipupotilaat/data/endometriosis/matched_controls/'
-dataloc1 = '/Volumes/Shield1/kipupotilaat/data/endometriosis/processed/'
-outfilename = '/Users/juusu53/Documents/projects/endometrioosi/figures/emotions_endo_control_2024_03_22_threerows.png'
+dataloc = '/Volumes/Shield1/kipupotilaat/data/endometriosis/processed_other_mixed/'
+dataloc1 = '/Volumes/Shield1/kipupotilaat/data/endometriosis/processed_peritoneal/'
+outfilename = '/Users/juusu53/Documents/projects/endometrioosi/figures/emotions_pain_subtype_threerows.png'
 suptitle = 'Average emotions'
 
 
@@ -121,8 +121,8 @@ ax2cb.ax.tick_params(labelsize=20)
 ax2cb.ax.set_title('patient > control', fontsize=20)
 ax2cb.ax.set_xlabel('control > patient', fontsize=20)
 
-plt.gcf().text(0.03, 0.73, "Endometriosis patients", fontsize=24, rotation=90)
-plt.gcf().text(0.03, 0.45, "Pain-free controls", fontsize=24, rotation=90)
+plt.gcf().text(0.03, 0.73, "Peritoneal", fontsize=24, rotation=90)
+plt.gcf().text(0.03, 0.45, "Mixed/other", fontsize=24, rotation=90)
 plt.gcf().text(0.03, 0.15, "Difference", fontsize=24, rotation=90)
 
 plt.savefig(outfilename)
