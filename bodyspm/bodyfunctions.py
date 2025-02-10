@@ -446,4 +446,5 @@ def p_adj_maps(pval_map, mask=None, alpha = 0.05, method='fdr_bh'):
     return pval_map_corrected, reject_map
 
 def extract_numbers(s):
-    return re.findall(r'\d+', s)  # Find all numeric sequences
+    numbers = re.findall(r'\d+', s)  # Find all numeric sequences
+    return int("".join(numbers)) if numbers else None  # Join and convert to int
