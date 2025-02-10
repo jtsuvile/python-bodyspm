@@ -6,7 +6,7 @@ from scipy import stats
 from skimage import io
 from statsmodels.stats.proportion import proportions_ztest, proportions_chisquare
 from statsmodels.stats.multitest import multipletests
-from classdefinitions import Subject, Stimuli
+from bodyspm.classdefinitions import Subject, Stimuli
 from datetime import datetime
 import h5py
 from tqdm import tqdm
