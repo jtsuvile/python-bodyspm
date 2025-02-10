@@ -11,22 +11,25 @@ from matplotlib.colors import ListedColormap
 
 
 
-figloc = '/m/nbe/scratch/socbrain/kipupotilaat/figures/endometriosis/'
-maskloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/'
-dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/processed'
+figloc = '/Users/juusu53/Documents/projects/endometrioosi/figures/'
+maskloc = '/Users/juusu53/Documents/projects/kipupotilaat/python_code/sample_data/'
+dataloc = '/Volumes/Shield1/kipupotilaat/data/endometriosis/processed_peritoneal/'
 datafile = get_latest_datafile(dataloc)
 
-dataloc_controls = '/m/nbe/scratch/socbrain/kipupotilaat/data/endometriosis/matched_controls'
+dataloc_controls = '/Volumes/Shield1/kipupotilaat/data/endometriosis/processed_other_mixed/'
 datafile_controls = get_latest_datafile(dataloc_controls)
 
 mask_fb = read_in_mask(maskloc + 'mask_front_new.png', maskloc + 'mask_back_new.png')
 mask_one = read_in_mask(maskloc + 'mask_front_new.png')
 
-stim_names = {'emotions_0': ['sadness', 0], 'emotions_1': ['happiness', 0], 'emotions_2': ['anger', 0],
-              'emotions_3': ['surprise', 0], 'emotions_4': ['fear', 0], 'emotions_5': ['disgust', 0],
-              'emotions_6': ['neutral', 0],
-              'pain_0': ['current pain', 1], 'pain_1': ['chonic pain', 1], 'sensitivity_0': ['tactile sensitivity', 1],
-              'sensitivity_1': ['nociceptive sensitivity', 1], 'sensitivity_2': ['hedonic sensitivity', 1]}
+stim_names = {
+    #'emotions_0': ['sadness', 0], 'emotions_1': ['happiness', 0], 'emotions_2': ['anger', 0],
+    #          'emotions_3': ['surprise', 0], 'emotions_4': ['fear', 0], 'emotions_5': ['disgust', 0],
+    #          'emotions_6': ['neutral', 0],
+              'pain_0': ['current pain', 1], 'pain_1': ['chonic pain', 1], 
+              #'sensitivity_0': ['tactile sensitivity', 1],
+              #'sensitivity_1': ['nociceptive sensitivity', 1], 'sensitivity_2': ['hedonic sensitivity', 1]
+              }
 
 #stim_names = {'pain_0': ['current pain', 1], 'pain_1': ['chonic pain', 1]}
 
@@ -94,13 +97,13 @@ for i, cond in enumerate(stim_names.keys()):
 
     ax1 = plt.subplot(142)
     img1 = plt.imshow(masked_kipu, cmap=cmap, vmin=vmin, vmax=vmax)
-    ax1.title.set_text('Endometriosis patients')
+    ax1.title.set_text('Peritoneal')
     fig.colorbar(img1,fraction=0.046, pad=0.04)
     ax1.axis('off')
 
     ax2 = plt.subplot(141)
     img2 = plt.imshow(masked_control, cmap=cmap, vmin=vmin, vmax=vmax)
-    ax2.title.set_text('Pain-free controls')
+    ax2.title.set_text('Other/mixed')
     fig.colorbar(img2, fraction=0.046, pad=0.04)
     ax2.axis('off')
 
@@ -119,5 +122,5 @@ for i, cond in enumerate(stim_names.keys()):
     #
     fig.suptitle(stim_names[cond][0], size=20, va='top')
     #plt.show()
-    plt.savefig(figloc+cond+'_controls_pain_pixelwise.png')
+    plt.savefig(figloc+cond+'_peritoneal_other_pixelwise.png')
     plt.close()
