@@ -1,5 +1,5 @@
-from classdefinitions import Subject, Stimuli
-from bodyfunctions import *
+from bodyspm.classdefinitions import Subject, Stimuli
+from bodyspm.bodyfunctions import *
 import h5py
 import numpy as np
 import pandas as pd

@@ -1,8 +1,8 @@
 import os
 import sys
 import pandas as pd
-from classdefinitions import Subject, Stimuli
-from bodyfunctions import combine_data, preprocess_subjects
+from bodyspm.classdefinitions import Subject, Stimuli
+from bodyspm.bodyfunctions import combine_data, preprocess_subjects
 import matplotlib.pyplot as plt
 import numpy as np
 

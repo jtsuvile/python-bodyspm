@@ -1,7 +1,7 @@
 import os
 import sys
 import pandas as pd
-from bodyfunctions import *
+from bodyspm.bodyfunctions import *
 import numpy as np
 import csv
 
