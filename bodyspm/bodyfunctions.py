@@ -2,14 +2,17 @@
 import numpy as np
 import pandas as pd
 import os
+import re
+from datetime import datetime
+import h5py
+from tqdm import tqdm
+
 from scipy import stats
 from skimage import io
 from statsmodels.stats.proportion import proportions_ztest, proportions_chisquare
 from statsmodels.stats.multitest import multipletests
 from bodyspm.classdefinitions import Subject, Stimuli
-from datetime import datetime
-import h5py
-from tqdm import tqdm
+
 
 
 ## Data wrangling
@@ -128,7 +131,7 @@ def combine_data(dataloc, subnums, groups=None, save=False, noImages = False):
             print(temp_sub)
             temp_sub.read_sub_from_file(dataloc, noImages)
             if sum(all_res['bg']['subid'] == subnum) == 0:
-                all_res['bg'].loc[subnum, 'subid'] = subnum
+                all_res['bg'].loc[subnum, 'subid'] = int(extract_numbers(subnum))
                 for bgkey, bgvalue in temp_sub.bginfo.items():
                     #if bgkey != 'profession':  # cannot be neatly converted to numeric, excluding for now
                     if not isinstance(bgvalue, str):
@@ -158,7 +161,7 @@ def combine_data(dataloc, subnums, groups=None, save=False, noImages = False):
                 temp_sub.read_sub_from_file(dataloc, noImages)
                 data_matrix[j] = temp_sub.data[key]
                 if sum(all_res['bg']['subid'] == subnum) == 0:
-                    all_res['bg'].loc[subnum, 'subid'] = subnum
+                    all_res['bg'].loc[subnum, 'subid'] = int(extract_numbers(subnum))
                     for bgkey, bgvalue in temp_sub.bginfo.items():
                         try:  # some variables cannot be neatly converted to numeric, excluding for now
                             float(bgvalue)
@@ -441,3 +444,6 @@ def p_adj_maps(pval_map, mask=None, alpha = 0.05, method='fdr_bh'):
         reject_map = np.ones(dims)
         reject_map[mask.astype(int) > 0] = reject
     return pval_map_corrected, reject_map
+
+def extract_numbers(s):
+    return re.findall(r'\d+', s)  # Find all numeric sequences
