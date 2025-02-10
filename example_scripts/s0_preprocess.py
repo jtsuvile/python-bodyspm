@@ -5,6 +5,7 @@ from bodyspm.classdefinitions import Subject, Stimuli
 from bodyspm.bodyfunctions import combine_data, preprocess_subjects
 import matplotlib.pyplot as plt
 import numpy as np
+from pathlib import Path
 
 # set up stimuli description
 onesided = [True, True, True, True, True, True, True, False, False, False]
@@ -16,10 +17,18 @@ data_names = ['emotions_0', 'emotions_1', 'emotions_2', 'emotions_3', 'emotions_
 stim_names = ['stim1','stim2','stim3','stim4','stim5', 'pain1', 'pain2'] # potentially add stimulus names for more intuitive data handling
 
 # inputs
-dataloc = '/home/bodymaps/subjects/'
-outdataloc = '/home/bodymaps/processed/'
+repo_root = Path(__file__).resolve().parent.parent
+dataloc = repo_root / "sample_data" 
+outdataloc = repo_root / "processed"
+Path(outdataloc).mkdir(parents=True, exist_ok=True)
 
-csvname = '/home/bodymaps/subject_background.csv'
+# what file to use for output
+subject_info_csv_filename = outdataloc / "subject_background.csv"
+
+#dataloc = '/home/bodymaps/subjects/'
+#outdataloc = '/home/bodymaps/processed/'
+#csvname = '/home/bodymaps/subject_background.csv'
+
 subnums = ['test_sub_1', 'test_sub_2', 'test_sub_3','test_sub_4']
 bg_files = ['data.txt']
 fieldnames = [['sex','age','height','weight','handedness','education','physical_work','sitting_work','profession','history_of_x','history_of_y','history_of_z']]
@@ -28,16 +37,15 @@ fieldnames = [['sex','age','height','weight','handedness','education','physical_
 stim = Stimuli(data_names, onesided=onesided)
 
 # read subjects from web output and write out to a more sensible format
-preprocess_subjects(subnums, dataloc, outdataloc, stim, bg_files, fieldnames)
+preprocess_subjects(subnums, str(dataloc), str(outdataloc), stim, bg_files, fieldnames)
 
 # Gather subjects into one dict
 print("combining data from ", len(subnums), " subjects")
 print("getting started")
 subnums = ['test_sub_1', 'test_sub_2', 'test_sub_3','test_sub_4']
-outdataloc = '/Users/jtsuvile/Documents/projects/kipupotilaat/python_code_testing/'
 grouping = ['foo', 'bar', 'foo', 'bar']
 
-full_dataset = combine_data(outdataloc, subnums, save=False, noImages=False)
+full_dataset = combine_data(str(outdataloc), subnums, save=False, noImages=False)
 
 bg = full_dataset['bg']
-bg.to_csv(csvname)
+bg.to_csv(subject_info_csv_filename)

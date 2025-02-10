@@ -128,7 +128,7 @@ def combine_data(dataloc, subnums, groups=None, save=False, noImages = False):
             print(temp_sub)
             temp_sub.read_sub_from_file(dataloc, noImages)
             if sum(all_res['bg']['subid'] == subnum) == 0:
-                all_res['bg'].loc[subnum, 'subid'] = int(subnum)
+                all_res['bg'].loc[subnum, 'subid'] = subnum
                 for bgkey, bgvalue in temp_sub.bginfo.items():
                     #if bgkey != 'profession':  # cannot be neatly converted to numeric, excluding for now
                     if not isinstance(bgvalue, str):
