@@ -351,7 +351,8 @@ def get_latest_datafile(datadir):
             if latestfile == '' or os.path.getmtime(datadir +  '/' + file) > os.path.getmtime(datadir + '/' + latestfile):
                 latestfile = file
             dataloc = os.path.join(datadir, latestfile)
-    return dataloc
+            return dataloc
+    return None
 
 
 

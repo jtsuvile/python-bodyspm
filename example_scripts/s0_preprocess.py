@@ -1,10 +1,5 @@
-import os
-import sys
-import pandas as pd
-from bodyspm.classdefinitions import Subject, Stimuli
+from bodyspm.classdefinitions import Stimuli
 from bodyspm.bodyfunctions import combine_data, preprocess_subjects
-import matplotlib.pyplot as plt
-import numpy as np
 from pathlib import Path
 
 # set up stimuli description
@@ -45,7 +40,6 @@ print("getting started")
 subnums = ['test_sub_1', 'test_sub_2', 'test_sub_3','test_sub_4']
 grouping = ['foo', 'bar', 'foo', 'bar']
 
-## TODO: make a smarter system to handle subject IDs that are not strictly int, hdf5 does not want them
 full_dataset = combine_data(str(outdataloc), subnums, save=True, noImages=False)
 
 bg = full_dataset['bg']

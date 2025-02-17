@@ -1,18 +1,13 @@
 from bodyspm.classdefinitions import Subject, Stimuli
 from bodyspm.bodyfunctions import *
-import pickle
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.image as mpimg
-from skimage import io
-from scipy import stats
-import pandas as pd
+from pathlib import Path
 
-# Read pickled dataset from file
 
-dataloc = '/Users/jtsuvile/Documents/projects/kipupotilaat/python_code_testing/'
-datafile = dataloc + 'full_dataset.pickle'
-all_data = pickle.load(open(datafile, "rb" ))
+## TODO: rewrite to not work like pickle anymore
+dataloc1= str(Path(__file__).resolve().parent.parent)
+all_data = get_latest_datafile(dataloc1)
 
 mask_use = read_in_mask(dataloc + 'mask_front_new.png',dataloc + 'mask_back_new.png')
 
