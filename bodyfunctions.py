@@ -383,7 +383,7 @@ def read_in_mask(file1, file2=None):
     :param file2: Mask to use for the right side, if any
     :return: numpy array of the mask with 1=include, 0=exclude
     """
-    mask_array = io.imread(file1, as_gray=True)
+    mask_array = io.imread(file1)
     dims = mask_array.shape
     if len(dims) == 3:
         mask_array = mask_array[:, :, 0]
@@ -391,7 +391,7 @@ def read_in_mask(file1, file2=None):
     mask_array = mask_array * -1
     mask_array = mask_array + 1
     if file2 is not None:
-        mask_other_side = io.imread(file2, as_gray=True)
+        mask_other_side = io.imread(file2)
         dims = mask_other_side.shape
         if len(dims) == 3:
             mask_other_side = mask_other_side[:, :, 0]
