@@ -10,24 +10,28 @@ from operator import add
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from matplotlib import cm
 from matplotlib.colors import ListedColormap, LinearSegmentedColormap
-#
-dataloc = '/Volumes/Shield1/kipupotilaat/data/stockholm/processed/lbp/'
-dataloc1 = '/Volumes/Shield1/kipupotilaat/data/stockholm/processed/fibro/'
-outfilename = '/Users/juusu53/Documents/projects/kipupotilaat/stockholm/figures/emotions_lbp_fibro_threerows.png'
-suptitle = 'Average emotions'
 
+# define how we want to separate out our groups
+group_key = 'sex'
+group_1_definition = 0
+group_1_name = 'men'
+group_2_definition = 1
+group_2_name = 'women'
 
-datafile = get_latest_datafile(dataloc1)
-datafile_controls = get_latest_datafile(dataloc)
-
+# filenames
+dataloc = '/Volumes/Shield1/kipupotilaat/data/stockholm/controls/test/'
+outfilename = f'/Users/juusu53/Documents/projects/kipupotilaat/stockholm/figures/compare_{group_key}.png'
 maskloc = '/Users/juusu53/Documents/projects/kipupotilaat/python_code/sample_data/'
+
+
+datafile = get_latest_datafile(dataloc)
+
 
 stim_names = {'emotions_2': ['Anger', 0],'emotions_4': ['Fear', 0],  'emotions_5': ['Disgust', 0],
               'emotions_1': ['Happiness', 0], 'emotions_0': ['Sadness', 0],
               'emotions_3': ['Surprise', 0], 'emotions_6': ['Neutral', 0]}
 
 mask_one = read_in_mask(maskloc + 'mask_front_new.png')
-
 
 # colormap for emotions
 hot = plt.cm.get_cmap('hot', 256)
@@ -52,6 +56,7 @@ vmax = 1
 #axs = axs.ravel()
 
 fig = plt.figure(figsize=(18, 19))
+suptitle = 'Average emotions'
 
 all_figs = np.zeros([mask_one.shape[0], mask_one.shape[1]])
 mask = mask_one
@@ -59,18 +64,21 @@ mask = mask_one
 for i, cond in enumerate(stim_names.keys()):
     print("working on " + cond)
     with h5py.File(datafile, 'r') as h:
-        kipu = h[cond][()]
+        all_subs = h[cond][()]
+        [key for key in h.keys()]
+        condition = h[group_key][()]
+        group_1_indices = np.where(condition == group_1_definition)
+        group_1 = np.take(all_subs, group_1_indices, axis=0)[0]
+        group_2_indices = np.where(condition == group_2_definition)
+        group_2 = np.take(all_subs, group_2_indices, axis=0)[0]
 
-    with h5py.File(datafile_controls, 'r') as c:
-        control = c[cond][()]
+    prop_group_1 = np.nanmean(binarize(group_1.copy()), axis=0)
+    masked_group_1 = np.ma.masked_where(mask != 1, prop_group_1)
 
-    prop_control = np.nanmean(binarize(control.copy()), axis=0)
-    masked_control= np.ma.masked_where(mask != 1,prop_control)
+    prop_group_2 = np.nanmean(binarize(group_2.copy()), axis=0)
+    masked_group_2= np.ma.masked_where(mask != 1, prop_group_2)
 
-    prop_kipu = np.nanmean(binarize(kipu.copy()), axis=0)
-    masked_kipu = np.ma.masked_where(mask != 1, prop_kipu)
-
-    twosamp_t, twosamp_p = compare_groups(kipu, control)
+    twosamp_t, twosamp_p = compare_groups(group_1, group_2)
     twosamp_p_corrected, twosamp_reject = p_adj_maps(twosamp_p, mask=mask, method='fdr_bh')
     twosamp_p_corrected[np.isnan(twosamp_p_corrected)] = 1
 
@@ -83,14 +91,14 @@ for i, cond in enumerate(stim_names.keys()):
     subplot_n_row_3 = 15+i
 
     ax1 = plt.subplot(3,7,subplot_n_row_1)
-    im1 = ax1.imshow(masked_kipu, cmap=cmap, vmin=vmin, vmax=vmax)
+    im1 = ax1.imshow(masked_group_1, cmap=cmap, vmin=vmin, vmax=vmax)
     ax1.set_title(stim_names[cond][0], size=30)
     ax1.set_xticklabels([])
     ax1.set_yticklabels([])
     ax1.set_axis_off()
 
     ax2 = plt.subplot(3,7,subplot_n_row_2)
-    ax2.imshow(masked_control, cmap=cmap, vmin=vmin, vmax=vmax)
+    ax2.imshow(masked_group_2, cmap=cmap, vmin=vmin, vmax=vmax)
     ax2.set_xticklabels([])
     ax2.set_yticklabels([])
     ax2.set_axis_off()
@@ -118,11 +126,11 @@ cbar2_ax = fig.add_axes([x02+pad, y20+pad, width, y02-y20-2*pad])
 ax2cb = fig.colorbar(im3, cax=cbar2_ax)
 ax2cb.set_label(label='Difference', fontsize=20)
 ax2cb.ax.tick_params(labelsize=20)
-ax2cb.ax.set_title('fibro > lbp', fontsize=20)
-ax2cb.ax.set_xlabel('lbp > fibro', fontsize=20)
+ax2cb.ax.set_title(f"{group_1_name} > {group_2_name}", fontsize=20)
+ax2cb.ax.set_xlabel(f"{group_2_name} > {group_1_name}", fontsize=20)
 
-plt.gcf().text(0.03, 0.74, "Fibromyalgia patients", fontsize=24, rotation=90)
-plt.gcf().text(0.03, 0.47, "LBP patients", fontsize=24, rotation=90)
+plt.gcf().text(0.03, 0.74, group_1_name, fontsize=24, rotation=90)
+plt.gcf().text(0.03, 0.47, group_2_name, fontsize=24, rotation=90)
 plt.gcf().text(0.03, 0.15, "Difference", fontsize=24, rotation=90)
 
 plt.savefig(outfilename)

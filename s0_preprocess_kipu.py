@@ -9,7 +9,7 @@ import time
 import csv
 
 
-who = 'clbp_controls_stockholm'
+who = 'controls'
 start = time.time()
 # set up stimuli description
 onesided = [True, True, True, True, True, True, True, False, False, False, False, False]
@@ -25,17 +25,17 @@ bg_files = ['data.txt', 'pain_info.txt', 'current_feelings.txt', 'BPI_1.txt', 'B
 stim = Stimuli(data_names, onesided=onesided)
 
 # inputs
-if who == 'control':
-    dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/subjects/'
-    outdataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/processed/'
-    subfile = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/subs.txt'
+if who == 'controls':
+    dataloc = '/Volumes/Shield1/kipupotilaat/data/controls/subjects/'
+    outdataloc = '/Volumes/Shield1/kipupotilaat/data/stockholm/controls/test/'
+    subfile = '/Users/juusu53/Documents/projects/kipupotilaat/data/KI/controls_all_acceptable_nopain_karolinska.txt'
     field_names = [['sex', 'age', 'weight','height','handedness','education','work_physical','work_sitting','profession','psychologist','psychiatrist', 'neurologist'],
                ['pain_now','pain_last_day', 'pain_chronic','hist_migraine','hist_headache','hist_abdomen','hist_back_shoulder','hist_joint_limb','hist_menstrual',
                 'painkillers_overcounter','painkillers_prescription', 'painkillers_othercns'],
                ['feels_pain','feels_depression','feels_anxiety','feels_happy','feels_sad','feels_angry','feels_fear','feels_surprise','feels_disgust'],
                ['bpi_worst', 'bpi_least', 'bpi_average', 'bpi_now', 'bpi_painkiller_relief'],
                ['bpi_functioning', 'bpi_mood','bpi_walk','bpi_work', 'bpi_relationships','bpi_sleep','bpi_enjoyment']]
-    csvname = '/m/nbe/scratch/socbrain/kipupotilaat/data/bg_all_controls_29_10_2020.csv'
+    csvname = '/Volumes/Shield1/kipupotilaat/data/stockholm/controls/test/bg_all_acceptable_controls_2025-02-19.csv'
 elif who == 'stockholm':
     dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/stockholm/subjects/'
     outdataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/stockholm/processed/'
