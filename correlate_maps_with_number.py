@@ -29,7 +29,7 @@ stim_names = {
 
 
 cond = "pain_0"
-corr_variable_name = 'bpi_average'
+corr_variable_name = 'feels_anxiety'
 
 with h5py.File(datafile, 'r') as h:
     bodymap = h[cond][()]
@@ -89,11 +89,13 @@ masked_result_map_no_fdr = np.ma.masked_where(mask != 1, result_map_r_no_fdr)
 
 result_map_p_corrected, twosamp_reject = p_adj_maps(result_map_p, mask=mask, method='fdr_bh')
 result_map_r_with_fdr[result_map_p_corrected > 0.05] = 0
+result_map_r_with_fdr[np.isnan(result_map_p_corrected)] = 0
+
 # this line does not do what it should!
 masked_result_map_with_fdr = np.ma.masked_where(mask != 1, result_map_r_with_fdr)
 
-#unique, counts = np.unique(result_map_r_with_fdr, return_counts=True)
-#dict(zip(unique, counts))
+unique, counts = np.unique(result_map_r_with_fdr, return_counts=True)
+foo = pd.DataFrame.from_dict(dict(zip(unique, counts)), orient='index').reset_index().sort_values(0, ascending = False)
 
 fig = plt.figure(figsize=(20, 10))
 
