@@ -206,7 +206,8 @@ def binarize(data, threshold=0.007):
     data[data < -threshold] = -1
     return data
 
-def count_pixels(data, mask=None):
+
+def count_pixels(data, mask=None, threshold=0.007):
     """
     Count the number and proportion of coloured pixels per subject
 
@@ -214,7 +215,7 @@ def count_pixels(data, mask=None):
     :param mask: optional. If provided, takes values inside mask into account in counting proportion colored
     :return: number of coloured pixels per subject
     """
-    data = binarize(data)
+    data = binarize(data, threshold)
     data = np.exp2(data)
     # sum all cells for each subject
     if mask is None:
@@ -226,6 +227,7 @@ def count_pixels(data, mask=None):
         counts_vector = np.sum(inside_mask, axis=1)
     prop_vector = [x / n_pixels for x in counts_vector]
     return counts_vector, prop_vector
+
 
 def count_pixels_posneg(data, mask=None, threshold=0.007):
     """
@@ -244,8 +246,11 @@ def count_pixels_posneg(data, mask=None, threshold=0.007):
     # sum all cells for each subject
     if mask is None:
         mask = np.ones((data.shape[1],data.shape[2]))
+    else:
+        mask[mask != 1] = 0
+    # this cuts out tons of pos data -why??
     inside_mask_pos = data_pos[:, mask == 1]
-    pos_vector = np.sum(inside_mask_pos, axis=1)
+    pos_vector = np.count_nonzero(inside_mask_pos, axis=1)
     inside_mask_neg = data_neg[:, mask == 1]
     neg_vector = np.sum(inside_mask_neg, axis=1)
     n_pixels = np.sum(np.sum(mask))

@@ -7,11 +7,13 @@ from matplotlib.colors import ListedColormap, LinearSegmentedColormap
 
 figloc = '/Users/juusu53/Documents/projects/kipupotilaat/stockholm/figures/'
 maskloc = '/Users/juusu53/Documents/projects/kipupotilaat/python_code/sample_data/'
-dataloc = '/Volumes/Shield1/kipupotilaat/data/stockholm/processed/fibro/'
-datafile = get_latest_datafile(dataloc)
 
-dataloc_controls = '/Volumes/Shield1/kipupotilaat/data/stockholm/processed/lbp/'
-datafile_controls = get_latest_datafile(dataloc_controls)
+dataloc = '/Volumes/Shield1/kipupotilaat/data/stockholm/controls/all/'
+dataloc1 = '/Volumes/Shield1/kipupotilaat/data/stockholm/processed/fibro/'
+dataloc2 = '/Volumes/Shield1/kipupotilaat/data/stockholm/processed/lbp/'
+datafile_controls = get_latest_datafile(dataloc)
+datafile_fibro = get_latest_datafile(dataloc1)
+datafile_lbp = get_latest_datafile(dataloc2)
 
 mask_fb = read_in_mask(maskloc + 'mask_front_new.png', maskloc + 'mask_back_new.png')
 
@@ -39,16 +41,19 @@ fig = plt.figure(figsize=(20, 25))
 
 hotcool = cm.get_cmap('bwr', 256)
 newcolors = hotcool(np.linspace(0, 1, 256))
-outlinecolor = np.array([100/256, 100/256, 100/256, 1])
-newcolors = np.vstack((outlinecolor, newcolors))
+#outlinecolor = np.array([100/256, 100/256, 100/256, 1])
+#newcolors = np.vstack((outlinecolor, newcolors))
 newcmp = ListedColormap(newcolors)
 
 # Visualise group differences
 
 for i, cond in enumerate(stim_names.keys()):
     print("working on " + cond)
-    with h5py.File(datafile, 'r') as h:
-        kipu = h[cond][()]
+    with h5py.File(datafile_fibro, 'r') as h:
+        fibro = h[cond][()]
+    with h5py.File(datafile_lbp, 'r') as h:
+        lbp = h[cond][()]
+    kipu = np.concatenate((fibro,lbp))
 
     with h5py.File(datafile_controls, 'r') as c:
         control = c[cond][()]
@@ -125,7 +130,7 @@ for i, cond in enumerate(stim_names.keys()):
         ax4.set_axis_off()
 
         ax6 = plt.subplot(339)
-        img6 = plt.imshow(masked_twosamp, cmap=newcmp, vmin=-8, vmax=8)
+        img6 = plt.imshow(masked_twosamp, cmap=newcmp, vmin=-12, vmax=12)
         ax6.set_xticklabels([])
         ax6.set_yticklabels([])
         ax6.set_axis_off()
@@ -145,12 +150,12 @@ axcb.ax.tick_params(labelsize=20)
 cbar2_ax = fig.add_axes([x02+pad, y20+pad, width, y02-y20-2*pad])
 ax2cb = fig.colorbar(img6, cax=cbar2_ax)
 ax2cb.set_label(label='Difference', fontsize=20)
-ax2cb.ax.set_title('fibro >\nlbp', fontsize=20)
-ax2cb.ax.set_xlabel('lbp >\nfibro', fontsize=20)
+ax2cb.ax.tick_params(labelsize=20)
+ax2cb.ax.set_title('patient >\ncontrol', fontsize=20)
 
-plt.gcf().text(0.03, 0.76, "Fibromyaliga patients", fontsize=24, rotation=90)
-plt.gcf().text(0.03, 0.47, "LBP patients", fontsize=24, rotation=90)
+plt.gcf().text(0.03, 0.76, "Chronic pain patients", fontsize=24, rotation=90)
+plt.gcf().text(0.03, 0.47, "Pain-free controls", fontsize=24, rotation=90)
 plt.gcf().text(0.03, 0.18, "Difference", fontsize=24, rotation=90)
 
-plt.savefig(figloc+'sensitivity_location_fibro_clbp_manuscript_fig.png')
+plt.savefig(figloc+'sensitivity_location_controls_pain_manuscript_fig.png')
 plt.close()

@@ -9,7 +9,7 @@ import time
 import csv
 
 
-who = 'controls'
+who = 'stockholm'
 start = time.time()
 # set up stimuli description
 onesided = [True, True, True, True, True, True, True, False, False, False, False, False]
@@ -37,18 +37,16 @@ if who == 'controls':
                ['bpi_functioning', 'bpi_mood','bpi_walk','bpi_work', 'bpi_relationships','bpi_sleep','bpi_enjoyment']]
     csvname = '/Volumes/Shield1/kipupotilaat/data/stockholm/controls/test/bg_all_acceptable_controls_2025-02-19.csv'
 elif who == 'stockholm':
-    dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/stockholm/subjects/'
-    outdataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/stockholm/processed/'
-    subfile = '/m/nbe/scratch/socbrain/kipupotilaat/data/stockholm/stockholm_patients.csv'
-    subdata = pd.read_csv(subfile, sep=';')
-    subnums = list(subdata['subid'])
+    dataloc = '/Volumes/Shield1/kipupotilaat/data/stockholm_old/subjects/'
+    outdataloc = '/Volumes/Shield1/kipupotilaat/data/stockholm/processed/all'
+    subfile = '/Volumes/Shield1/kipupotilaat/data/stockholm/all_pain_patients_after_qc.txt'
     field_names = [['sex', 'age', 'weight','height','handedness','education','work_physical','work_sitting','psychologist','psychiatrist','neurologist'],
                ['pain_now','pain_last_day', 'pain_chronic','hist_migraine','hist_headache','hist_abdomen','hist_back_shoulder','hist_joint_limb','hist_menstrual',
                 'painkillers_overcounter','painkillers_prescription', 'painkillers_othercns'],
                ['feels_pain','feels_depression','feels_anxiety','feels_happy','feels_sad','feels_angry','feels_fear','feels_surprise','feels_disgust'],
                ['bpi_worst', 'bpi_least', 'bpi_average', 'bpi_now', 'bpi_painkiller_relief'],
                ['bpi_functioning', 'bpi_mood','bpi_walk','bpi_work', 'bpi_relationships','bpi_sleep','bpi_enjoyment']]
-    csvname = '/m/nbe/scratch/socbrain/kipupotilaat/data/bg_pain_stockholm_2024-01-05.csv'
+    csvname = '/Volumes/Shield1/kipupotilaat/data/stockholm/all_pain_patients_bg_2025-02-21.csv'
 elif who == 'stockholm_lbp':
     dataloc = '/Volumes/Shield1/backups_aalto_scratch/kipupotilaat/data/stockholm/subjects/'
     outdataloc = '/Volumes/Shield1/kipupotilaat/data/stockholm/processed/lbp/'
@@ -104,6 +102,17 @@ elif who == 'fibro_controls_stockholm':
                ['bpi_worst', 'bpi_least', 'bpi_average', 'bpi_now', 'bpi_painkiller_relief'],
                ['bpi_functioning', 'bpi_mood','bpi_walk','bpi_work', 'bpi_relationships','bpi_sleep','bpi_enjoyment']]
     csvname = '/Volumes/Shield1/kipupotilaat/data/stockholm/bg_fibromyalgia_matched_controls_stockholm_2024_03_22.csv'
+elif who == 'stockholm_test':
+    dataloc = '/Volumes/Shield1/kipupotilaat/data/stockholm_old/test_sub_after_server_upgrade/subjects/'
+    outdataloc = '/Volumes/Shield1/kipupotilaat/data/stockholm_old/test_sub_after_server_upgrade/processed/'
+    subfile = '/Volumes/Shield1/kipupotilaat/data/stockholm_old/test_sub_after_server_upgrade/subs.txt'
+    field_names = [['sex', 'age', 'weight','height','handedness','education','work_physical','work_sitting','profession','psychologist','psychiatrist', 'neurologist'],
+               ['pain_now','pain_last_day', 'pain_chronic','hist_migraine','hist_headache','hist_abdomen','hist_back_shoulder','hist_joint_limb','hist_menstrual',
+                'painkillers_overcounter','painkillers_prescription', 'painkillers_othercns'],
+               ['feels_pain','feels_depression','feels_anxiety','feels_happy','feels_sad','feels_angry','feels_fear','feels_surprise','feels_disgust'],
+               ['bpi_worst', 'bpi_least', 'bpi_average', 'bpi_now', 'bpi_painkiller_relief'],
+               ['bpi_functioning', 'bpi_mood','bpi_walk','bpi_work', 'bpi_relationships','bpi_sleep','bpi_enjoyment']]
+    csvname = '/Volumes/Shield1/kipupotilaat/data/stockholm_old/test_sub_after_server_upgrade/test.csv'
 
 
 with open(subfile) as f:

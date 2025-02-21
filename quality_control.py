@@ -9,12 +9,17 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-who = 'stockholm_fibro'
+who = 'stockholm_test'
 
 if who == 'control':
     dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/subjects/'
     outdataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/qc/'
     subfile = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/subs.txt'
+    csvname = '/m/nbe/scratch/socbrain/kipupotilaat/data/bg_all_controls.csv'
+if who == 'stockholm_test':
+    dataloc = '/Volumes/Shield1/kipupotilaat/data/stockholm_old/test_sub_after_server_upgrade/subjects'
+    outdataloc = '/Volumes/Shield1/kipupotilaat/data/stockholm_old/test_sub_after_server_upgrade/qc/'
+    subfile = '/Volumes/Shield1/kipupotilaat/data/stockholm_old/test_sub_after_server_upgrade/subs.txt'
     csvname = '/m/nbe/scratch/socbrain/kipupotilaat/data/bg_all_controls.csv'
 elif who == 'stockholm_lbp':
     dataloc = '/Volumes/Shield1/backups_aalto_scratch/kipupotilaat/data/stockholm/subjects/'
@@ -24,13 +29,6 @@ elif who == 'stockholm_fibro':
     dataloc = '/Volumes/Shield1/backups_aalto_scratch/kipupotilaat/data/stockholm/subjects/'
     outdataloc = '/Volumes/Shield1/kipupotilaat/data/stockholm/processed/fibro_patients_qc/'
     subfile = '/Volumes/Shield1/kipupotilaat/data/stockholm/stockholm_subnums_fibro_pre_qc.txt'
-elif who == 'matched_controls_helsinki':
-    dataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/subjects/'
-    outdataloc = '/m/nbe/scratch/socbrain/kipupotilaat/data/controls/qc/'
-    subfile = '/m/nbe/scratch/socbrain/kipupotilaat/data/age_and_gender_matched_subs_pain_helsinki.csv'
-    csvname = '/m/nbe/scratch/socbrain/kipupotilaat/data/bg_matched_controls_30_10_2019.csv'
-    matchdata = pd.read_csv(subfile)
-    subnums = [str(x) for x in list(matchdata['control_id'])]
 
 subnums = list(pd.read_csv(subfile, header=None)[0])
 onesided = [True, True, True, True, True, True, True, False, False, False, False, False]

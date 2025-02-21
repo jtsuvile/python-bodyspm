@@ -1,24 +1,24 @@
 from bodyfunctions import *
 import h5py
 import numpy as np
-import scipy.misc
 import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
-from matplotlib import gridspec
-from PIL import Image
-from operator import add
-from mpl_toolkits.axes_grid1 import make_axes_locatable
+
 from matplotlib import cm
 from matplotlib.colors import ListedColormap, LinearSegmentedColormap
 #
 dataloc = '/Volumes/Shield1/kipupotilaat/data/stockholm/processed/lbp/'
-dataloc1 = '/Volumes/Shield1/kipupotilaat/data/stockholm/processed/fibro/'
-outfilename = '/Users/juusu53/Documents/projects/kipupotilaat/stockholm/figures/emotions_lbp_fibro_threerows.png'
+dataloc1 = '/Volumes/Shield1/kipupotilaat/data/stockholm/controls/clbp/'
+outfilename = '/Users/juusu53/Documents/projects/kipupotilaat/stockholm/figures/emotions_clbp_and_controls_threerows.png'
 suptitle = 'Average emotions'
 
 
-datafile = get_latest_datafile(dataloc1)
-datafile_controls = get_latest_datafile(dataloc)
+datafile = get_latest_datafile(dataloc)
+datafile_controls = get_latest_datafile(dataloc1)
+# feature of data collection system
+threshold_pain = 0.001
+threshold_controls = 0.007
+
 
 maskloc = '/Users/juusu53/Documents/projects/kipupotilaat/python_code/sample_data/'
 
@@ -64,10 +64,10 @@ for i, cond in enumerate(stim_names.keys()):
     with h5py.File(datafile_controls, 'r') as c:
         control = c[cond][()]
 
-    prop_control = np.nanmean(binarize(control.copy()), axis=0)
+    prop_control = np.nanmean(binarize(control.copy(), threshold= threshold_controls), axis=0)
     masked_control= np.ma.masked_where(mask != 1,prop_control)
 
-    prop_kipu = np.nanmean(binarize(kipu.copy()), axis=0)
+    prop_kipu = np.nanmean(binarize(kipu.copy(), threshold=threshold_pain), axis=0)
     masked_kipu = np.ma.masked_where(mask != 1, prop_kipu)
 
     twosamp_t, twosamp_p = compare_groups(kipu, control)
@@ -96,7 +96,7 @@ for i, cond in enumerate(stim_names.keys()):
     ax2.set_axis_off()
 
     ax3 = plt.subplot(3,7,subplot_n_row_3)
-    im3 = ax3.imshow(masked_twosamp, cmap=newcmp, vmin=-8, vmax=8)
+    im3 = ax3.imshow(masked_twosamp, cmap=newcmp, vmin=-11.5, vmax=11.5)
     ax3.set_xticklabels([])
     ax3.set_yticklabels([])
     ax3.set_axis_off()
@@ -118,11 +118,10 @@ cbar2_ax = fig.add_axes([x02+pad, y20+pad, width, y02-y20-2*pad])
 ax2cb = fig.colorbar(im3, cax=cbar2_ax)
 ax2cb.set_label(label='Difference', fontsize=20)
 ax2cb.ax.tick_params(labelsize=20)
-ax2cb.ax.set_title('fibro > lbp', fontsize=20)
-ax2cb.ax.set_xlabel('lbp > fibro', fontsize=20)
+ax2cb.ax.set_title('patient > control', fontsize=20)
 
-plt.gcf().text(0.03, 0.74, "Fibromyalgia patients", fontsize=24, rotation=90)
-plt.gcf().text(0.03, 0.47, "LBP patients", fontsize=24, rotation=90)
+plt.gcf().text(0.03, 0.74, "CLBP patients", fontsize=24, rotation=90)
+plt.gcf().text(0.03, 0.4, "CLBP controls", fontsize=24, rotation=90)
 plt.gcf().text(0.03, 0.15, "Difference", fontsize=24, rotation=90)
 
 plt.savefig(outfilename)
