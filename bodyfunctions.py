@@ -248,9 +248,8 @@ def count_pixels_posneg(data, mask=None, threshold=0.007):
         mask = np.ones((data.shape[1],data.shape[2]))
     else:
         mask[mask != 1] = 0
-    # this cuts out tons of pos data -why??
     inside_mask_pos = data_pos[:, mask == 1]
-    pos_vector = np.count_nonzero(inside_mask_pos, axis=1)
+    pos_vector = np.sum(inside_mask_pos, axis=1)
     inside_mask_neg = data_neg[:, mask == 1]
     neg_vector = np.sum(inside_mask_neg, axis=1)
     n_pixels = np.sum(np.sum(mask))
