@@ -6,11 +6,12 @@ from matplotlib import cm
 from matplotlib.colors import ListedColormap, LinearSegmentedColormap
 
 figloc = '/Users/juusu53/Documents/projects/kipupotilaat/stockholm/figures/'
+figfilename = figloc+'pain_location_pain_controls.png'
 maskloc = '/Users/juusu53/Documents/projects/kipupotilaat/python_code/sample_data/'
-dataloc = '/Volumes/Shield1/kipupotilaat/data/stockholm/processed/fibro/'
+dataloc = '/Volumes/Shield1/kipupotilaat/data/stockholm/processed/all/'
 datafile = get_latest_datafile(dataloc)
 
-dataloc_controls = '/Volumes/Shield1/kipupotilaat/data/stockholm/processed/lbp/'
+dataloc_controls = '/Volumes/Shield1/kipupotilaat/data/stockholm/controls/all/'
 datafile_controls = get_latest_datafile(dataloc_controls)
 
 mask_fb = read_in_mask(maskloc + 'mask_front_new.png', maskloc + 'mask_back_new.png')
@@ -56,7 +57,7 @@ for i, cond in enumerate(stim_names.keys()):
     prop_control = prop_control + mask_array
     masked_control= np.ma.masked_where(mask != 1,prop_control)
 
-    prop_kipu = np.nanmean(binarize(kipu.copy()), axis=0)
+    prop_kipu = np.nanmean(binarize(kipu.copy(), threshold = 0.001), axis=0)
     prop_kipu = prop_kipu + mask_array
     masked_kipu = np.ma.masked_where(mask != 1, prop_kipu)
 
@@ -125,12 +126,12 @@ cbar2_ax = fig.add_axes([x02+pad, y20+pad, width, y02-y20-2*pad])
 ax2cb = fig.colorbar(img6, cax=cbar2_ax)
 ax2cb.set_label(label='Difference', fontsize=20)
 ax2cb.ax.tick_params(labelsize=20)
-ax2cb.ax.set_title('fibro >\nlbp', fontsize=20)
+ax2cb.ax.set_title('pain >\ncontrol', fontsize=20)
 ax2cb.ax.set_xlabel('lbp >\nfibro', fontsize=20)
 
-plt.gcf().text(0.03, 0.76, "Fibromyalgia patients", fontsize=24, rotation=90)
-plt.gcf().text(0.03, 0.47, "LBP patients", fontsize=24, rotation=90)
+plt.gcf().text(0.03, 0.76, "Pain Patients", fontsize=24, rotation=90)
+plt.gcf().text(0.03, 0.47, "Controls", fontsize=24, rotation=90)
 plt.gcf().text(0.03, 0.18, "Difference", fontsize=24, rotation=90)
 
-plt.savefig(figloc+'pain_location_fibro_lbp.png')
+plt.savefig(figfilename)
 plt.close()

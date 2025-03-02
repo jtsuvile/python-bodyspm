@@ -7,9 +7,9 @@ from matplotlib.colors import ListedColormap
 from matplotlib import cm
 from matplotlib.colors import ListedColormap, LinearSegmentedColormap
 #
-dataloc = '/Volumes/Shield1/kipupotilaat/data/stockholm/processed/lbp/'
-dataloc1 = '/Volumes/Shield1/kipupotilaat/data/stockholm/controls/clbp/'
-outfilename = '/Users/juusu53/Documents/projects/kipupotilaat/stockholm/figures/emotions_clbp_and_controls_threerows.png'
+dataloc = '/Volumes/Shield1/kipupotilaat/data/stockholm/processed/all/'
+dataloc1 = '/Volumes/Shield1/kipupotilaat/data/stockholm/controls/all/'
+outfilename = '/Users/juusu53/Documents/projects/kipupotilaat/stockholm/figures/emotions_all_pain_controls_threerows.png'
 suptitle = 'Average emotions'
 
 
