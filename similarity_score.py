@@ -5,6 +5,7 @@ from itertools import combinations
 from scipy.spatial.distance import jaccard, hamming
 
 who = 'patients'
+distance_metric = 'jaccard'
 
 if who == 'controls':
     dataloc = '/Volumes/Shield1/kipupotilaat/data/stockholm/controls/all/'
@@ -12,10 +13,11 @@ if who == 'controls':
     with h5py.File(datafile_controls, 'r') as c:
         data = c['emotions_0'][()]
         n_subs = len(data)
+    threshold = 0.007
 
 elif who == 'patients':
     dataloc1 = '/Volumes/Shield1/kipupotilaat/data/stockholm/processed/fibro/'
-    dataloc2 = '/Volumes/Shield1/kipupotilaat/data/stockholm/processed/lbp/'
+    dataloc2 = '/Volumes/Shield1/kipupotilaat/data/stockholm/processed/clbp/'
     datafile_fibro = get_latest_datafile(dataloc1)
     datafile_lbp = get_latest_datafile(dataloc2)
     with h5py.File(datafile_fibro, 'r') as c:
@@ -25,9 +27,10 @@ elif who == 'patients':
         data_lbp = c['emotions_0'][()]
         n_subs_lbp = len(data_lbp)
     n_subs = n_subs_fibro+n_subs_lbp
+    threshold = 0.001
     
 
-outfilename = f'/Volumes/Shield1/kipupotilaat/data/stockholm/hamming_distance_emotions_{who}.csv'
+outfilename = f'/Volumes/Shield1/kipupotilaat/data/stockholm/{distance_metric}_distance_emotions_{who}.csv'
 
 maskloc = '/Users/juusu53/Documents/projects/kipupotilaat/python_code/sample_data/'
 
@@ -65,13 +68,16 @@ for cond1_name, cond2_name in combinations(stimuli, 2):
         cond1 =  np.concatenate((cond1_lbp, cond1_fibro))
         cond2 =  np.concatenate((cond2_lbp, cond2_fibro))
 
-    cond1 = binarize(cond1)
-    cond2 = binarize(cond2)
+    cond1 = binarize(cond1, threshold=threshold)
+    cond2 = binarize(cond2, threshold=threshold)
 
     for i in range(n_subs):
         curr_subject_cond_1 = np.concatenate(cond1[i])
         curr_subject_cond_2 = np.concatenate(cond2[i])
-        curr_subject_res = hamming(curr_subject_cond_1, curr_subject_cond_2)
+        if distance_metric == 'jaccard':
+            curr_subject_res = jaccard(curr_subject_cond_1, curr_subject_cond_2)
+        elif distance_metric == 'hamming':
+            curr_subject_res = hamming(curr_subject_cond_1, curr_subject_cond_2)
         res.loc[i, f"{cond1_name}-{cond2_name}"] = curr_subject_res
 
 res.dropna().to_csv(outfilename, index = False)

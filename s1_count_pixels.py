@@ -5,9 +5,9 @@ from bodyfunctions import *
 import numpy as np
 import csv
 
-bgdatapath = '/Volumes/Shield1/kipupotilaat/data/stockholm/bg_pain_stockholm_fibro_with_activations_post_qc_03_2024.csv'
-dataloc = '/Volumes/Shield1/kipupotilaat/data/stockholm/processed/fibro'
-outfilename ='/Volumes/Shield1/kipupotilaat/data/stockholm/bg_fibro_pain_stockholm_with_activations_2025-02-21.csv'
+bgdatapath = '/Volumes/Shield1/kipupotilaat/data/stockholm/processed/clbp_pre_qc/bg_pain_stockholm_lbp_pre_qc_2025-03-02.csv'
+dataloc = '/Volumes/Shield1/kipupotilaat/data/stockholm/processed/clbp_pre_qc/'
+outfilename ='/Volumes/Shield1/kipupotilaat/data/stockholm/processed/clbp_pre_qc/bg_pain_stockholm_lbp_pre_qc_with_activations_2025-03-02.csv'
 threshold = 0.001 # 0.001 for patients, 0.007 for controls
 
 maskloc = '/Users/juusu53/Documents/projects/kipupotilaat/python_code/sample_data/'
