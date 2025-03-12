@@ -12,9 +12,9 @@ import csv
 who = 'stockholm_lbp'
 
 dataloc = '/Volumes/Shield1/backups_aalto_scratch/kipupotilaat/data/stockholm/subjects/'
-outdataloc = '/Volumes/Shield1/kipupotilaat/data/stockholm/processed/fibro/'
-subfile = '/Volumes/Shield1/kipupotilaat/data/stockholm/fibro_after_qc_2025-03-02.txt'
-csvname = '/Volumes/Shield1/kipupotilaat/data/stockholm/bg_fibro_after_qc_2025-03-02.csv'
+outdataloc = '/Volumes/Shield1/kipupotilaat/data/stockholm/processed/clbp/'
+subfile = '/Volumes/Shield1/kipupotilaat/data/stockholm/clbp_after_qc_2025-03-02.txt'
+csvname = '/Volumes/Shield1/kipupotilaat/data/stockholm/bg_clbp_after_qc_2025-03-02.csv'
 
 start = time.time()
 # set up stimuli description

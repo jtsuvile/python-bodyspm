@@ -43,10 +43,10 @@ stim_names = {
 
 stimuli = list(stim_names.keys())
 
-res = pd.DataFrame(np.nan, columns=[f"{stimuli[0]}-{stimuli[1]}",
-                            f"{stimuli[0]}-{stimuli[2]}",
-                            f"{stimuli[0]}-{stimuli[3]}",
-                            f"{stimuli[0]}-{stimuli[4]}",
+res = pd.DataFrame(np.nan, columns=[f"{stim_names[stimuli[0]]}-{stim_names[stimuli[1]]}",
+                            f"{stim_names[stimuli[0]]}-{stim_names[stimuli[2]]}",
+                            f"{stim_names[stimuli[0]]}-{stim_names[stimuli[3]]}",
+                            f"{stim_names[stimuli[0]]}-{stim_names[stimuli[4]]}",
                             ],
                             index = range(0,n_subs))
 
@@ -78,6 +78,6 @@ for cond1_name, cond2_name in combinations(stimuli, 2):
             curr_subject_res = jaccard(curr_subject_cond_1, curr_subject_cond_2)
         elif distance_metric == 'hamming':
             curr_subject_res = hamming(curr_subject_cond_1, curr_subject_cond_2)
-        res.loc[i, f"{cond1_name}-{cond2_name}"] = curr_subject_res
+        res.loc[i, f"{stim_names[cond1_name]}-{stim_names[cond2_name]}"] = curr_subject_res
 
 res.dropna().to_csv(outfilename, index = False)
