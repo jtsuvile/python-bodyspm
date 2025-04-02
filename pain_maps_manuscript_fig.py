@@ -6,7 +6,7 @@ from matplotlib import cm
 from matplotlib.colors import ListedColormap, LinearSegmentedColormap
 
 figloc = '/Users/juusu53/Documents/projects/kipupotilaat/stockholm/figures/'
-figfilename = figloc+'pain_location_pain_controls.png'
+figfilename = figloc+'pain_location_all-pain_all-controls.png'
 maskloc = '/Users/juusu53/Documents/projects/kipupotilaat/python_code/sample_data/'
 dataloc = '/Volumes/Shield1/kipupotilaat/data/stockholm/processed/all/'
 datafile = get_latest_datafile(dataloc)
@@ -129,8 +129,8 @@ ax2cb.ax.tick_params(labelsize=20)
 ax2cb.ax.set_title('pain >\ncontrol', fontsize=20)
 ax2cb.ax.set_xlabel('lbp >\nfibro', fontsize=20)
 
-plt.gcf().text(0.03, 0.76, "Pain Patients", fontsize=24, rotation=90)
-plt.gcf().text(0.03, 0.47, "Controls", fontsize=24, rotation=90)
+plt.gcf().text(0.03, 0.76, "Chronic pain patients", fontsize=24, rotation=90)
+plt.gcf().text(0.03, 0.47, "Pain-free controls", fontsize=24, rotation=90)
 plt.gcf().text(0.03, 0.18, "Difference", fontsize=24, rotation=90)
 
 plt.savefig(figfilename)

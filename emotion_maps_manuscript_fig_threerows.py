@@ -7,9 +7,9 @@ from matplotlib.colors import ListedColormap
 from matplotlib import cm
 from matplotlib.colors import ListedColormap, LinearSegmentedColormap
 #
-dataloc = '/Volumes/Shield1/kipupotilaat/data/stockholm/processed/all/'
-dataloc1 = '/Volumes/Shield1/kipupotilaat/data/stockholm/controls/all/'
-outfilename = '/Users/juusu53/Documents/projects/kipupotilaat/stockholm/figures/emotions_all_pain_controls_threerows.png'
+dataloc = '/Volumes/Shield1/kipupotilaat/data/stockholm/processed/clbp/'
+dataloc1 = '/Volumes/Shield1/kipupotilaat/data/stockholm/processed/fibro/'
+outfilename = '/Users/juusu53/Documents/projects/kipupotilaat/stockholm/figures/emotions_clbp_fibro.png'
 suptitle = 'Average emotions'
 
 
@@ -96,7 +96,7 @@ for i, cond in enumerate(stim_names.keys()):
     ax2.set_axis_off()
 
     ax3 = plt.subplot(3,7,subplot_n_row_3)
-    im3 = ax3.imshow(masked_twosamp, cmap=newcmp, vmin=-11.5, vmax=11.5)
+    im3 = ax3.imshow(masked_twosamp, cmap=newcmp, vmin=-13, vmax=13)
     ax3.set_xticklabels([])
     ax3.set_yticklabels([])
     ax3.set_axis_off()
@@ -121,7 +121,7 @@ ax2cb.ax.tick_params(labelsize=20)
 ax2cb.ax.set_title('patient > control', fontsize=20)
 
 plt.gcf().text(0.03, 0.74, "CLBP patients", fontsize=24, rotation=90)
-plt.gcf().text(0.03, 0.4, "CLBP controls", fontsize=24, rotation=90)
+plt.gcf().text(0.03, 0.4, "Fibromyalgia patients", fontsize=24, rotation=90)
 plt.gcf().text(0.03, 0.15, "Difference", fontsize=24, rotation=90)
 
 plt.savefig(outfilename)

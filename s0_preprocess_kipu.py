@@ -9,12 +9,14 @@ import time
 import csv
 
 
-who = 'stockholm_lbp'
+who = 'control'
 
+#dataloc = '/Volumes/Shield1/backups_aalto_scratch/kipupotilaat/data/controls/subjects/'
 dataloc = '/Volumes/Shield1/backups_aalto_scratch/kipupotilaat/data/stockholm/subjects/'
-outdataloc = '/Volumes/Shield1/kipupotilaat/data/stockholm/processed/clbp/'
-subfile = '/Volumes/Shield1/kipupotilaat/data/stockholm/clbp_after_qc_2025-03-02.txt'
-csvname = '/Volumes/Shield1/kipupotilaat/data/stockholm/bg_clbp_after_qc_2025-03-02.csv'
+
+outdataloc = '/Volumes/Shield1/kipupotilaat/data/stockholm/processed/fibro/'
+subfile = '/Volumes/Shield1/kipupotilaat/data/stockholm/fibro_2025-04-02.txt'
+csvname = '/Volumes/Shield1/kipupotilaat/data/stockholm/bg_fibro_2025-04-02.csv'
 
 start = time.time()
 # set up stimuli description
@@ -44,7 +46,7 @@ subnums = [x.strip() for x in subnums]
 #
 #
 # # read subjects from web output and write out to a more sensible format
-if who in ['helsinki','stockholm','stockholm_lbp','stockholm_fibro']:
+if who in ['helsinki','stockholm']:
     preprocess_subjects(subnums, dataloc, outdataloc, stim, bg_files, field_names, intentionally_empty=True)
 else:
     preprocess_subjects(subnums, dataloc, outdataloc, stim, bg_files, field_names)

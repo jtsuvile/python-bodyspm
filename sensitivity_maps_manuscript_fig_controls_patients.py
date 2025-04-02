@@ -8,12 +8,11 @@ from matplotlib.colors import ListedColormap, LinearSegmentedColormap
 figloc = '/Users/juusu53/Documents/projects/kipupotilaat/stockholm/figures/'
 maskloc = '/Users/juusu53/Documents/projects/kipupotilaat/python_code/sample_data/'
 
-dataloc = '/Volumes/Shield1/kipupotilaat/data/stockholm/controls/all/'
-dataloc1 = '/Volumes/Shield1/kipupotilaat/data/stockholm/processed/fibro/'
-dataloc2 = '/Volumes/Shield1/kipupotilaat/data/stockholm/processed/lbp/'
+outdataloc = figloc+'sensitivity_CLBP-fibro.png'
+dataloc = '/Volumes/Shield1/kipupotilaat/data/stockholm/processed/fibro/'
+dataloc1 = '/Volumes/Shield1/kipupotilaat/data/stockholm/processed/clbp/'
 datafile_controls = get_latest_datafile(dataloc)
-datafile_fibro = get_latest_datafile(dataloc1)
-datafile_lbp = get_latest_datafile(dataloc2)
+datafile_pain = get_latest_datafile(dataloc1)
 
 mask_fb = read_in_mask(maskloc + 'mask_front_new.png', maskloc + 'mask_back_new.png')
 
@@ -49,11 +48,8 @@ newcmp = ListedColormap(newcolors)
 
 for i, cond in enumerate(stim_names.keys()):
     print("working on " + cond)
-    with h5py.File(datafile_fibro, 'r') as h:
-        fibro = h[cond][()]
-    with h5py.File(datafile_lbp, 'r') as h:
-        lbp = h[cond][()]
-    kipu = np.concatenate((fibro,lbp))
+    with h5py.File(datafile_pain, 'r') as h:
+        kipu = h[cond][()]
 
     with h5py.File(datafile_controls, 'r') as c:
         control = c[cond][()]
@@ -153,9 +149,9 @@ ax2cb.set_label(label='Difference', fontsize=20)
 ax2cb.ax.tick_params(labelsize=20)
 ax2cb.ax.set_title('patient >\ncontrol', fontsize=20)
 
-plt.gcf().text(0.03, 0.76, "Chronic pain patients", fontsize=24, rotation=90)
-plt.gcf().text(0.03, 0.47, "Pain-free controls", fontsize=24, rotation=90)
+plt.gcf().text(0.03, 0.76, "CLBP patients", fontsize=24, rotation=90)
+plt.gcf().text(0.03, 0.47, "Fibromyalgia patients", fontsize=24, rotation=90)
 plt.gcf().text(0.03, 0.18, "Difference", fontsize=24, rotation=90)
 
-plt.savefig(figloc+'sensitivity_location_controls_pain_manuscript_fig.png')
+plt.savefig(outdataloc)
 plt.close()
