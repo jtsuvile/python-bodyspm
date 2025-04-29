@@ -10,6 +10,7 @@ from classdefinitions import Subject, Stimuli
 from datetime import datetime
 import h5py
 from tqdm import tqdm
+import matplotlib.pyplot as plt
 
 
 ## Data wrangling
@@ -258,6 +259,7 @@ def count_pixels_posneg(data, mask=None, threshold=0.007):
 
     return pos_vector, prop_pos, neg_vector, prop_neg
 
+
 def one_sample_t_test(data):
     """
     one sample t-test to see if coloured data is significantly more than 0
@@ -298,7 +300,7 @@ def compare_groups(group1, group2, testtype='t'):
         # tried an ugly solution to division by 0 in cases of extreme difference
         successes[0] = successes[0]+1
         successes[1] = successes[1]+1
-        
+
         # run proportions test for each pixel based on number of observations(counts) and number of coloured pixels (successes)
         map_out = list(map(lambda x, y: proportions_ztest(x,y), np.transpose(successes), np.transpose(counts))) # a little slow, is there a better iteration?
         #map_out = list(map(lambda x, y: proportions_chisquare(x,y), np.transpose(successes), np.transpose(counts))) # a little slow, is there a better iteration?
@@ -324,21 +326,35 @@ def correlate_maps(data, corr_with, method):
     if dims[0] is not len(corr_with): # NB: change this to a proper error at some point
         print('You need to provide exactly one value per subject for the analysis. Stopping execution.')
         return np.nan
-    # temporarily change data to 2-D to enable correlation analysis
+
+    # special implementation for pointbiserialr
+    if method == 'pointbiserialr':
+        corr_map, p_map = count_pointserialr_for_array(data, corr_with)
+        return corr_map, p_map
+
+    # other methods
+
+    # temporarily change data to 2-D to enable vectorized analysis
     data_reshaped = np.reshape(data, (dims[0], -1))
     # run correlation on each pixel separately
-    if method=='spearman':
-        corr_res, pvals = np.apply_along_axis(stats.spearmanr, data_reshaped, corr_with, axis=0)
-    if method=='pearson':
-        corr_res, pvals = np.apply_along_axis(stats.pearsonr,data_reshaped, corr_with, axis=0)
+    if method == 'spearmanr':
+        corr_res, pvals = np.apply_along_axis(stats.spearmanr, 0,
+                                              data_reshaped, corr_with,
+                                              nan_policy='omit')
+    elif method == 'pearson':
+        corr_res, pvals = np.apply_along_axis(stats.pearsonr, 0,
+                                              data_reshaped, corr_with,
+                                              nan_policy='omit')
+    else:
+        raise ValueError(f"analysis type {method} is not implemented. Or maybe there's a typo?")
+
     # reshape result
     corr_map = np.reshape(corr_res, (dims[1], dims[2]))
     p_map = np.reshape(pvals, (dims[1], dims[2]))
     return corr_map, p_map
 
 
-
-## Helper functions
+# Helper functions
 
 
 def get_latest_datafile(datadir):
@@ -353,7 +369,6 @@ def get_latest_datafile(datadir):
                 latestfile = file
             dataloc = os.path.join(datadir, latestfile)
     return dataloc
-
 
 
 def make_qc_figures(subnums, indataloc, stimuli, outdataloc = None):
@@ -373,8 +388,62 @@ def make_qc_figures(subnums, indataloc, stimuli, outdataloc = None):
         sub = Subject(subnum)
         sub.read_data(indataloc, stimuli, whole_image=True)
         sub.draw_sub_data(stimuli, fileloc=outdataloc, qc=True)
-    
     return "done with qc figures"
+
+
+def make_correlation_plot(result_map_r, result_map_p, mask, suptitle, outdataloc):
+    # fix plot color definitions
+    hot = plt.cm.get_cmap('hot', 256)
+    new_cols = hot(np.linspace(0, 1, 256))
+
+    cold = np.hstack((np.fliplr(new_cols[:, 0:3]), new_cols[:, 3][:, None]))
+    newcolors = np.vstack((np.flipud(cold), new_cols))
+    newcolors = np.delete(newcolors, np.arange(200, 312, 2), 0)
+
+    cmap = 'coolwarm'
+    vmin = -1
+    vmax = 1
+
+    # make versions of array with and without fdr correction
+    result_map_r_no_fdr = result_map_r.copy()
+    result_map_r_with_fdr = result_map_r.copy()
+
+    result_map_r_no_fdr[result_map_p > 0.05] = 0
+    masked_result_map_no_fdr = np.ma.masked_where(mask != 1, result_map_r_no_fdr)
+
+    result_map_p_corrected, twosamp_reject = p_adj_maps(result_map_p, mask=mask, method='fdr_bh')
+    result_map_r_with_fdr[result_map_p_corrected > 0.05] = 0
+    result_map_r_with_fdr[np.isnan(result_map_p_corrected)] = 0
+
+    masked_result_map_with_fdr = np.ma.masked_where(mask != 1, result_map_r_with_fdr)
+
+    # plotting
+    fig = plt.figure(figsize=(20, 10))
+
+    ax1 = plt.subplot(131)
+    img1 = plt.imshow(result_map_r, cmap=cmap, vmin=vmin, vmax=vmax)
+    ax1.title.set_text("Correlation coefficient, also showing insignificant")
+    fig.colorbar(img1, fraction=0.046, pad=0.04)
+    ax1.axis('off')
+
+    ax2 = plt.subplot(132)
+    img2 = plt.imshow(masked_result_map_no_fdr, cmap=cmap, vmin=-1, vmax=1)
+    ax2.title.set_text('Significant correlations before FDR')
+    fig.colorbar(img2, fraction=0.046, pad=0.04)
+    ax2.axis('off')
+
+    ax3 = plt.subplot(133)
+    img3 = plt.imshow(masked_result_map_with_fdr, cmap=cmap, vmin=-1, vmax=1)
+    ax3.title.set_text('Correlations that survive FDR')
+    fig.colorbar(img3, fraction=0.046, pad=0.04)
+    ax3.axis('off')
+
+    fig.suptitle(suptitle)
+
+    plt.savefig(outdataloc + '/' + suptitle + '.png')
+    plt.close()
+
+    return "done with plotting"
 
 
 def read_in_mask(file1, file2=None):
@@ -446,3 +515,77 @@ def p_adj_maps(pval_map, mask=None, alpha = 0.05, method='fdr_bh'):
         reject_map = np.ones(dims)
         reject_map[mask.astype(int) > 0] = reject
     return pval_map_corrected, reject_map
+
+
+def align_data(sublist, subarray, dataframe, subidcolumn='subid'):
+    """ Aligns two data items: a matrix and a dataframe in the same order
+    Sublist: a list of subject id's. This MUST be in the same order as the subject dimension in subarray
+    Subarray: an array with embody data. Subject dimension MUST be the first dimension.
+    Dataframe: a data frame with additional subject data to be aligned to the subarray
+    Subidcolumn: if the subject id column in the dataframe is not 'subid', define the column name
+    """
+
+    # First, let's create a mapping from subject ID to index in data_array
+    subject_to_index = {subject: idx for idx, subject in enumerate(sublist)}
+
+    # Create a new array to store the aligned data
+    # We'll first identify which subjects in df are also in subs
+    common_subjects = [s for s in dataframe[subidcolumn].values if s in subject_to_index]
+    n_common = len(common_subjects)
+
+    # Get the shape of each "picture" in data_array
+    pic_shape = subarray.shape[1:]  # This will be (height, width)
+
+    # Create new array with the right size
+    aligned_data = np.zeros((n_common,) + pic_shape)
+
+    # Create a new dataframe with only the common subjects
+    aligned_df = dataframe[dataframe[subidcolumn].isin(common_subjects)].copy().reset_index(drop=True)
+
+    # Fill the aligned_data array with data from data_array in the order of aligned_df
+    for i, subject in enumerate(aligned_df[subidcolumn]):
+        original_idx = subject_to_index[subject]
+        aligned_data[i] = subarray[original_idx]
+
+    return aligned_data, aligned_df
+
+
+def count_pointserialr_for_array(data, corr_with):
+    """
+    Helper function to count pointserialr correlation. 
+    """
+    # NB: The function is sensitive to missing values which is why this is not implemented with 
+    # np.apply_along_axis
+    dim1 = data.shape[1]
+    dim2 = data.shape[2]
+
+    result_map_r = np.zeros([dim1, dim2])
+    result_map_p = np.zeros([dim1, dim2])
+
+    # are we missing anything in the corr variable?
+    missing_corrvar = np.isnan(corr_with)
+    if (sum(missing_corrvar > 0)):
+        problem_indices_corrvariable = np.argwhere(missing_corrvar)
+    else:
+        problem_indices_corrvariable = np.array([])
+
+    for ind_i in range(0, dim1):
+        for ind_j in range(0, dim2):
+            # remove variables with nans
+            problem_indices_bodymap = np.argwhere(np.isnan(data[:, ind_i, ind_j]))
+            all_problem_indices = list(set(problem_indices_corrvariable.flatten()) | set(problem_indices_bodymap.flatten()))
+
+            # drop problematic values
+            bodymap_bin_no_nans = np.delete(data[:, ind_i, ind_j], all_problem_indices)
+            corr_variable_no_nans = np.delete(corr_with, all_problem_indices)
+
+            if len(set(bodymap_bin_no_nans)) == 1 | len(set(corr_variable_no_nans)) == 1:
+                correlation = 0
+                p_value = 1
+            else:
+                correlation, p_value = stats.pointbiserialr(bodymap_bin_no_nans, corr_variable_no_nans)
+
+            result_map_p[ind_i, ind_j] = p_value
+            result_map_r[ind_i, ind_j] = correlation
+
+    return result_map_r, result_map_p
