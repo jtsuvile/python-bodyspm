@@ -1,13 +1,16 @@
 import pandas as pd
-from bodyfunctions import make_correlation_plot, binarize, correlate_maps, align_data
-from bodyfunctions import get_latest_datafile, read_in_mask
+from bodyfunctions import make_correlation_plot, binarize, correlate_maps
+from bodyfunctions import get_latest_datafile, read_in_mask, align_data
 import h5py
 
 dataloc = '/Volumes/Shield1/kipupotilaat/data/stockholm/processed/all'
-tableloc = '/Volumes/Shield1/kipupotilaat/data/stockholm/intermediate/stockholm_questionnaires_munged.csv'
+tableloc = '/Volumes/Shield1/kipupotilaat/data/stockholm/intermediate/' +\
+    'stockholm_questionnaires_munged.csv'
 outdataloc = '/Users/juusu53/Documents/projects/kipupotilaat/stockholm/figures/'
-interesting_variables = ["lidande_genomsnitt", "obehag_genomsnitt", "styrka_genomsnitt", 'smartduration_decimalt']
-# which_maps = ['pain_0', 'pain_1', 'sensitivity_0', 'sensitivity_1', 'sensitivity_2']
+interesting_variables = ["lidande_genomsnitt", "obehag_genomsnitt",
+                         "styrka_genomsnitt", 'smartduration_decimalt']
+# which_maps = ['pain_0', 'pain_1',
+#               'sensitivity_0', 'sensitivity_1', 'sensitivity_2']
 # analysis = 'pointbiserialr'
 which_maps = ['emotions_0', 'emotions_1', 'emotions_2', 'emotions_3',
               'emotions_4', 'emotions_5', 'emotions_6']
@@ -15,17 +18,26 @@ analysis = 'spearmanr'
 
 threshold = 0.001  # 0.001 for patients, 0.007 for controls
 
-maskloc = '/Users/juusu53/Documents/projects/kipupotilaat/python_code/sample_data/'
+maskloc = '/Users/juusu53/Documents/projects/kipupotilaat/' +\
+    'python_code/sample_data/'
 datafile = get_latest_datafile(dataloc)
 
 mask_one = read_in_mask(maskloc + 'mask_front_new.png')
-mask_fb = read_in_mask(maskloc + 'mask_front_new.png', maskloc + 'mask_back_new.png')
+mask_fb = read_in_mask(maskloc + 'mask_front_new.png',
+                       maskloc + 'mask_back_new.png')
 
-stim_names = {'emotions_0': ['sadness', 0], 'emotions_1': ['happiness', 0], 'emotions_2': ['anger', 0],
-              'emotions_3': ['surprise', 0], 'emotions_4': ['fear', 0], 'emotions_5': ['disgust', 0],
+stim_names = {'emotions_0': ['sadness', 0],
+              'emotions_1': ['happiness', 0],
+              'emotions_2': ['anger', 0],
+              'emotions_3': ['surprise', 0],
+              'emotions_4': ['fear', 0],
+              'emotions_5': ['disgust', 0],
               'emotions_6': ['neutral', 0],
-              'pain_0': ['current_pain', 1], 'pain_1': ['chonic_pain', 1], 'sensitivity_0': ['tactile_sensitivity', 1],
-              'sensitivity_1': ['nociceptive_sensitivity', 1], 'sensitivity_2': ['hedonic_sensitivity', 1]}
+              'pain_0': ['current_pain', 1],
+              'pain_1': ['chonic_pain', 1],
+              'sensitivity_0': ['tactile_sensitivity', 1],
+              'sensitivity_1': ['nociceptive_sensitivity', 1],
+              'sensitivity_2': ['hedonic_sensitivity', 1]}
 
 
 # read in data
@@ -54,5 +66,7 @@ for which_map in which_maps:
             mask = mask_one
         else:
             mask = mask_fb
-        suptitle = f'{analysis} correlation between {variablename} and {stim_names[which_map][0]}'
-        make_correlation_plot(result_map_r, result_map_p, mask, suptitle, outdataloc)
+        suptitle = f'{analysis} correlation between {variablename} ' +\
+                   f'and {stim_names[which_map][0]}'
+        make_correlation_plot(result_map_r, result_map_p,
+                              mask, suptitle, outdataloc)
