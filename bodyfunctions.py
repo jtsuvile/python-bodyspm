@@ -386,7 +386,7 @@ def correlate_maps(data, corr_with, method):
     """
     dims = data.shape
     # TODO: change this to a proper error at some point
-    if dims[0] is not len(corr_with):
+    if dims[0] != len(corr_with):
         print('You need to provide exactly one value per subject ' +
               'for the analysis. Stopping execution.')
         return np.nan

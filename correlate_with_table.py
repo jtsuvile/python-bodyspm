@@ -5,16 +5,19 @@ import h5py
 
 dataloc = '/Volumes/Shield1/kipupotilaat/data/stockholm/processed/all'
 tableloc = '/Volumes/Shield1/kipupotilaat/data/stockholm/intermediate/' +\
-    'stockholm_questionnaires_munged.csv'
-outdataloc = '/Users/juusu53/Documents/projects/kipupotilaat/stockholm/figures/'
-interesting_variables = ["lidande_genomsnitt", "obehag_genomsnitt",
-                         "styrka_genomsnitt", 'smartduration_decimalt']
-# which_maps = ['pain_0', 'pain_1',
-#               'sensitivity_0', 'sensitivity_1', 'sensitivity_2']
-# analysis = 'pointbiserialr'
-which_maps = ['emotions_0', 'emotions_1', 'emotions_2', 'emotions_3',
-              'emotions_4', 'emotions_5', 'emotions_6']
-analysis = 'spearmanr'
+    'stockholm_questionnaires_scored.csv'
+outdataloc = '/Users/juusu53/Documents/projects/kipupotilaat/stockholm/r_code/figures/'
+interesting_variables = ["styrka_nu", "styrka_genomsnitt",
+                         "lidande_nu", "lidande_genomsnitt",
+                         "obehag_nu", "obehag_genomsnitt",
+                         "pain_duration", "score_pain_intensity", "score_bpi_inference"]
+# "score_bdi", "score_stai_state", "score_stai_trait"]
+which_maps = ['pain_0', 'pain_1',
+              'sensitivity_0', 'sensitivity_1', 'sensitivity_2']
+analysis = 'pointbiserialr'
+# which_maps = ['emotions_0', 'emotions_1', 'emotions_2', 'emotions_3',
+#               'emotions_4', 'emotions_5', 'emotions_6']
+# analysis = 'spearmanr'
 
 threshold = 0.001  # 0.001 for patients, 0.007 for controls
 
