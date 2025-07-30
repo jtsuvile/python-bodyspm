@@ -535,21 +535,27 @@ def read_in_mask(file1, file2=None):
     :return: numpy array of the mask with 1=include, 0=exclude
     """
     mask_array = io.imread(file1)
+    mask_array = adjust_mask_values(mask_array)
+    if file2 is not None:
+        mask_other_side = io.imread(file2)
+        mask_other_side = adjust_mask_values(mask_array)
+        mask_array = np.concatenate((mask_array, mask_other_side), axis=1)
+    return mask_array
+
+
+def adjust_mask_values(mask_array):
+    """
+    Convert mask figure to 1 == black and 0 == white to allow use as mask
+    """
     dims = mask_array.shape
     if len(dims) == 3:
         mask_array = mask_array[:, :, 0]
-    mask_array[mask_array < 1] = 0
-    mask_array = mask_array * -1
-    mask_array = mask_array + 1
-    if file2 is not None:
-        mask_other_side = io.imread(file2)
-        dims = mask_other_side.shape
-        if len(dims) == 3:
-            mask_other_side = mask_other_side[:, :, 0]
-        mask_other_side[mask_other_side < 1] = 0
-        mask_other_side = mask_other_side * -1
-        mask_other_side = mask_other_side + 1
-        mask_array = np.concatenate((mask_array, mask_other_side), axis=1)
+    if np.max(mask_array) == 255:
+        mask_array = np.where(mask_array == 0, 1, 0)
+    elif len(np.unique(mask_array))==2:
+        mask_array = mask_array # we don't need to do anything
+    else:
+        raise Exception("Expecting to see picture with white for background")
     return mask_array
 
 
@@ -635,7 +641,7 @@ def align_data(sublist, subarray, dataframe, subidcolumn='subid'):
     for i, subject in enumerate(aligned_df[subidcolumn]):
         original_idx = subject_to_index[subject]
         aligned_data[i] = subarray[original_idx]
-
+    print(n_common)
     return aligned_data, aligned_df
 
 
@@ -687,3 +693,13 @@ def count_pointserialr_for_array(data, corr_with):
             result_map_r[ind_i, ind_j] = correlation
 
     return result_map_r, result_map_p
+
+
+def extract_masked_vector(array, mask):
+    """
+    Given a 2D array and mask that are the same size,
+    take non-masked elements (elements value 0 in mask)
+    and make those into vector for further processing
+    """
+    res_vector = np.ma.concatenate(np.ma.masked_where(mask != 1, array)).compressed()
+    return res_vector

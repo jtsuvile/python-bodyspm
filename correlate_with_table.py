@@ -10,7 +10,7 @@ outdataloc = '/Users/juusu53/Documents/projects/kipupotilaat/stockholm/r_code/fi
 interesting_variables = ["styrka_nu", "styrka_genomsnitt",
                          "lidande_nu", "lidande_genomsnitt",
                          "obehag_nu", "obehag_genomsnitt",
-                         "pain_duration", "score_pain_intensity", "score_bpi_inference"]
+                         "pain_duration", "score_pain_intensity", "score_bpi_interference"]
 # "score_bdi", "score_stai_state", "score_stai_trait"]
 which_maps = ['pain_0', 'pain_1',
               'sensitivity_0', 'sensitivity_1', 'sensitivity_2']
