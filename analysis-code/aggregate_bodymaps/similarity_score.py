@@ -14,19 +14,30 @@ from scipy.spatial.distance import jaccard, hamming
 from scipy.stats import spearmanr
 
 # settings
-who = 'controls'
+who = 'patients'
+what = 'twosided'
 distance_metric = 'jaccard'
-outfilename = f'/Volumes/Shield1/kipupotilaat/data/stockholm/intermediate/{distance_metric}_distance_emotions_{who}.csv'
+outfilename = f'/Volumes/Shield1/kipupotilaat/data/stockholm/intermediate/{distance_metric}_distance_{what}_{who}.csv'
 maskloc = '/Users/juusu53/Documents/projects/kipupotilaat/python_code/sample_data/'
-mask = read_in_mask(maskloc + 'mask_front_new.png')
 
-stim_names = {
-    'emotions_0': ['Sadness', 0],
-    'emotions_2': ['Anger', 0],
-    'emotions_3': ['Surprise', 0],
-    'emotions_4': ['Fear', 0],  
-    'emotions_5': ['Disgust', 0],
-    'emotions_1': ['Happiness', 0]}
+if what == 'emotions':
+    mask = read_in_mask(maskloc + 'mask_front_new.png')
+    stim_names = {
+        'emotions_0': ['Sadness', 0],
+        'emotions_2': ['Anger', 0],
+        'emotions_3': ['Surprise', 0],
+        'emotions_4': ['Fear', 0],  
+        'emotions_5': ['Disgust', 0],
+        'emotions_1': ['Happiness', 0],
+        'emotions_6': ['Neutral', 0]}
+if what == 'twosided':
+    mask = read_in_mask(maskloc + 'mask_front_new.png', maskloc + 'mask_back_new.png')
+    stim_names = {'pain_0': ['Current pain', 1],
+                'pain_1': ['Chonic pain', 1],
+                'sensitivity_0': ['Tactile sensitivity', 1],
+                'sensitivity_1': ['Nociceptive sensitivity', 1],
+                'sensitivity_2': ['Hedonic sensitivity', 1]}
+
 stimuli = list(stim_names.keys())
 
 # 

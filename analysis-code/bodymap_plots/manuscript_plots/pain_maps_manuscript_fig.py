@@ -1,3 +1,11 @@
+import os
+import sys
+import inspect
+
+currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+parentdir = os.path.dirname(os.path.dirname(os.path.dirname(currentdir)))
+sys.path.insert(0, parentdir) 
+
 from bodyfunctions import *
 import h5py
 import numpy as np
@@ -5,7 +13,7 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 from matplotlib.colors import ListedColormap, LinearSegmentedColormap
 
-figloc = '/Users/juusu53/Documents/projects/kipupotilaat/stockholm/figures/'
+figloc = '/Users/juusu53/Documents/projects/kipupotilaat/stockholm/r_code/figures/'
 figfilename = figloc+'pain_location_all-pain_all-controls.png'
 maskloc = '/Users/juusu53/Documents/projects/kipupotilaat/python_code/sample_data/'
 dataloc = '/Volumes/Shield1/kipupotilaat/data/stockholm/processed/all/'

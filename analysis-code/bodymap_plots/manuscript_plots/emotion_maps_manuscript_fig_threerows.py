@@ -1,3 +1,12 @@
+import os
+import sys
+import inspect
+
+currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+parentdir = os.path.dirname(os.path.dirname(os.path.dirname(currentdir)))
+sys.path.insert(0, parentdir) 
+
+
 from bodyfunctions import *
 import h5py
 import numpy as np
@@ -9,7 +18,7 @@ from matplotlib.colors import ListedColormap, LinearSegmentedColormap
 #
 dataloc = '/Volumes/Shield1/kipupotilaat/data/stockholm/processed/clbp/'
 dataloc1 = '/Volumes/Shield1/kipupotilaat/data/stockholm/processed/fibro/'
-outfilename = '/Users/juusu53/Documents/projects/kipupotilaat/stockholm/figures/emotions_clbp_fibro.png'
+outfilename = '/Users/juusu53/Documents/projects/kipupotilaat/stockholm/r_code/figures/emotions_clbp_fibro.png'
 suptitle = 'Average emotions'
 
 
@@ -17,7 +26,7 @@ datafile = get_latest_datafile(dataloc)
 datafile_controls = get_latest_datafile(dataloc1)
 # feature of data collection system
 threshold_pain = 0.001
-threshold_controls = 0.007
+threshold_controls = 0.001
 
 
 maskloc = '/Users/juusu53/Documents/projects/kipupotilaat/python_code/sample_data/'

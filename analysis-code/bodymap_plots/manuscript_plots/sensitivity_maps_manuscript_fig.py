@@ -1,3 +1,11 @@
+import os
+import sys
+import inspect
+
+currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+parentdir = os.path.dirname(os.path.dirname(os.path.dirname(currentdir)))
+sys.path.insert(0, parentdir) 
+
 from bodyfunctions import *
 import h5py
 import numpy as np
@@ -5,13 +13,15 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 from matplotlib.colors import ListedColormap, LinearSegmentedColormap
 
-figloc = '/Users/juusu53/Documents/projects/kipupotilaat/stockholm/figures/'
-figfilename = figloc+'sensitivity_location_clbp_control.png'
+figloc = '/Users/juusu53/Documents/projects/kipupotilaat/stockholm/r_code/figures/'
+figfilename = figloc+'sensitivity_location_patients_controls.png'
 maskloc = '/Users/juusu53/Documents/projects/kipupotilaat/python_code/sample_data/'
-dataloc = '/Volumes/Shield1/kipupotilaat/data/stockholm/processed/lbp/'
-datafile = get_latest_datafile(dataloc)
+dataloc1 = '/Volumes/Shield1/kipupotilaat/data/stockholm/processed/fibro/'
+dataloc2 = '/Volumes/Shield1/kipupotilaat/data/stockholm/processed/clbp/'
+datafile_fibro = get_latest_datafile(dataloc1)
+datafile_lbp = get_latest_datafile(dataloc2)
 
-dataloc_controls = '/Volumes/Shield1/kipupotilaat/data/stockholm/controls/clbp/'
+dataloc_controls = '/Volumes/Shield1/kipupotilaat/data/stockholm/controls/all/'
 datafile_controls = get_latest_datafile(dataloc_controls)
 
 mask_fb = read_in_mask(maskloc + 'mask_front_new.png', maskloc + 'mask_back_new.png')
@@ -48,12 +58,15 @@ newcmp = ListedColormap(newcolors)
 
 for i, cond in enumerate(stim_names.keys()):
     print("working on " + cond)
-    with h5py.File(datafile, 'r') as h:
-        kipu = h[cond][()]
+    with h5py.File(datafile_fibro, 'r') as h:
+        fibro = h[cond][()]
+    with h5py.File(datafile_lbp, 'r') as h:
+        lbp = h[cond][()]
 
     with h5py.File(datafile_controls, 'r') as c:
         control = c[cond][()]
-
+    
+    kipu = np.concatenate((fibro,lbp))
     prop_control = np.nanmean(binarize(control.copy()), axis=0)
     prop_control = prop_control + mask_array
     masked_control= np.ma.masked_where(mask != 1,prop_control)
@@ -86,7 +99,7 @@ for i, cond in enumerate(stim_names.keys()):
         ax3.set_axis_off()
 
         ax5 = plt.subplot(337)
-        img5 = plt.imshow(masked_twosamp, cmap=newcmp, vmin=-12, vmax=12)
+        img5 = plt.imshow(masked_twosamp, cmap=newcmp, vmin=-12.5, vmax=12.5)
         ax5.set_xticklabels([])
         ax5.set_yticklabels([])
         ax5.set_axis_off()

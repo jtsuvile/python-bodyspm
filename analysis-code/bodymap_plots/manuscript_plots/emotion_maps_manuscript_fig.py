@@ -1,3 +1,11 @@
+import os
+import sys
+import inspect
+
+currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+parentdir = os.path.dirname(os.path.dirname(os.path.dirname(currentdir)))
+sys.path.insert(0, parentdir) 
+
 from bodyfunctions import *
 import h5py
 import numpy as np
@@ -7,8 +15,8 @@ from matplotlib import cm
 
 dataloc = '/Volumes/Shield1/kipupotilaat/data/stockholm/controls/all/'
 dataloc1 = '/Volumes/Shield1/kipupotilaat/data/stockholm/processed/fibro/'
-dataloc2 = '/Volumes/Shield1/kipupotilaat/data/stockholm/processed/lbp/'
-outfilename = '/Users/juusu53/Documents/projects/kipupotilaat/stockholm/figures/emotions_all_pain_all_controls.png'
+dataloc2 = '/Volumes/Shield1/kipupotilaat/data/stockholm/processed/clbp/'
+outfilename = '/Users/juusu53/Documents/projects/kipupotilaat/stockholm/r_code/figures/emotions_all_pain_all_controls.png'
 suptitle = 'Average emotions'
 
 
@@ -38,8 +46,8 @@ cmap = ListedColormap(newcolors)
 # colormap for difference
 hotcool = cm.get_cmap('bwr', 256)
 newcolors = hotcool(np.linspace(0, 1, 256))
-outlinecolor = np.array([100/256, 100/256, 100/256, 1])
-newcolors = np.vstack((outlinecolor, newcolors))
+#outlinecolor = np.array([100/256, 100/256, 100/256, 1])
+#newcolors = np.vstack((outlinecolor, newcolors))
 newcmp = ListedColormap(newcolors)
 
 vmin = -1
@@ -61,10 +69,10 @@ for i, cond in enumerate(stim_names.keys()):
         control = c[cond][()]
 
     kipu = np.concatenate((fibro,lbp))
-    prop_control = np.nanmean(binarize(control.copy()), axis=0)
+    prop_control = np.nanmean(binarize(control.copy(), threshold=0.007), axis=0)
     masked_control= np.ma.masked_where(mask != 1,prop_control)
 
-    prop_kipu = np.nanmean(binarize(kipu.copy()), axis=0)
+    prop_kipu = np.nanmean(binarize(kipu.copy(), threshold=0.001), axis=0)
     masked_kipu = np.ma.masked_where(mask != 1, prop_kipu)
 
     twosamp_t, twosamp_p = compare_groups(kipu, control)
@@ -93,7 +101,7 @@ for i, cond in enumerate(stim_names.keys()):
     ax2.set_axis_off()
 
     ax3 = plt.subplot(3,7,subplot_n_row_3)
-    im3 = ax3.imshow(masked_twosamp, cmap=newcmp, vmin=-11.5, vmax=11.5)
+    im3 = ax3.imshow(masked_twosamp, cmap=newcmp, vmin=-12.5, vmax=12.5)
     ax3.set_xticklabels([])
     ax3.set_yticklabels([])
     ax3.set_axis_off()

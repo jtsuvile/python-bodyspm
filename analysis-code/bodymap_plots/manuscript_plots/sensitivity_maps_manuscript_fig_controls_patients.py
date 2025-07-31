@@ -1,3 +1,11 @@
+import os
+import sys
+import inspect
+
+currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+parentdir = os.path.dirname(os.path.dirname(os.path.dirname(currentdir)))
+sys.path.insert(0, parentdir) 
+
 from bodyfunctions import *
 import h5py
 import numpy as np
@@ -5,7 +13,7 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 from matplotlib.colors import ListedColormap, LinearSegmentedColormap
 
-figloc = '/Users/juusu53/Documents/projects/kipupotilaat/stockholm/figures/'
+figloc = '/Users/juusu53/Documents/projects/kipupotilaat/stockholm/r_code/figures/'
 maskloc = '/Users/juusu53/Documents/projects/kipupotilaat/python_code/sample_data/'
 
 outdataloc = figloc+'sensitivity_CLBP-fibro.png'
@@ -40,8 +48,8 @@ fig = plt.figure(figsize=(20, 25))
 
 hotcool = cm.get_cmap('bwr', 256)
 newcolors = hotcool(np.linspace(0, 1, 256))
-#outlinecolor = np.array([100/256, 100/256, 100/256, 1])
-#newcolors = np.vstack((outlinecolor, newcolors))
+outlinecolor = np.array([100/256, 100/256, 100/256, 1])
+newcolors = np.vstack((outlinecolor, newcolors))
 newcmp = ListedColormap(newcolors)
 
 # Visualise group differences
@@ -58,7 +66,7 @@ for i, cond in enumerate(stim_names.keys()):
     prop_control = prop_control + mask_array
     masked_control= np.ma.masked_where(mask != 1,prop_control)
 
-    prop_kipu = np.nanmean(binarize(kipu.copy()), axis=0)
+    prop_kipu = np.nanmean(binarize(kipu.copy(), threshold=0.001), axis=0)
     prop_kipu = prop_kipu + mask_array
     masked_kipu = np.ma.masked_where(mask != 1, prop_kipu)
 
@@ -86,7 +94,7 @@ for i, cond in enumerate(stim_names.keys()):
         ax3.set_axis_off()
 
         ax5 = plt.subplot(337)
-        img5 = plt.imshow(masked_twosamp, cmap=newcmp, vmin=-8, vmax=8)
+        img5 = plt.imshow(masked_twosamp, cmap=newcmp, vmin=-12, vmax=12)
         ax5.set_xticklabels([])
         ax5.set_yticklabels([])
         ax5.set_axis_off()
@@ -106,7 +114,7 @@ for i, cond in enumerate(stim_names.keys()):
         ax4.set_axis_off()
 
         ax6 = plt.subplot(338)
-        img6 = plt.imshow(masked_twosamp, cmap=newcmp, vmin=-8, vmax=8)
+        img6 = plt.imshow(masked_twosamp, cmap=newcmp, vmin=-12, vmax=12)
         ax6.set_xticklabels([])
         ax6.set_yticklabels([])
         ax6.set_axis_off()
