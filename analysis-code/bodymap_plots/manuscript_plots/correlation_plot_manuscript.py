@@ -16,14 +16,14 @@ dataloc = '/Volumes/Shield1/kipupotilaat/data/stockholm/processed/all'
 tableloc = '/Volumes/Shield1/kipupotilaat/data/stockholm/intermediate/' +\
     'stockholm_questionnaires_scored.csv'
 outdataloc = '/Users/juusu53/Documents/projects/kipupotilaat/stockholm/r_code/figures/'
-map_family = 'emotions'
+map_family = 'sensitivity'
 
-# interesting_variables = ["pain_duration", #"score_bdi", "score_stai_state", "score_stai_trait", 
-#                          "styrka_nu", "styrka_genomsnitt", "intensity_range",
-#                          "lidande_nu", "lidande_genomsnitt", "suffering_range",
-#                          "obehag_nu", "obehag_genomsnitt", "discomfort_range",
-#                          "score_pain_intensity", "score_bpi_interference"]
-interesting_variables = ["score_bdi", "score_stai_state", "score_stai_trait"]
+interesting_variables = ["pain_duration", "score_bdi", "score_stai_state", "score_stai_trait", 
+                         "styrka_nu", "styrka_genomsnitt", "intensity_range",
+                         "lidande_nu", "lidande_genomsnitt", "suffering_range",
+                         "obehag_nu", "obehag_genomsnitt", "discomfort_range",
+                         "score_pain_intensity", "score_bpi_interference"]
+#interesting_variables = ["score_bdi", "score_stai_state", "score_stai_trait"]
 
 threshold = 0.001  # 0.001 for patients, 0.007 for controls
 

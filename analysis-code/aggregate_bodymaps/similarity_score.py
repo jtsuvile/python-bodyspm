@@ -14,7 +14,7 @@ from scipy.spatial.distance import jaccard, hamming
 from scipy.stats import spearmanr
 
 # settings
-who = 'patients'
+who = 'controls'
 what = 'twosided'
 distance_metric = 'jaccard'
 outfilename = f'/Volumes/Shield1/kipupotilaat/data/stockholm/intermediate/{distance_metric}_distance_{what}_{who}.csv'
@@ -33,10 +33,26 @@ if what == 'emotions':
 if what == 'twosided':
     mask = read_in_mask(maskloc + 'mask_front_new.png', maskloc + 'mask_back_new.png')
     stim_names = {'pain_0': ['Current pain', 1],
-                'pain_1': ['Chonic pain', 1],
+                'pain_1': ['Chronic pain', 1],
                 'sensitivity_0': ['Tactile sensitivity', 1],
                 'sensitivity_1': ['Nociceptive sensitivity', 1],
                 'sensitivity_2': ['Hedonic sensitivity', 1]}
+if what == 'twosided_vs_emotions':
+    mask = read_in_mask(maskloc + 'mask_front_new.png')
+    stim_names = {
+        'pain_0': ['Current pain', 1],
+        'pain_1': ['Chronic pain', 1],
+        'sensitivity_0': ['Tactile sensitivity', 1],
+        'sensitivity_1': ['Nociceptive sensitivity', 1],
+        'sensitivity_2': ['Hedonic sensitivity', 1],
+        'emotions_0': ['Sadness', 0],
+        'emotions_2': ['Anger', 0],
+        'emotions_3': ['Surprise', 0],
+        'emotions_4': ['Fear', 0],  
+        'emotions_5': ['Disgust', 0],
+        'emotions_1': ['Happiness', 0],
+        'emotions_6': ['Neutral', 0]
+}
 
 stimuli = list(stim_names.keys())
 
@@ -56,13 +72,8 @@ with h5py.File(datafile, 'r') as c:
     n_subs = len(subs)
 
 
-
 res = pd.DataFrame(np.nan, columns=[
-    f"{distance_metric}_{stim_names[stimuli[0]][0]}_{stim_names[stimuli[1]][0]}",
-                            f"{distance_metric}_{stim_names[stimuli[0]][0]}_{stim_names[stimuli[2]][0]}",
-                            f"{distance_metric}_{stim_names[stimuli[0]][0]}_{stim_names[stimuli[3]][0]}",
-                            f"{distance_metric}_{stim_names[stimuli[0]][0]}_{stim_names[stimuli[4]][0]}",
-                            ],
+    f"{distance_metric}_{stim_names[stimuli[0]][0]}_{stim_names[stimuli[1]][0]}"],
                             index = subs)
 
 for cond1_name, cond2_name in combinations(stimuli, 2):
@@ -71,7 +82,21 @@ for cond1_name, cond2_name in combinations(stimuli, 2):
     with h5py.File(datafile, 'r') as c:
         cond1 = c[cond1_name][()]
         cond2 = c[cond2_name][()]
+    
+    colname = f"{distance_metric}_{stim_names[cond1_name][0]}_{stim_names[cond2_name][0]}"
 
+    if what == "twosided_vs_emotions":
+        if cond1.shape[2]==cond2.shape[2]:
+            if colname in res.columns:
+                res = res.drop(columns=colname)
+            print("not an interesting contrast")
+            continue
+        else:
+            if cond1.shape[2] > cond2.shape[2]:
+                cond1 = twosided_to_onesided_bodymap(cond1)
+            else:
+                cond2 = twosided_to_onesided_bodymap(cond2)
+    
     cond1 = binarize(cond1, threshold=threshold)
     cond2 = binarize(cond2, threshold=threshold)
 
@@ -84,6 +109,6 @@ for cond1_name, cond2_name in combinations(stimuli, 2):
             curr_subject_res = hamming(curr_subject_cond_1, curr_subject_cond_2)
         elif distance_metric == 'spearman':
             curr_subject_res, curr_subject_p = spearmanr(curr_subject_cond_1, curr_subject_cond_2)
-        res.loc[sub, f"{distance_metric}_{stim_names[cond1_name][0]}_{stim_names[cond2_name][0]}"] = curr_subject_res
+        res.loc[sub, colname] = curr_subject_res
 
 res.reset_index().rename(columns={"index":"subid"}).to_csv(outfilename, index = False)

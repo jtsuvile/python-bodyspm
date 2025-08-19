@@ -160,9 +160,9 @@ cbar2_ax = fig.add_axes([x02+pad, y20+pad, width, y02-y20-2*pad])
 ax2cb = fig.colorbar(img6, cax=cbar2_ax)
 ax2cb.set_label(label='Difference', fontsize=20)
 ax2cb.ax.set_title('pain >\ncontrols', fontsize=20)
-ax2cb.ax.set_xlabel('lbp >\nfibro', fontsize=20)
+#ax2cb.ax.set_xlabel('lbp >\nfibro', fontsize=20)
 
-plt.gcf().text(0.03, 0.76, "CLBP patients", fontsize=24, rotation=90)
+plt.gcf().text(0.03, 0.76, "Chronic pain patients", fontsize=24, rotation=90)
 plt.gcf().text(0.03, 0.47, "Controls", fontsize=24, rotation=90)
 plt.gcf().text(0.03, 0.18, "Difference", fontsize=24, rotation=90)
 

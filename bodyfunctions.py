@@ -703,3 +703,26 @@ def extract_masked_vector(array, mask):
     """
     res_vector = np.ma.concatenate(np.ma.masked_where(mask != 1, array)).compressed()
     return res_vector
+
+
+def split_bodymap_in_half(array, axis=2):
+    halfway = int(array.shape[axis]/2)
+    array_left = array[:,:,:halfway]
+    array_right = array[:,:,halfway:]
+    return array_left, array_right
+
+
+def flip_map_along_axis(array, axis=2):
+    array_out = np.flip(array, axis=axis)
+    return array_out
+
+
+def twosided_to_onesided_bodymap(array):
+    array_left, array_right = split_bodymap_in_half(array, axis=2)
+    if array_left.shape == array_right.shape:
+        array_right_flipped = flip_map_along_axis(array_right, axis=2)
+        array_out = array_left + array_right_flipped
+        return array_out    
+    else:
+        raise Exception('not able to split maps in the middle')
+

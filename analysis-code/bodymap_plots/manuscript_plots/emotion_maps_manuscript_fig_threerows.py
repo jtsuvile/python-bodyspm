@@ -18,7 +18,7 @@ from matplotlib.colors import ListedColormap, LinearSegmentedColormap
 #
 dataloc = '/Volumes/Shield1/kipupotilaat/data/stockholm/processed/clbp/'
 dataloc1 = '/Volumes/Shield1/kipupotilaat/data/stockholm/processed/fibro/'
-outfilename = '/Users/juusu53/Documents/projects/kipupotilaat/stockholm/r_code/figures/emotions_clbp_fibro.png'
+outfilename = '/Users/juusu53/Documents/projects/kipupotilaat/stockholm/r_code/figures/flipped_pain_clbp_fibro.png'
 suptitle = 'Average emotions'
 
 
