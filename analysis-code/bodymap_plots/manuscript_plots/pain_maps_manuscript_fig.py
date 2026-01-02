@@ -14,13 +14,19 @@ from matplotlib import cm
 from matplotlib.colors import ListedColormap, LinearSegmentedColormap
 
 figloc = '/Users/juusu53/Documents/projects/kipupotilaat/stockholm/r_code/figures/'
-figfilename = figloc+'pain_location_all-pain_all-controls.png'
+figfilename = figloc+'pain_location_CLBP-fibro.png'
 maskloc = '/Users/juusu53/Documents/projects/kipupotilaat/python_code/sample_data/'
-dataloc = '/Volumes/Shield1/kipupotilaat/data/stockholm/processed/all/'
+dataloc = '/Volumes/Shield1/kipupotilaat/data/stockholm/processed/fibro/'
 datafile = get_latest_datafile(dataloc)
+threshold = 0.001
 
-dataloc_controls = '/Volumes/Shield1/kipupotilaat/data/stockholm/controls/all/'
+dataloc_controls = '/Volumes/Shield1/kipupotilaat/data/stockholm/processed/clbp/'
 datafile_controls = get_latest_datafile(dataloc_controls)
+threshold_controls =0.007
+
+# NB: Coloring threshold for pain patients 0.001, 
+# Threshold for controls 0.007 
+# (based on tests with data collection systems)
 
 mask_fb = read_in_mask(maskloc + 'mask_front_new.png', maskloc + 'mask_back_new.png')
 
@@ -61,11 +67,12 @@ for i, cond in enumerate(stim_names.keys()):
     with h5py.File(datafile_controls, 'r') as c:
         control = c[cond][()]
 
-    prop_control = np.nanmean(binarize(control.copy()), axis=0)
+
+    prop_control = np.nanmean(binarize(control.copy(), threshold = threshold_controls), axis=0)
     prop_control = prop_control + mask_array
     masked_control= np.ma.masked_where(mask != 1,prop_control)
 
-    prop_kipu = np.nanmean(binarize(kipu.copy(), threshold = 0.001), axis=0)
+    prop_kipu = np.nanmean(binarize(kipu.copy(), threshold = threshold), axis=0)
     prop_kipu = prop_kipu + mask_array
     masked_kipu = np.ma.masked_where(mask != 1, prop_kipu)
 
@@ -93,7 +100,9 @@ for i, cond in enumerate(stim_names.keys()):
         ax3.set_axis_off()
 
         ax5 = plt.subplot(325)
-        img5 = plt.imshow(masked_twosamp, cmap=newcmp, vmin=-8, vmax=8)
+        img5 = plt.imshow(masked_twosamp, cmap=newcmp, 
+                          vmin=-12, vmax=12,
+                          interpolation="nearest")
         ax5.set_xticklabels([])
         ax5.set_yticklabels([])
         ax5.set_axis_off()
@@ -113,7 +122,9 @@ for i, cond in enumerate(stim_names.keys()):
         ax4.set_axis_off()
 
         ax6 = plt.subplot(326)
-        img6 = plt.imshow(masked_twosamp, cmap=newcmp, vmin=-8, vmax=8)
+        img6 = plt.imshow(masked_twosamp, cmap=newcmp, 
+                          vmin=-12, vmax=12,
+                          interpolation="nearest")
         ax6.set_xticklabels([])
         ax6.set_yticklabels([])
         ax6.set_axis_off()
@@ -134,12 +145,12 @@ cbar2_ax = fig.add_axes([x02+pad, y20+pad, width, y02-y20-2*pad])
 ax2cb = fig.colorbar(img6, cax=cbar2_ax)
 ax2cb.set_label(label='Difference', fontsize=20)
 ax2cb.ax.tick_params(labelsize=20)
-ax2cb.ax.set_title('pain >\ncontrol', fontsize=20)
-ax2cb.ax.set_xlabel('lbp >\nfibro', fontsize=20)
+#ax2cb.ax.set_title('pain >\ncontrol', fontsize=20)
+ax2cb.ax.set_title('Fibromyalgia\n > CLBP', fontsize=20)
 
-plt.gcf().text(0.03, 0.76, "Chronic pain patients", fontsize=24, rotation=90)
-plt.gcf().text(0.03, 0.47, "Pain-free controls", fontsize=24, rotation=90)
-plt.gcf().text(0.03, 0.18, "Difference", fontsize=24, rotation=90)
+plt.gcf().text(0.03, 0.73, "Fibromyalgia patients", fontsize=24, rotation=90)
+plt.gcf().text(0.03, 0.47, "CLBP patients", fontsize=24, rotation=90)
+plt.gcf().text(0.03, 0.15, "Difference", fontsize=24, rotation=90)
 
 plt.savefig(figfilename)
 plt.close()

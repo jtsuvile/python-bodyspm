@@ -1,5 +1,6 @@
 import sys
 import os
+from skimage import io
 
 root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..'))
 sys.path.append(root_dir)
@@ -11,19 +12,17 @@ from bodyfunctions import get_latest_datafile, read_in_mask, align_data
 import h5py
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
+from matplotlib.colors import ListedColormap
+
 
 dataloc = '/Volumes/Shield1/kipupotilaat/data/stockholm/processed/all'
 tableloc = '/Volumes/Shield1/kipupotilaat/data/stockholm/intermediate/' +\
-    'stockholm_questionnaires_scored.csv'
+    'combined_data_patients.csv'
 outdataloc = '/Users/juusu53/Documents/projects/kipupotilaat/stockholm/r_code/figures/'
-map_family = 'sensitivity'
+map_family = 'emotions'
 
 interesting_variables = ["pain_duration", "score_bdi", "score_stai_state", "score_stai_trait", 
-                         "styrka_nu", "styrka_genomsnitt", "intensity_range",
-                         "lidande_nu", "lidande_genomsnitt", "suffering_range",
-                         "obehag_nu", "obehag_genomsnitt", "discomfort_range",
-                         "score_pain_intensity", "score_bpi_interference"]
-#interesting_variables = ["score_bdi", "score_stai_state", "score_stai_trait"]
+                         "styrka_nu", "intensity_range", "Chronic pain_total_color"]
 
 threshold = 0.001  # 0.001 for patients, 0.007 for controls
 
@@ -81,19 +80,36 @@ elif map_family == 'pain':
 else:
     sys.exit(f"map family {map_family} not recognized")
 
-
-
+# read in outline
+if mask.shape == mask_fb.shape:
+    mask_array = io.imread(maskloc + 'kipu_traced_outline_front.png', as_gray=True)
+    mask_array[mask_array < 1] = 0
+    dims = mask_array.shape
+    if len(dims) == 3:
+        mask_array = mask_array[:, :, 0]
+    mask_other_side = io.imread(maskloc + 'kipu_traced_outline_back.png', as_gray=True)
+    mask_other_side[mask_other_side < 1] = 0
+    dims = mask_other_side.shape
+    if len(dims) == 3:
+        mask_other_side = mask_other_side[:, :, 0]
+    mask_array = np.concatenate((mask_array, mask_other_side), axis=1)
+else:
+    mask_array = io.imread(maskloc + 'kipu_traced_outline.png', as_gray=True)
+    mask_array[mask_array < 1] = 0
+    dims = mask_array.shape
+    if len(dims) == 3:
+        mask_array = mask_array[:, :, 0]
 
 
 # define colormap
-hot = plt.cm.get_cmap('hot', 256)
-new_cols = hot(np.linspace(0, 1, 256))
+coolwarm = plt.cm.get_cmap('coolwarm', 256)
+newcolors = coolwarm(np.linspace(0, 1, 256))
+outlinecolor = np.array([100/256, 100/256, 100/256, 1])
+newcolors = np.vstack((outlinecolor, newcolors))
+cmap = ListedColormap(newcolors)
 
-cold = np.hstack((np.fliplr(new_cols[:, 0:3]), new_cols[:, 3][:, None]))
-newcolors = np.vstack((np.flipud(cold), new_cols))
-newcolors = np.delete(newcolors, np.arange(200, 312, 2), 0)
+#cmap = 'coolwarm'
 
-cmap = 'coolwarm'
 vmin = -1
 vmax = 1
 
@@ -129,9 +145,12 @@ for variablename in interesting_variables:
 
         masked_result_map_with_fdr = \
             np.ma.masked_where(mask != 1, result_map_r_with_fdr)
+        masked_result_map_with_fdr_and_outline = masked_result_map_with_fdr - mask_array*30
 
         ax1 = plt.subplot(gs[m])
-        img1 = plt.imshow(masked_result_map_with_fdr, cmap=cmap, vmin=-1, vmax=1)
+        img1 = plt.imshow(masked_result_map_with_fdr_and_outline, cmap=cmap, 
+                          vmin=-1, vmax=1,
+                          interpolation="nearest")
         ax1.set_title(f'{stim_names[which_map][0]}', fontsize=title_font_size)
         ax1.axis('off')
 
